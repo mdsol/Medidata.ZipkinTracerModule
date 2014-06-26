@@ -7,7 +7,7 @@
     <authors>$author$</authors>
     <owners>$author$</owners>
     <projectUrl>https://github.com/mdsol/Medidata.ZipkinTracerModule</projectUrl>
-    <description>$description$</description>
+    <description>Medidata Zipkin Tracer Module</description>
     <releaseNotes>Initial Beta Release of the ZipkinTracer HttpModule for .Net Projects</releaseNotes>
     <copyright>Copyright 2014</copyright>
     <tags>ZipkinTracer HttpModule</tags>
