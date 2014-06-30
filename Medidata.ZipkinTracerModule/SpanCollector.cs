@@ -10,7 +10,7 @@ namespace Medidata.ZipkinTracerModule
 {
     public class SpanCollector
     {
-        private BlockingCollection<Span> spanQueue;
+        internal BlockingCollection<Span> spanQueue;
 
         private const int MAX_QUEUE_SIZE = 100;
 
@@ -29,6 +29,11 @@ namespace Medidata.ZipkinTracerModule
             }
             
             spanQueue = new BlockingCollection<Span>(MAX_QUEUE_SIZE);
+        }
+
+        public void Collect(Span span)
+        {
+            spanQueue.Add(span);
         }
     }
 }
