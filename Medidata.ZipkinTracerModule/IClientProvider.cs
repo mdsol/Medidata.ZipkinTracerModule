@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Medidata.ZipkinTracerModule
 {
-    public class Class1
+    public interface IClientProvider
     {
+        void Setup();
+        void Close();
     }
 }
