@@ -9,24 +9,25 @@ namespace Medidata.ZipkinTracerModule.Test
     public class SpanCollectorTests
     {
         IFixture fixture;
+        private IClientProvider clientProvider;
+        private SpanCollector spanCollector;
 
         [TestInitialize]
         public void Init()
         {
             fixture = new Fixture();
+
+            clientProvider = MockRepository.GenerateStub<IClientProvider>();
+            spanCollector = new SpanCollector(clientProvider);
         }
 
         [TestMethod]
         public void CollectSpans()
         {
-            var clientProvider = MockRepository.GenerateStub<IClientProvider>();
-
             var testSpanId = fixture.Create<long>(); 
             var testTraceId = fixture.Create<long>(); 
             var testParentSpanId = fixture.Create<long>(); 
             var testName = fixture.Create<string>(); 
-
-            var spanCollector = new SpanCollector(clientProvider);
             
             Span span = new Span();
             span.Id = testSpanId;
@@ -42,6 +43,12 @@ namespace Medidata.ZipkinTracerModule.Test
             var spanInQueue = spanCollector.spanQueue.TryTake(out queuedSpan);
 
             Assert.AreEqual(span, queuedSpan);
+        }
+
+        [TestMethod]
+        public void StartProcessingSpans()
+        { 
+
         }
     }
 }

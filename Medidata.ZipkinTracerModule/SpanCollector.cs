@@ -13,9 +13,13 @@ namespace Medidata.ZipkinTracerModule
         internal BlockingCollection<Span> spanQueue;
 
         private const int MAX_QUEUE_SIZE = 100;
+        private SpanProcessor spanProcessor;
+        private IClientProvider clientProvider;
 
         public SpanCollector(IClientProvider clientProvider)
         {
+            this.clientProvider = clientProvider;
+
             try
             {
                 clientProvider.Setup();
@@ -29,11 +33,23 @@ namespace Medidata.ZipkinTracerModule
             }
             
             spanQueue = new BlockingCollection<Span>(MAX_QUEUE_SIZE);
+            spanProcessor = new SpanProcessor(spanQueue, clientProvider);
         }
 
         public void Collect(Span span)
         {
             spanQueue.Add(span);
+        }
+
+        public void Start()
+        {
+            spanProcessor.Start();
+        }
+
+        public void Stop()
+        {
+            spanProcessor.Stop();
+            clientProvider.Close();
         }
     }
 }
