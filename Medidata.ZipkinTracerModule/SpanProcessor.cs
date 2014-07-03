@@ -7,7 +7,7 @@ using Thrift.Protocol;
 
 namespace Medidata.ZipkinTracerModule
 {
-    public class SpanProcessor
+    public class SpanProcessor : ISpanProcessor
     {
         private List<LogEntry> logEntries;
         private TBinaryProtocol.Factory protocolFactory;
@@ -24,12 +24,11 @@ namespace Medidata.ZipkinTracerModule
             protocolFactory = new TBinaryProtocol.Factory();
         }
 
-        internal void Start()
+        public void Start()
         {
-            throw new NotImplementedException();
         }
 
-        internal void Stop()
+        public void Stop()
         {
             throw new NotImplementedException();
         }
