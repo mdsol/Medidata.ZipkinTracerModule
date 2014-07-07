@@ -8,7 +8,7 @@ using Thrift;
 
 namespace Medidata.ZipkinTracerModule
 {
-    public class SpanCollector
+    public class SpanCollector : ISpanCollector
     {
         internal BlockingCollection<Span> spanQueue;
 
@@ -23,7 +23,6 @@ namespace Medidata.ZipkinTracerModule
             try
             {
                 clientProvider.Setup();
-
             }
             catch (TException tEx)
             {
