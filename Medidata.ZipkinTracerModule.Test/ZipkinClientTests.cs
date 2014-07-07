@@ -31,7 +31,7 @@ namespace Medidata.ZipkinTracerModule.Test
         public void CTOR_WithNullZipkinPort()
         {
             var zipkinConfigStub = MockRepository.GenerateStub<IZipkinConfig>();
-            zipkinConfigStub.Expect(x => x.ZipkinServerName()).Return("hi");
+            zipkinConfigStub.Expect(x => x.ZipkinServerName()).Return(fixture.Create<string>());
             zipkinConfigStub.Expect(x => x.ZipkinServerPort()).Return(null);
 
             var zipkinClient = new ZipkinClient(zipkinConfigStub);
@@ -42,8 +42,8 @@ namespace Medidata.ZipkinTracerModule.Test
         public void CTOR_WithNonIntegerZipkinPort()
         {
             var zipkinConfigStub = MockRepository.GenerateStub<IZipkinConfig>();
-            zipkinConfigStub.Expect(x => x.ZipkinServerName()).Return("hi");
-            zipkinConfigStub.Expect(x => x.ZipkinServerPort()).Return("abc");
+            zipkinConfigStub.Expect(x => x.ZipkinServerName()).Return(fixture.Create<string>());
+            zipkinConfigStub.Expect(x => x.ZipkinServerPort()).Return(fixture.Create<string>());
 
             var zipkinClient = new ZipkinClient(zipkinConfigStub);
         }
