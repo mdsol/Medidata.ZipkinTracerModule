@@ -46,7 +46,6 @@
   <ItemGroup>
     <Compile Include="ClientProvider.cs" />
     <Compile Include="IClientProvider.cs" />
-    <Compile Include="ISpanCollector.cs" />
     <Compile Include="ISpanProcessor.cs" />
     <Compile Include="IZipkinConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

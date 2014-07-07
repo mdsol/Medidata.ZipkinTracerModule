@@ -8,8 +8,8 @@ namespace Medidata.ZipkinTracerModule
 {
     public interface IZipkinConfig
     {
-        string ZipkinServerName();
-        string ZipkinServerPort();
-        string ServiceName();
+        string ZipkinServerName { get; }
+        string ZipkinServerPort { get; }
+        string ServiceName { get; }
     }
 }

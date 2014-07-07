@@ -8,7 +8,7 @@ using Thrift;
 
 namespace Medidata.ZipkinTracerModule
 {
-    public class SpanCollector : ISpanCollector
+    public class SpanCollector
     {
         internal BlockingCollection<Span> spanQueue;
 
