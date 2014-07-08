@@ -23,7 +23,6 @@ namespace Medidata.ZipkinTracerModule
             try
             {
                 clientProvider.Setup();
-
             }
             catch (TException tEx)
             {
