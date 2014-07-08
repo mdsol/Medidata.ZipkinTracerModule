@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Ploeh.AutoFixture.AutoRhinoMock</name>
+    </assembly>
+    <members>
+        <member name="T:Ploeh.AutoFixture.AutoRhinoMock.AutoRhinoMockCustomization">
+            <summary>
+            Enables IFixture auto-mocking of abstract classes and interfaces using RhinoMocks.
+            </summary>
+        </member>
+        <member name="M:Ploeh.AutoFixture.AutoRhinoMock.AutoRhinoMockCustomization.Customize(Ploeh.AutoFixture.IFixture)">
+            <summary>
+            Customizes an <see cref="T:Ploeh.AutoFixture.IFixture"/> to enable auto-mocking with Rhino Mocks.
+            </summary>
+            <param name="fixture">The fixture upon which to enable auto-mocking.</param>
+        </member>
+        <member name="T:Ploeh.AutoFixture.AutoRhinoMock.RhinoMockConstructorMethod">
+            <summary>
+            Encapsulates how to create a mock instance with Rhino Mocks, using a constructor with
+            appropriate parameters.
+            </summary>
+            <remarks>
+            <para>
+            The main purpose of RhinoMockConstructorMethod is to support creation of mock instances of
+            abstract classes with non-default constructors. In this case Rhino Mocks must be supplied
+            with the appropriate parameter values to be able to properly initialize the mock instance,
+            since it needs to pass those parameters to the base class.
+            </para>
+            </remarks>
+        </member>
+        <member name="M:Ploeh.AutoFixture.AutoRhinoMock.RhinoMockConstructorMethod.#ctor(System.Type,System.Reflection.ParameterInfo[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:Ploeh.AutoFixture.AutoRhinoMock.RhinoMockConstructorMethod"/> class.
+            </summary>
+            <param name="mockTargetType">
+            The type of which a mock instance should be created.
+            </param>
+            <param name="parameterInfos">
+            The parameter information which can be used to identify the signature of the
+            constructor.
+            </param>
+        </member>
+        <member name="M:Ploeh.AutoFixture.AutoRhinoMock.RhinoMockConstructorMethod.Invoke(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Creates a mock instance using Rhino Mocks.
+            </summary>
+            <param name="parameters">
+            The parameters which will be supplied to the base constructor.
+            </param>
+            <returns>A mock instance created with Rhino Mocks.</returns>
+        </member>
+        <member name="P:Ploeh.AutoFixture.AutoRhinoMock.RhinoMockConstructorMethod.MockTargetType">
+            <summary>
+            Gets the type of which a mock instance should be created.
+            </summary>
+            <seealso cref="M:Ploeh.AutoFixture.AutoRhinoMock.RhinoMockConstructorMethod.#ctor(System.Type,System.Reflection.ParameterInfo[])"/>
+        </member>
+        <member name="P:Ploeh.AutoFixture.AutoRhinoMock.RhinoMockConstructorMethod.Parameters">
+            <summary>
+            Gets information about the parameters of the method.
+            </summary>
+        </member>
+        <member name="T:Ploeh.AutoFixture.AutoRhinoMock.RhinoMockConstructorQuery">
+            <summary>
+            Selects appropriate constructors to create mock instances with Rhino Mocks.
+            </summary>
+        </member>
+        <member name="M:Ploeh.AutoFixture.AutoRhinoMock.RhinoMockConstructorQuery.SelectMethods(System.Type)">
+            <summary>
+            Selects the constructors for the supplied type.
+            </summary>
+            <param name="type">The type.</param>
+            <returns>
+            Constructors for <paramref name="type"/>.
+            </returns>
+            <remarks>
+            <para>
+            This method returns a sequence of <see cref="T:Ploeh.AutoFixture.AutoRhinoMock.RhinoMockConstructorMethod"/> according to
+            the public and protected constructors available on <paramref name="type"/>.
+            </para>
+            </remarks>
+        </member>
+        <member name="T:Ploeh.AutoFixture.AutoRhinoMock.RhinoMockAroundAdvice">
+            <summary>
+            Provides pre- and post-condition checks for requests for mock instances.
+            </summary>
+            <seealso cref="M:Ploeh.AutoFixture.AutoRhinoMock.RhinoMockAroundAdvice.Create(System.Object,Ploeh.AutoFixture.Kernel.ISpecimenContext)"/>
+        </member>
+        <member name="M:Ploeh.AutoFixture.AutoRhinoMock.RhinoMockAroundAdvice.#ctor(Ploeh.AutoFixture.Kernel.ISpecimenBuilder)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Ploeh.AutoFixture.AutoRhinoMock.RhinoMockAroundAdvice"/> class with an
+            <see cref="T:Ploeh.AutoFixture.Kernel.ISpecimenBuilder"/> to decorate.
+            </summary>
+            <param name="builder">The builder which must build mock instances.</param>
+            <remarks>
+            <para>
+            <paramref name="builder"/> is subsequently available through the <see cref="P:Ploeh.AutoFixture.AutoRhinoMock.RhinoMockAroundAdvice.Builder"/>
+            property.
+            </para>
+            </remarks>
+            <seealso cref="P:Ploeh.AutoFixture.AutoRhinoMock.RhinoMockAroundAdvice.Builder"/>
+        </member>
+        <member name="M:Ploeh.AutoFixture.AutoRhinoMock.RhinoMockAroundAdvice.Create(System.Object,Ploeh.AutoFixture.Kernel.ISpecimenContext)">
+            <summary>
+            Creates a new specimen based on a request.
+            </summary>
+            <param name="request">The request that describes what to create.</param>
+            <param name="context">A context that can be used to create other specimens.</param>
+            <returns>
+            A mock instance created by Rhino Mocks if appropriate; otherwise a
+            <see cref="T:Ploeh.AutoFixture.Kernel.NoSpecimen"/> instance.
+            </returns>
+            <remarks>
+            <para>
+            The Create method checks whether a request is for an interface or abstract class. If so
+            it delegates the call to the decorated <see cref="P:Ploeh.AutoFixture.AutoRhinoMock.RhinoMockAroundAdvice.Builder"/>. When the specimen is
+            returned from the decorated <see cref="T:Ploeh.AutoFixture.Kernel.ISpecimenBuilder"/> the method checks whether
+            the returned instance is, indeed, a Rhino Mocks instance.
+            </para>
+            <para>
+            If all pre- and post-conditions are satisfied, the mock instance is returned; otherwise
+            a <see cref="T:Ploeh.AutoFixture.Kernel.NoSpecimen"/> instance.
+            </para>
+            </remarks>
+        </member>
+        <member name="P:Ploeh.AutoFixture.AutoRhinoMock.RhinoMockAroundAdvice.Builder">
+            <summary>
+            Gets the decorated builder supplied through the constructor.
+            </summary>
+            <seealso cref="M:Ploeh.AutoFixture.AutoRhinoMock.RhinoMockAroundAdvice.#ctor(Ploeh.AutoFixture.Kernel.ISpecimenBuilder)"/>
+        </member>
+    </members>
+</doc>

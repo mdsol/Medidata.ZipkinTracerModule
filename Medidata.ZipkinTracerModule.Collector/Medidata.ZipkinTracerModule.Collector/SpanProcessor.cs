@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using Thrift.Protocol;
 
-namespace Medidata.ZipkinTracerModule
+namespace Medidata.ZipkinTracerModule.Collector
 {
     public class SpanProcessor
     {

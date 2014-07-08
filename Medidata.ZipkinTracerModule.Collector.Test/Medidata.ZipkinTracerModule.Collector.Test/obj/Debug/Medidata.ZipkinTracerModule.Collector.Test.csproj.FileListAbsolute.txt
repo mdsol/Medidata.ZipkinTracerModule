@@ -1,0 +1,14 @@
+C:\Users\tkwan\git\Medidata.ZipkinTracerModule\Medidata.ZipkinTracerModule.Collector.Test\Medidata.ZipkinTracerModule.Collector.Test\bin\Debug\Medidata.ZipkinTracerModule.Collector.Test.dll
+C:\Users\tkwan\git\Medidata.ZipkinTracerModule\Medidata.ZipkinTracerModule.Collector.Test\Medidata.ZipkinTracerModule.Collector.Test\bin\Debug\Medidata.ZipkinTracerModule.Collector.Test.pdb
+C:\Users\tkwan\git\Medidata.ZipkinTracerModule\Medidata.ZipkinTracerModule.Collector.Test\Medidata.ZipkinTracerModule.Collector.Test\bin\Debug\Medidata.ZipkinTracerModule.Collector.dll
+C:\Users\tkwan\git\Medidata.ZipkinTracerModule\Medidata.ZipkinTracerModule.Collector.Test\Medidata.ZipkinTracerModule.Collector.Test\bin\Debug\Ploeh.AutoFixture.AutoRhinoMock.dll
+C:\Users\tkwan\git\Medidata.ZipkinTracerModule\Medidata.ZipkinTracerModule.Collector.Test\Medidata.ZipkinTracerModule.Collector.Test\bin\Debug\Ploeh.AutoFixture.dll
+C:\Users\tkwan\git\Medidata.ZipkinTracerModule\Medidata.ZipkinTracerModule.Collector.Test\Medidata.ZipkinTracerModule.Collector.Test\bin\Debug\Rhino.Mocks.dll
+C:\Users\tkwan\git\Medidata.ZipkinTracerModule\Medidata.ZipkinTracerModule.Collector.Test\Medidata.ZipkinTracerModule.Collector.Test\bin\Debug\Thrift.dll
+C:\Users\tkwan\git\Medidata.ZipkinTracerModule\Medidata.ZipkinTracerModule.Collector.Test\Medidata.ZipkinTracerModule.Collector.Test\bin\Debug\Medidata.ZipkinTracerModule.Collector.pdb
+C:\Users\tkwan\git\Medidata.ZipkinTracerModule\Medidata.ZipkinTracerModule.Collector.Test\Medidata.ZipkinTracerModule.Collector.Test\bin\Debug\Ploeh.AutoFixture.xml
+C:\Users\tkwan\git\Medidata.ZipkinTracerModule\Medidata.ZipkinTracerModule.Collector.Test\Medidata.ZipkinTracerModule.Collector.Test\bin\Debug\Ploeh.AutoFixture.AutoRhinoMock.xml
+C:\Users\tkwan\git\Medidata.ZipkinTracerModule\Medidata.ZipkinTracerModule.Collector.Test\Medidata.ZipkinTracerModule.Collector.Test\bin\Debug\Thrift.pdb
+C:\Users\tkwan\git\Medidata.ZipkinTracerModule\Medidata.ZipkinTracerModule.Collector.Test\Medidata.ZipkinTracerModule.Collector.Test\obj\Debug\Medidata.ZipkinTracerModule.Collector.Test.csprojResolveAssemblyReference.cache
+C:\Users\tkwan\git\Medidata.ZipkinTracerModule\Medidata.ZipkinTracerModule.Collector.Test\Medidata.ZipkinTracerModule.Collector.Test\obj\Debug\Medidata.ZipkinTracerModule.Collector.Test.dll
+C:\Users\tkwan\git\Medidata.ZipkinTracerModule\Medidata.ZipkinTracerModule.Collector.Test\Medidata.ZipkinTracerModule.Collector.Test\obj\Debug\Medidata.ZipkinTracerModule.Collector.Test.pdb

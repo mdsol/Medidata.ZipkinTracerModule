@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
-namespace Medidata.ZipkinTracerModule.Test
+namespace Medidata.ZipkinTracerModule.Collector.Test
 {
     [TestClass]
     public class SpanCollectorTests
