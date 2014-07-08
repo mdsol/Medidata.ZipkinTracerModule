@@ -27,8 +27,7 @@ namespace Medidata.ZipkinTracerModule.Collector
             catch (TException tEx)
             {
                 clientProvider.Close();
-
-                throw new Exception("Error setting up connection to scribe", tEx);
+                throw tEx;
             }
             
             spanQueue = new BlockingCollection<Span>(MAX_QUEUE_SIZE);

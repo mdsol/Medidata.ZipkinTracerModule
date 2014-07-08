@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
+using Medidata.ZipkinTracerModule.Collector;
 
 namespace Medidata.ZipkinTracerModule.Test
 {
@@ -23,7 +24,7 @@ namespace Medidata.ZipkinTracerModule.Test
             var zipkinConfigStub = MockRepository.GenerateStub<IZipkinConfig>();
             zipkinConfigStub.Expect(x => x.ZipkinServerName).Return(null);
 
-            var zipkinClient = new ZipkinClient(zipkinConfigStub);
+            var zipkinClient = new ZipkinClient(zipkinConfigStub, MockRepository.GenerateStub<ISpanCollectorBuilder>());
         }
 
         [TestMethod]
@@ -34,7 +35,7 @@ namespace Medidata.ZipkinTracerModule.Test
             zipkinConfigStub.Expect(x => x.ZipkinServerName).Return(fixture.Create<string>());
             zipkinConfigStub.Expect(x => x.ZipkinServerPort).Return(null);
 
-            var zipkinClient = new ZipkinClient(zipkinConfigStub);
+            var zipkinClient = new ZipkinClient(zipkinConfigStub, MockRepository.GenerateStub<ISpanCollectorBuilder>());
         }
 
         [TestMethod]
@@ -45,7 +46,7 @@ namespace Medidata.ZipkinTracerModule.Test
             zipkinConfigStub.Expect(x => x.ZipkinServerName).Return(fixture.Create<string>());
             zipkinConfigStub.Expect(x => x.ZipkinServerPort).Return(fixture.Create<string>());
 
-            var zipkinClient = new ZipkinClient(zipkinConfigStub);
+            var zipkinClient = new ZipkinClient(zipkinConfigStub, MockRepository.GenerateStub<ISpanCollectorBuilder>());
         }
     }
 }

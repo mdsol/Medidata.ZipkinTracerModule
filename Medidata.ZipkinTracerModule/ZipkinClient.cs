@@ -11,7 +11,7 @@ namespace Medidata.ZipkinTracerModule
     {
         internal SpanCollector spanCollector;
 
-        public ZipkinClient(IZipkinConfig zipkinConfig)
+        public ZipkinClient(IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder)
         {
             if ( String.IsNullOrEmpty(zipkinConfig.ZipkinServerName)
                 || String.IsNullOrEmpty(zipkinConfig.ZipkinServerPort) )
@@ -25,7 +25,7 @@ namespace Medidata.ZipkinTracerModule
                 throw new ArgumentException("zipkinConfig port is not an int");
             }
 
-            spanCollector = new SpanCollector(new ClientProvider(zipkinConfig.ZipkinServerName, port));
+            spanCollector = spanCollectorBuilder.Build(zipkinConfig.ZipkinServerName, port);
         }
     }
 }
