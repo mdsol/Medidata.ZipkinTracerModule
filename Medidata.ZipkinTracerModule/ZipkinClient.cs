@@ -27,5 +27,15 @@ namespace Medidata.ZipkinTracerModule
 
             spanCollector = spanCollectorBuilder.Build(zipkinConfig.ZipkinServerName, port);
         }
+
+        public void Init()
+        {
+            spanCollector.Start();
+        }
+
+        public void ShutDown()
+        {
+            spanCollector.Stop();
+        }
     }
 }

@@ -44,7 +44,7 @@ namespace Medidata.ZipkinTracerModule.Collector
             spanProcessor.Start();
         }
 
-        public void Stop()
+        public virtual void Stop()
         {
             spanProcessor.Stop();
             clientProvider.Close();
