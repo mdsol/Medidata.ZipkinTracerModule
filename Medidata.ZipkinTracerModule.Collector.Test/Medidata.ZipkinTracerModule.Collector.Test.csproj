@@ -38,17 +38,17 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Ploeh.AutoFixture">
-      <HintPath>..\..\packages\AutoFixture.3.19.1\lib\net40\Ploeh.AutoFixture.dll</HintPath>
+      <HintPath>..\packages\AutoFixture.3.19.1\lib\net40\Ploeh.AutoFixture.dll</HintPath>
     </Reference>
     <Reference Include="Ploeh.AutoFixture.AutoRhinoMock">
-      <HintPath>..\..\packages\AutoFixture.AutoRhinoMocks.3.19.1\lib\net40\Ploeh.AutoFixture.AutoRhinoMock.dll</HintPath>
+      <HintPath>..\packages\AutoFixture.AutoRhinoMocks.3.19.1\lib\net40\Ploeh.AutoFixture.AutoRhinoMock.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.Mocks">
-      <HintPath>..\..\packages\RhinoMocks.3.6\lib\Rhino.Mocks.dll</HintPath>
+      <HintPath>..\packages\RhinoMocks.3.6\lib\Rhino.Mocks.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="Thrift">
-      <HintPath>..\..\packages\Thrift.0.9.1.3\lib\net35\Thrift.dll</HintPath>
+      <HintPath>..\packages\Thrift.0.9.1.3\lib\net35\Thrift.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Choose>
@@ -68,7 +68,7 @@
     <Compile Include="SpanCollectorTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Medidata.ZipkinTracerModule.Collector\Medidata.ZipkinTracerModule.Collector\Medidata.ZipkinTracerModule.Collector.csproj">
+    <ProjectReference Include="..\Medidata.ZipkinTracerModule.Collector\Medidata.ZipkinTracerModule.Collector.csproj">
       <Project>{12e57184-b43e-43c5-ac19-06ad1dc25e96}</Project>
       <Name>Medidata.ZipkinTracerModule.Collector</Name>
     </ProjectReference>

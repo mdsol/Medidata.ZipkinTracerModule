@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracerModule
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracerModule.Collector", "Medidata.ZipkinTracerModule.Collector\Medidata.ZipkinTracerModule.Collector.csproj", "{12E57184-B43E-43C5-AC19-06AD1DC25E96}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracerModule.Collector.Test", "Medidata.ZipkinTracerModule.Collector.Test\Medidata.ZipkinTracerModule.Collector.Test\Medidata.ZipkinTracerModule.Collector.Test.csproj", "{A6AFE0F7-F1DE-4E0B-B6F6-CFDC293CAE2D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracerModule.Collector.Test", "Medidata.ZipkinTracerModule.Collector.Test\Medidata.ZipkinTracerModule.Collector.Test.csproj", "{A6AFE0F7-F1DE-4E0B-B6F6-CFDC293CAE2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
