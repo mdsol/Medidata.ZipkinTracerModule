@@ -26,7 +26,7 @@ namespace Medidata.ZipkinTracerModule.Collector.Test
             clientProviderStub = MockRepository.GenerateStub<IClientProvider>();
             spanCollector.clientProvider = clientProviderStub; 
 
-            spanProcessorStub = MockRepository.GenerateStub<SpanProcessor>();
+            spanProcessorStub = MockRepository.GenerateStub<SpanProcessor>(spanCollector.spanQueue, clientProviderStub);
             spanCollector.spanProcessor = spanProcessorStub;
         }
 

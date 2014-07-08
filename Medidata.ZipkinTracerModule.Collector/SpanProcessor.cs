@@ -16,8 +16,6 @@ namespace Medidata.ZipkinTracerModule.Collector
         private BlockingCollection<Span> spanQueue;
         private IClientProvider cliendProvider;
 
-        public SpanProcessor() { }
-
         public SpanProcessor(BlockingCollection<Span> spanQueue, IClientProvider cliendProvider)
         {
             this.spanQueue = spanQueue;
