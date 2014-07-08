@@ -11,7 +11,7 @@ namespace Medidata.ZipkinTracerModule.Test
         IFixture fixture;
         private IClientProvider clientProviderStub;
         private SpanCollector spanCollector;
-        private ISpanProcessor spanProcessorStub;
+        private SpanProcessor spanProcessorStub;
 
         [TestInitialize]
         public void Init()
@@ -21,7 +21,7 @@ namespace Medidata.ZipkinTracerModule.Test
             clientProviderStub = MockRepository.GenerateStub<IClientProvider>();
             spanCollector = new SpanCollector(clientProviderStub);
 
-            spanProcessorStub = MockRepository.GenerateStub<ISpanProcessor>();
+            spanProcessorStub = MockRepository.GenerateStub<SpanProcessor>();
             spanCollector.spanProcessor = spanProcessorStub;
         }
 

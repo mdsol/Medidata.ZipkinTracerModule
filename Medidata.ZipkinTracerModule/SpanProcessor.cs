@@ -7,7 +7,7 @@ using Thrift.Protocol;
 
 namespace Medidata.ZipkinTracerModule
 {
-    public class SpanProcessor : ISpanProcessor
+    public class SpanProcessor
     {
         private List<LogEntry> logEntries;
         private TBinaryProtocol.Factory protocolFactory;
@@ -15,6 +15,8 @@ namespace Medidata.ZipkinTracerModule
         private int MAX_BATCH_SIZE = 20;
         private BlockingCollection<Span> spanQueue;
         private IClientProvider cliendProvider;
+
+        public SpanProcessor() { }
 
         public SpanProcessor(BlockingCollection<Span> spanQueue, IClientProvider cliendProvider)
         {
@@ -24,11 +26,11 @@ namespace Medidata.ZipkinTracerModule
             protocolFactory = new TBinaryProtocol.Factory();
         }
 
-        public void Start()
+        public virtual void Start()
         {
         }
 
-        public void Stop()
+        public virtual void Stop()
         {
             throw new NotImplementedException();
         }

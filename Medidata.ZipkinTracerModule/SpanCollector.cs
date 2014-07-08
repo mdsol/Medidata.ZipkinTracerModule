@@ -13,7 +13,7 @@ namespace Medidata.ZipkinTracerModule
         internal BlockingCollection<Span> spanQueue;
 
         private const int MAX_QUEUE_SIZE = 100;
-        internal ISpanProcessor spanProcessor;
+        internal SpanProcessor spanProcessor;
         private IClientProvider clientProvider;
 
         public SpanCollector(IClientProvider clientProvider)
@@ -40,7 +40,7 @@ namespace Medidata.ZipkinTracerModule
             spanQueue.Add(span);
         }
 
-        public void Start()
+        public virtual void Start()
         {
             spanProcessor.Start();
         }
