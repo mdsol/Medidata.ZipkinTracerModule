@@ -14,11 +14,13 @@ namespace Medidata.ZipkinTracerModule.Collector
 
         private const int MAX_QUEUE_SIZE = 100;
         internal SpanProcessor spanProcessor;
-        private IClientProvider clientProvider;
+        internal IClientProvider clientProvider;
 
-        public SpanCollector(IClientProvider clientProvider)
+        public SpanCollector() { }
+
+        public SpanCollector(string host, int port)
         {
-            this.clientProvider = clientProvider;
+            this.clientProvider = new ClientProvider(host, port);
 
             try
             {
