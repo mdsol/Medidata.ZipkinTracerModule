@@ -6,15 +6,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Thrift;
 
-namespace Medidata.ZipkinTracerModule
+namespace Medidata.ZipkinTracerModule.Collector
 {
     public class SpanCollector
     {
         internal BlockingCollection<Span> spanQueue;
 
         private const int MAX_QUEUE_SIZE = 100;
-        internal ISpanProcessor spanProcessor;
-        private IClientProvider clientProvider;
+        internal SpanProcessor spanProcessor;
+        internal IClientProvider clientProvider;
 
         public SpanCollector(IClientProvider clientProvider)
         {
@@ -40,7 +40,7 @@ namespace Medidata.ZipkinTracerModule
             spanQueue.Add(span);
         }
 
-        public void Start()
+        public virtual void Start()
         {
             spanProcessor.Start();
         }

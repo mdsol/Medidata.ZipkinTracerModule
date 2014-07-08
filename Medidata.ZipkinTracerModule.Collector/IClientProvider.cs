@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Medidata.ZipkinTracerModule
+namespace Medidata.ZipkinTracerModule.Collector
 {
-    public interface ISpanProcessor
+    public interface IClientProvider
     {
-        void Start();
-        void Stop();
+        void Setup();
+        void Close();
     }
 }

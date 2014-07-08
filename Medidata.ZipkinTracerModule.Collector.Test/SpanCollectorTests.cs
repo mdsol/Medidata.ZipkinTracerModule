@@ -2,8 +2,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
+using System.Collections.Concurrent;
 
-namespace Medidata.ZipkinTracerModule.Test
+namespace Medidata.ZipkinTracerModule.Collector.Test
 {
     [TestClass]
     public class SpanCollectorTests
@@ -11,7 +12,7 @@ namespace Medidata.ZipkinTracerModule.Test
         IFixture fixture;
         private IClientProvider clientProviderStub;
         private SpanCollector spanCollector;
-        private ISpanProcessor spanProcessorStub;
+        private SpanProcessor spanProcessorStub;
 
         [TestInitialize]
         public void Init()
@@ -21,7 +22,8 @@ namespace Medidata.ZipkinTracerModule.Test
             clientProviderStub = MockRepository.GenerateStub<IClientProvider>();
             spanCollector = new SpanCollector(clientProviderStub);
 
-            spanProcessorStub = MockRepository.GenerateStub<ISpanProcessor>();
+            spanCollector.spanQueue = fixture.Create<BlockingCollection<Span>>();
+            spanProcessorStub = MockRepository.GenerateStub<SpanProcessor>(spanCollector.spanQueue, clientProviderStub);
             spanCollector.spanProcessor = spanProcessorStub;
         }
 

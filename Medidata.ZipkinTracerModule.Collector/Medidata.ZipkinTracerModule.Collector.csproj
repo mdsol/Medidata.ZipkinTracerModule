@@ -4,14 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{EB432891-204B-4B97-BFB1-A820E424284E}</ProjectGuid>
+    <ProjectGuid>{12E57184-B43E-43C5-AC19-06AD1DC25E96}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Medidata.ZipkinTracerModule</RootNamespace>
-    <AssemblyName>Medidata.ZipkinTracerModule</AssemblyName>
+    <RootNamespace>Medidata.ZipkinTracerModule.Collector</RootNamespace>
+    <AssemblyName>Medidata.ZipkinTracerModule.Collector</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">.\</SolutionDir>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -34,26 +34,43 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Thrift">
+      <HintPath>..\packages\Thrift.0.9.1.3\lib\net35\Thrift.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IZipkinConfig.cs" />
+    <Compile Include="ClientProvider.cs" />
+    <Compile Include="IClientProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ZipkinClient.cs" />
+    <Compile Include="SpanCollector.cs" />
+    <Compile Include="SpanProcessor.cs" />
+    <Compile Include="thrift\gen-sharp\AdjustableRateException.cs" />
+    <Compile Include="thrift\gen-sharp\Annotation.cs" />
+    <Compile Include="thrift\gen-sharp\AnnotationType.cs" />
+    <Compile Include="thrift\gen-sharp\BinaryAnnotation.cs" />
+    <Compile Include="thrift\gen-sharp\Dependencies.cs" />
+    <Compile Include="thrift\gen-sharp\DependencyLink.cs" />
+    <Compile Include="thrift\gen-sharp\Endpoint.cs" />
+    <Compile Include="thrift\gen-sharp\LogEntry.cs" />
+    <Compile Include="thrift\gen-sharp\Moments.cs" />
+    <Compile Include="thrift\gen-sharp\ResultCode.cs" />
+    <Compile Include="thrift\gen-sharp\Scribe.cs" />
+    <Compile Include="thrift\gen-sharp\Span.cs" />
+    <Compile Include="thrift\gen-sharp\StoreAggregatesException.cs" />
+    <Compile Include="thrift\gen-sharp\ZipkinCollector.cs" />
+    <Compile Include="thrift\gen-sharp\zipkinCore.Constants.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Medidata.ZipkinTracerModule.nuspec" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Medidata.ZipkinTracerModule.Collector\Medidata.ZipkinTracerModule.Collector.csproj">
-      <Project>{12e57184-b43e-43c5-ac19-06ad1dc25e96}</Project>
-      <Name>Medidata.ZipkinTracerModule.Collector</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
+    <None Include="thrift\resources\scribe.thrift" />
+    <None Include="thrift\resources\zipkinCollector.thrift" />
+    <None Include="thrift\resources\zipkinCore.thrift" />
+    <None Include="thrift\resources\zipkinDependencies.thrift" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

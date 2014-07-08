@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Medidata.ZipkinTracerModule.Collector;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,6 @@ namespace Medidata.ZipkinTracerModule
 {
     public class ZipkinClient
     {
-        private IZipkinConfig zipkinConfig;
         internal SpanCollector spanCollector;
 
         public ZipkinClient(IZipkinConfig zipkinConfig)
@@ -24,8 +24,6 @@ namespace Medidata.ZipkinTracerModule
             {
                 throw new ArgumentException("zipkinConfig port is not an int");
             }
-
-            this.zipkinConfig = zipkinConfig;
 
             spanCollector = new SpanCollector(new ClientProvider(zipkinConfig.ZipkinServerName, port));
         }

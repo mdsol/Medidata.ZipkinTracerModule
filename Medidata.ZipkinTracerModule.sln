@@ -15,6 +15,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{ACDBD6
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracerModule.Test", "Medidata.ZipkinTracerModule.Test\Medidata.ZipkinTracerModule.Test.csproj", "{0158C8BD-D881-4EE8-A8C6-54707A67A00D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracerModule.Collector", "Medidata.ZipkinTracerModule.Collector\Medidata.ZipkinTracerModule.Collector.csproj", "{12E57184-B43E-43C5-AC19-06AD1DC25E96}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracerModule.Collector.Test", "Medidata.ZipkinTracerModule.Collector.Test\Medidata.ZipkinTracerModule.Collector.Test.csproj", "{A6AFE0F7-F1DE-4E0B-B6F6-CFDC293CAE2D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +33,14 @@ Global
 		{0158C8BD-D881-4EE8-A8C6-54707A67A00D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0158C8BD-D881-4EE8-A8C6-54707A67A00D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0158C8BD-D881-4EE8-A8C6-54707A67A00D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12E57184-B43E-43C5-AC19-06AD1DC25E96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12E57184-B43E-43C5-AC19-06AD1DC25E96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12E57184-B43E-43C5-AC19-06AD1DC25E96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12E57184-B43E-43C5-AC19-06AD1DC25E96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6AFE0F7-F1DE-4E0B-B6F6-CFDC293CAE2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6AFE0F7-F1DE-4E0B-B6F6-CFDC293CAE2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6AFE0F7-F1DE-4E0B-B6F6-CFDC293CAE2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6AFE0F7-F1DE-4E0B-B6F6-CFDC293CAE2D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
