@@ -25,7 +25,7 @@ namespace Medidata.ZipkinTracerModule
                 throw new ArgumentException("zipkinConfig port is not an int");
             }
 
-            spanCollector = new SpanCollector(zipkinConfig.ZipkinServerName, port);
+            spanCollector = new SpanCollector(new ClientProvider(zipkinConfig.ZipkinServerName, port));
         }
     }
 }

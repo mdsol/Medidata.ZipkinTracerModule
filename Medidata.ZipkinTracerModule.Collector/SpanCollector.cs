@@ -16,11 +16,9 @@ namespace Medidata.ZipkinTracerModule.Collector
         internal SpanProcessor spanProcessor;
         internal IClientProvider clientProvider;
 
-        public SpanCollector() { }
-
-        public SpanCollector(string host, int port)
+        public SpanCollector(IClientProvider clientProvider)
         {
-            this.clientProvider = new ClientProvider(host, port);
+            this.clientProvider = clientProvider;
 
             try
             {

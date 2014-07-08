@@ -19,13 +19,10 @@ namespace Medidata.ZipkinTracerModule.Collector.Test
         {
             fixture = new Fixture();
 
-            spanCollector = new SpanCollector();
+            clientProviderStub = MockRepository.GenerateStub<IClientProvider>();
+            spanCollector = new SpanCollector(clientProviderStub);
 
             spanCollector.spanQueue = fixture.Create<BlockingCollection<Span>>();
-
-            clientProviderStub = MockRepository.GenerateStub<IClientProvider>();
-            spanCollector.clientProvider = clientProviderStub; 
-
             spanProcessorStub = MockRepository.GenerateStub<SpanProcessor>(spanCollector.spanQueue, clientProviderStub);
             spanCollector.spanProcessor = spanProcessorStub;
         }
