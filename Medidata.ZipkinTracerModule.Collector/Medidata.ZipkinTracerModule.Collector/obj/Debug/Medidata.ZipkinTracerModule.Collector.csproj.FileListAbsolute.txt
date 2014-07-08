@@ -1,6 +1,0 @@
-C:\Users\tkwan\git\Medidata.ZipkinTracerModule\Medidata.ZipkinTracerModule.Collector\Medidata.ZipkinTracerModule.Collector\bin\Debug\Medidata.ZipkinTracerModule.Collector.dll
-C:\Users\tkwan\git\Medidata.ZipkinTracerModule\Medidata.ZipkinTracerModule.Collector\Medidata.ZipkinTracerModule.Collector\bin\Debug\Medidata.ZipkinTracerModule.Collector.pdb
-C:\Users\tkwan\git\Medidata.ZipkinTracerModule\Medidata.ZipkinTracerModule.Collector\Medidata.ZipkinTracerModule.Collector\bin\Debug\Thrift.dll
-C:\Users\tkwan\git\Medidata.ZipkinTracerModule\Medidata.ZipkinTracerModule.Collector\Medidata.ZipkinTracerModule.Collector\bin\Debug\Thrift.pdb
-C:\Users\tkwan\git\Medidata.ZipkinTracerModule\Medidata.ZipkinTracerModule.Collector\Medidata.ZipkinTracerModule.Collector\obj\Debug\Medidata.ZipkinTracerModule.Collector.dll
-C:\Users\tkwan\git\Medidata.ZipkinTracerModule\Medidata.ZipkinTracerModule.Collector\Medidata.ZipkinTracerModule.Collector\obj\Debug\Medidata.ZipkinTracerModule.Collector.pdb
