@@ -10,11 +10,13 @@ namespace Medidata.ZipkinTracerModule
     public class ZipkinClient
     {
         internal SpanCollector spanCollector;
+        internal SpanTracer spanTracer;
 
         public ZipkinClient(IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder)
         {
             if ( String.IsNullOrEmpty(zipkinConfig.ZipkinServerName)
-                || String.IsNullOrEmpty(zipkinConfig.ZipkinServerPort) )
+                || String.IsNullOrEmpty(zipkinConfig.ZipkinServerPort)
+                || String.IsNullOrEmpty(zipkinConfig.ServiceName))
             {
                 throw new ArgumentNullException("zipkinConfig value is null");
             }
@@ -26,6 +28,7 @@ namespace Medidata.ZipkinTracerModule
             }
 
             spanCollector = spanCollectorBuilder.Build(zipkinConfig.ZipkinServerName, port);
+            spanTracer = new SpanTracer(spanCollector, zipkinConfig.ServiceName);
         }
 
         public void Init()
@@ -36,6 +39,16 @@ namespace Medidata.ZipkinTracerModule
         public void ShutDown()
         {
             spanCollector.Stop();
+        }
+        
+        public Span StartClientSpan(string requestName, string traceId, string parentSpanId)
+        {
+            return spanTracer.StartClientSpan(requestName, traceId, parentSpanId);
+        }
+
+        public void EndClientSpan(Span span, int duration)
+        {
+            spanTracer.EndClientSpan(span, duration);
         }
     }
 }
