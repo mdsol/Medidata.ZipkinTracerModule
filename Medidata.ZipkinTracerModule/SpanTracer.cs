@@ -10,8 +10,6 @@ namespace Medidata.ZipkinTracerModule
         private Collector.SpanCollector spanCollector;
         private string serviceName;
 
-        public SpanTracer() { } 
-
         public SpanTracer(Collector.SpanCollector spanCollector, string serviceName)
         {
             // TODO: Complete member initialization
