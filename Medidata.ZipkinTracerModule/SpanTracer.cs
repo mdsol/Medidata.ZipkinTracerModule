@@ -12,9 +12,14 @@ namespace Medidata.ZipkinTracerModule
 
         public SpanTracer(Collector.SpanCollector spanCollector, string serviceName)
         {
-            // TODO: Complete member initialization
-            //this.spanCollector = spanCollector;
-            //this.serviceName = serviceName;
+            if ( spanCollector == null) 
+            {
+                throw new ArgumentNullException("spanCollector is null");
+            }
+            if ( String.IsNullOrEmpty(serviceName)) 
+            {
+                throw new ArgumentNullException("serviceName is null or empty");
+            }
         }
 
         public virtual Span StartClientSpan(string requestName, string traceId, string parentSpanId)
