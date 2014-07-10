@@ -13,8 +13,8 @@ namespace Medidata.ZipkinTracerModule
         public SpanTracer(Collector.SpanCollector spanCollector, string serviceName)
         {
             // TODO: Complete member initialization
-            this.spanCollector = spanCollector;
-            this.serviceName = serviceName;
+            //this.spanCollector = spanCollector;
+            //this.serviceName = serviceName;
         }
 
         public virtual Span StartClientSpan(string requestName, string traceId, string parentSpanId)

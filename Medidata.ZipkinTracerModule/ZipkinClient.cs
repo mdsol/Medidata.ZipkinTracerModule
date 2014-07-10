@@ -14,11 +14,19 @@ namespace Medidata.ZipkinTracerModule
 
         public ZipkinClient(IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder)
         {
-            if ( String.IsNullOrEmpty(zipkinConfig.ZipkinServerName)
-                || String.IsNullOrEmpty(zipkinConfig.ZipkinServerPort)
-                || String.IsNullOrEmpty(zipkinConfig.ServiceName))
+            if ( String.IsNullOrEmpty(zipkinConfig.ZipkinServerName)) 
             {
-                throw new ArgumentNullException("zipkinConfig value is null");
+                throw new ArgumentNullException("zipkinConfig.ZipkinServerName is null");
+            }
+            
+            if ( String.IsNullOrEmpty(zipkinConfig.ZipkinServerPort))
+            {
+                throw new ArgumentNullException("zipkinConfig.ZipkinServerPort is null");
+            }
+
+            if ( String.IsNullOrEmpty(zipkinConfig.ServiceName))
+            {
+                throw new ArgumentNullException("zipkinConfig.ServiceName value is null");
             }
             
             int port;
