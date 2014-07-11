@@ -34,7 +34,7 @@ namespace Medidata.ZipkinTracerModule.Collector
             spanProcessor = new SpanProcessor(spanQueue, clientProvider);
         }
 
-        public void Collect(Span span)
+        public virtual void Collect(Span span)
         {
             spanQueue.Add(span);
         }

@@ -63,7 +63,18 @@ namespace Medidata.ZipkinTracerModule
 
         public virtual void EndClientSpan(Span span, int duration)
         {
-            throw new NotImplementedException();
+            // set annotation - zipkinCoreConstants.CLIENT_RECV
+            var annotation = new Annotation()
+            {
+                Host = zipkinEndpoint.GetEndpoint(serviceName),
+                Duration = duration,  //duration is currently not supported by zipkin UI
+                Timestamp = GetTimeStamp(),
+                Value = zipkinCoreConstants.CLIENT_RECV
+            };
+
+            span.Annotations.Add(annotation);
+
+            spanCollector.Collect(span);
         }
 
         private long GetTimeStamp()
