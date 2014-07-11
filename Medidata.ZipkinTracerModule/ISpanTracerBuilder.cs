@@ -9,6 +9,6 @@ namespace Medidata.ZipkinTracerModule
 {
     public interface ISpanTracerBuilder
     {
-        SpanTracer Build(SpanCollector spanCollector, string serviceName);
+        SpanTracer Build(SpanCollector spanCollector, string serviceName, IZipkinEndpoint zipkinEndpoint);
     }
 }
