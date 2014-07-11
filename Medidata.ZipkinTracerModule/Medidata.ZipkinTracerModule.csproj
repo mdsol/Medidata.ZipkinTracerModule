@@ -40,14 +40,20 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Thrift, Version=0.9.1.3, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Thrift.0.9.1.3\lib\net35\Thrift.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IZipkinConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SpanTracer.cs" />
     <Compile Include="ZipkinClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Medidata.ZipkinTracerModule.nuspec" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Medidata.ZipkinTracerModule.Collector\Medidata.ZipkinTracerModule.Collector.csproj">

@@ -10,13 +10,23 @@ namespace Medidata.ZipkinTracerModule
     public class ZipkinClient
     {
         internal SpanCollector spanCollector;
+        internal SpanTracer spanTracer;
 
-        public ZipkinClient(IZipkinConfig zipkinConfig)
+        public ZipkinClient(IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder)
         {
-            if ( String.IsNullOrEmpty(zipkinConfig.ZipkinServerName)
-                || String.IsNullOrEmpty(zipkinConfig.ZipkinServerPort) )
+            if ( String.IsNullOrEmpty(zipkinConfig.ZipkinServerName)) 
             {
-                throw new ArgumentNullException("zipkinConfig value is null");
+                throw new ArgumentNullException("zipkinConfig.ZipkinServerName is null");
+            }
+            
+            if ( String.IsNullOrEmpty(zipkinConfig.ZipkinServerPort))
+            {
+                throw new ArgumentNullException("zipkinConfig.ZipkinServerPort is null");
+            }
+
+            if ( String.IsNullOrEmpty(zipkinConfig.ServiceName))
+            {
+                throw new ArgumentNullException("zipkinConfig.ServiceName value is null");
             }
             
             int port;
@@ -25,7 +35,28 @@ namespace Medidata.ZipkinTracerModule
                 throw new ArgumentException("zipkinConfig port is not an int");
             }
 
-            spanCollector = new SpanCollector(new ClientProvider(zipkinConfig.ZipkinServerName, port));
+            spanCollector = spanCollectorBuilder.Build(zipkinConfig.ZipkinServerName, port);
+            spanTracer = new SpanTracer(spanCollector, zipkinConfig.ServiceName);
+        }
+
+        public void Init()
+        {
+            spanCollector.Start();
+        }
+
+        public void ShutDown()
+        {
+            spanCollector.Stop();
+        }
+        
+        public Span StartClientSpan(string requestName, string traceId, string parentSpanId)
+        {
+            return spanTracer.StartClientSpan(requestName, traceId, parentSpanId);
+        }
+
+        public void EndClientSpan(Span span, int duration)
+        {
+            spanTracer.EndClientSpan(span, duration);
         }
     }
 }
