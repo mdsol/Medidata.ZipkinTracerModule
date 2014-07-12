@@ -46,7 +46,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ISpanTracerBuilder.cs" />
     <Compile Include="IZipkinConfig.cs" />
     <Compile Include="IZipkinEndpoint.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
