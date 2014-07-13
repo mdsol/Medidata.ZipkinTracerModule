@@ -25,7 +25,7 @@ namespace Medidata.ZipkinTracerModule
 
             if ( zipkinEndpoint == null) 
             {
-                throw new ArgumentNullException("serviceName is null or empty");
+                throw new ArgumentNullException("zipkinEndpoint is null");
             }
 
             this.serviceName = serviceName;
