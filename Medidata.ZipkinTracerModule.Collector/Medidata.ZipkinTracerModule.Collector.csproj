@@ -49,6 +49,7 @@
     <Compile Include="ISpanCollectorBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpanCollector.cs" />
+    <Compile Include="SpanCollectorBuilder.cs" />
     <Compile Include="SpanProcessor.cs" />
     <Compile Include="thrift\gen-sharp\AdjustableRateException.cs" />
     <Compile Include="thrift\gen-sharp\Annotation.cs" />
