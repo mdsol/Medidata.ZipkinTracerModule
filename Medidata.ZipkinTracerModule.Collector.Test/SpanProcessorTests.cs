@@ -5,6 +5,8 @@ using System.Collections.Concurrent;
 using Rhino.Mocks;
 using System.Threading;
 using System.Threading.Tasks;
+using Thrift;
+using System.Collections.Generic;
 
 namespace Medidata.ZipkinTracerModule.Collector.Test
 {
@@ -14,14 +16,16 @@ namespace Medidata.ZipkinTracerModule.Collector.Test
         private IFixture fixture;
         private SpanProcessor spanProcessor;
         private SpanProcessorTaskFactory taskFactory;
+        private IClientProvider clientProvider;
+        private BlockingCollection<Span> queue;
 
         [TestInitialize]
         public void Init()
         {
             fixture = new Fixture();
 
-            var queue = new BlockingCollection<Span>();
-            var clientProvider = MockRepository.GenerateStub<IClientProvider>();
+            queue = new BlockingCollection<Span>();
+            clientProvider = MockRepository.GenerateStub<IClientProvider>();
             spanProcessor = new SpanProcessor(queue, clientProvider);
             taskFactory = MockRepository.GenerateStub<SpanProcessorTaskFactory>();
             spanProcessor.spanProcessorTaskFactory = taskFactory;
@@ -57,10 +61,65 @@ namespace Medidata.ZipkinTracerModule.Collector.Test
             Assert.IsTrue(spanProcessor.cancellationTokenSource.Token.IsCancellationRequested);
         }
 
+        [TestMethod]
+        [ExpectedException(typeof(TException))]
+        public void Log_HandleThriftException()
+        {
+            clientProvider.Expect(x => x.Log(Arg<List<LogEntry>>.Is.Anything)).Throw(new TException());
+            spanProcessor.Log(clientProvider, new List<LogEntry>());
+        }
+
+        [TestMethod]
+        public void LogSubmittedSpans_IncrementSubsequentEmptyQueueCountIfSpanQueueEmpty()
+        {
+            spanProcessor.LogSubmittedSpans();
+            Assert.AreEqual(1, spanProcessor.subsequentEmptyQueueCount);
+        }
+
+        [TestMethod]
+        public void LogSubmittedSpans_WhenQueueIsSubsequentlyEmptyForMaxTimes()
+        {
+            spanProcessor.cancellationTokenSource = new CancellationTokenSource();
+            spanProcessor.subsequentEmptyQueueCount = SpanProcessor.MAX_SUBSEQUENT_EMPTY_QUEUE + 1;
+            spanProcessor.logEntries.Add(new LogEntry());
+            spanProcessor.LogSubmittedSpans();
+
+            clientProvider.AssertWasCalled(x => x.Log(Arg<List<LogEntry>>.Is.Anything));
+        }
+
+        [TestMethod]
+        public void LogSubmittedSpans_WhenLogEntriesReachMaxBatchSize()
+        {
+            spanProcessor.cancellationTokenSource = new CancellationTokenSource();
+            AddLogEntriesToMaxBatchSize();
+            spanProcessor.LogSubmittedSpans();
+
+            clientProvider.AssertWasCalled(x => x.Log(Arg<List<LogEntry>>.Is.Anything));
+        }
+
+        [TestMethod]
+        public void LogSubmittedSpans_RemainingGetLoggedIfCancelled()
+        {
+            spanProcessor.cancellationTokenSource = new CancellationTokenSource();
+            spanProcessor.logEntries.Add(new LogEntry());
+            spanProcessor.cancellationTokenSource.Cancel();
+            spanProcessor.LogSubmittedSpans();
+
+            clientProvider.AssertWasCalled(x => x.Log(Arg<List<LogEntry>>.Is.Anything));
+        }
+
         private bool ValidateStartAction(Action y, SpanProcessor spanProcessor)
         {
-            Assert.AreEqual(() => spanProcessor.LogSubmittedSpans(), y);
+            Assert.AreEqual(() => spanProcessor.LogSubmittedSpansWrapper(), y);
             return true;
+        }
+
+        private void AddLogEntriesToMaxBatchSize()
+        {
+            for (int i = 0; i < SpanProcessor.MAX_BATCH_SIZE + 1; i++)
+            {
+                spanProcessor.logEntries.Add(new LogEntry());
+            }
         }
     }
 }

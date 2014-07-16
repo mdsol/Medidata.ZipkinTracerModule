@@ -13,20 +13,23 @@ namespace Medidata.ZipkinTracerModule.Collector
 {
     public class SpanProcessor
     {
-        private List<LogEntry> logEntries;
-        private TBinaryProtocol.Factory protocolFactory;
-
+        //wait time to poll for dequeuing
         private const int WAIT_INTERVAL_TO_DEQUEUE_MS = 1000;
 
-        private int MAX_BATCH_SIZE = 20;
+        //send contents of queue if it has been empty for 2 polls
+        internal const int MAX_SUBSEQUENT_EMPTY_QUEUE = 2;
+
+        //# of spans we submit to scribe in one go
+        internal const int MAX_BATCH_SIZE = 20;
+
+        private TBinaryProtocol.Factory protocolFactory;
         private BlockingCollection<Span> spanQueue;
         private IClientProvider clientProvider;
 
+        internal List<LogEntry> logEntries;
         internal CancellationTokenSource cancellationTokenSource;
         internal SpanProcessorTaskFactory spanProcessorTaskFactory;
-        private readonly BlockingCollection<Span> queue;
-
-        private int subsequentEmptyQueueCount;
+        internal int subsequentEmptyQueueCount;
 
         public SpanProcessor(BlockingCollection<Span> spanQueue, IClientProvider clientProvider)
         {
@@ -58,38 +61,42 @@ namespace Medidata.ZipkinTracerModule.Collector
         public virtual void Start()
         {
             cancellationTokenSource = new CancellationTokenSource();
-            spanProcessorTaskFactory.CreateAndStart(() => LogSubmittedSpans(), cancellationTokenSource);
+            spanProcessorTaskFactory.CreateAndStart(() => LogSubmittedSpansWrapper(), cancellationTokenSource);
+        }
+
+        internal void LogSubmittedSpansWrapper()
+        {
+            while(!cancellationTokenSource.Token.IsCancellationRequested )
+            {
+                LogSubmittedSpans();
+            } 
         }
 
         internal void LogSubmittedSpans()
         {
-            while(!cancellationTokenSource.Token.IsCancellationRequested )
+            Span span;
+            spanQueue.TryTake(out span, WAIT_INTERVAL_TO_DEQUEUE_MS);
+            if (span != null)
             {
-                Span span;
-                queue.TryTake(out span, WAIT_INTERVAL_TO_DEQUEUE_MS);
-                if (span != null)
-                {
-                    logEntries.Add(Create(span));
-                    subsequentEmptyQueueCount = 0;
-                }
-                else
-                {
-                    subsequentEmptyQueueCount++;
-                }
+                logEntries.Add(Create(span));
+                subsequentEmptyQueueCount = 0;
+            }
+            else
+            {
+                subsequentEmptyQueueCount++;
+            }
 
-                //if (logEntries.Count() >= MAX_BATCH_SIZE 
-                //    || logEntries.Any() && cancellationTokenSource.Token.IsCancellationRequested
-                //    || logEntries.Any() && subsequentEmptyQueueCount > MAX_SUBSEQUENT_EMPTY_QUEUE)
-                if ( logEntries.Any() )
-                {
-                    Log(clientProvider, logEntries);
-                    logEntries.Clear();
-                    subsequentEmptyQueueCount = 0;
-                }
-            } 
+            if (logEntries.Count() >= MAX_BATCH_SIZE
+                || logEntries.Any() && cancellationTokenSource.Token.IsCancellationRequested
+                || logEntries.Any() && subsequentEmptyQueueCount > MAX_SUBSEQUENT_EMPTY_QUEUE)
+            {
+                Log(clientProvider, logEntries);
+                logEntries.Clear();
+                subsequentEmptyQueueCount = 0;
+            }
         }
 
-        private void Log(IClientProvider client, List<LogEntry> logEntries)
+        internal void Log(IClientProvider client, List<LogEntry> logEntries)
         {
             try
             {
@@ -97,7 +104,8 @@ namespace Medidata.ZipkinTracerModule.Collector
             }
             catch (TException tEx)
             {
-                throw new Exception("Error writing to scribe", tEx);
+                //maybe retries?
+                throw tEx;
             }
         }
 
