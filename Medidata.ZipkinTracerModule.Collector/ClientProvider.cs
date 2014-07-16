@@ -39,5 +39,10 @@ namespace Medidata.ZipkinTracerModule.Collector
                 transport.Dispose();
             }
         }
+
+        public void Log(List<LogEntry> logEntries)
+        {
+            Client.Log(logEntries);
+        }
     }
 }

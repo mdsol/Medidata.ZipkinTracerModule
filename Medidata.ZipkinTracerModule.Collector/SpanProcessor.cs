@@ -30,6 +30,16 @@ namespace Medidata.ZipkinTracerModule.Collector
 
         public SpanProcessor(BlockingCollection<Span> spanQueue, IClientProvider clientProvider)
         {
+            if ( spanQueue == null) 
+            {
+                throw new ArgumentNullException("spanQueue is null");
+            }
+
+            if ( clientProvider == null) 
+            {
+                throw new ArgumentNullException("clientProvider is null");
+            }
+
             this.spanQueue = spanQueue;
             this.clientProvider = clientProvider;
             logEntries = new List<LogEntry>(MAX_BATCH_SIZE);
@@ -72,18 +82,18 @@ namespace Medidata.ZipkinTracerModule.Collector
                 //    || logEntries.Any() && subsequentEmptyQueueCount > MAX_SUBSEQUENT_EMPTY_QUEUE)
                 if ( logEntries.Any() )
                 {
-                    //Log(clientProvider, logEntries);
+                    Log(clientProvider, logEntries);
                     logEntries.Clear();
                     subsequentEmptyQueueCount = 0;
                 }
             } 
         }
 
-        private void Log(ClientProvider client, List<LogEntry> logEntries)
+        private void Log(IClientProvider client, List<LogEntry> logEntries)
         {
             try
             {
-                //clientProvider.Client.Log(logEntries);
+                clientProvider.Log(logEntries);
             }
             catch (TException tEx)
             {

@@ -10,5 +10,6 @@ namespace Medidata.ZipkinTracerModule.Collector
     {
         void Setup();
         void Close();
+        void Log(List<LogEntry> logEntries);
     }
 }

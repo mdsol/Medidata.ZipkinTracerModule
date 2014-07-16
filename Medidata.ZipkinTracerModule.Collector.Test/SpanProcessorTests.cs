@@ -28,6 +28,20 @@ namespace Medidata.ZipkinTracerModule.Collector.Test
         }
 
         [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CTOR_WithNullSpanQueue()
+        {
+            var spanProcessor = new SpanProcessor(null, MockRepository.GenerateStub<IClientProvider>());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void CTOR_WithNullClientProvider()
+        {
+            var spanProcessor = new SpanProcessor(new BlockingCollection<Span>(), null);
+        }
+
+        [TestMethod]
         public void Start()
         {
             spanProcessor.Start();
