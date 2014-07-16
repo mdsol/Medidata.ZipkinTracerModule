@@ -12,29 +12,38 @@ namespace Medidata.ZipkinTracerModule.Collector.Test
     public class SpanProcessorTests
     {
         private IFixture fixture;
+        private SpanProcessor spanProcessor;
+        private SpanProcessorTaskFactory taskFactory;
 
         [TestInitialize]
         public void Init()
         {
             fixture = new Fixture();
+
+            var queue = new BlockingCollection<Span>();
+            var clientProvider = MockRepository.GenerateStub<IClientProvider>();
+            spanProcessor = new SpanProcessor(queue, clientProvider);
+            taskFactory = MockRepository.GenerateStub<SpanProcessorTaskFactory>();
+            spanProcessor.spanProcessorTaskFactory = taskFactory;
         }
 
         [TestMethod]
         public void Start()
         {
-            var queue = new BlockingCollection<Span>();
-            var clientProvider = MockRepository.GenerateStub<IClientProvider>();
-            var spanProcessor = new SpanProcessor(queue, clientProvider);
-            var taskFactory = MockRepository.GenerateStub<SpanProcessorTaskFactory>();
-            spanProcessor.spanProcessorTaskFactory = taskFactory;
-
             spanProcessor.Start();
-
-            Action givenAction = null;
-            taskFactory.Expect(x => x.CreateAndStart(Arg<Action>.Matches(y => ValidateAction(y, spanProcessor)), Arg<CancellationTokenSource>.Is.Anything));
+            taskFactory.Expect(x => x.CreateAndStart(Arg<Action>.Matches(y => ValidateStartAction(y, spanProcessor)), Arg<CancellationTokenSource>.Is.Anything));
         }
 
-        private bool ValidateAction(Action y, SpanProcessor spanProcessor)
+        [TestMethod]
+        public void Stop()
+        {
+            spanProcessor.cancellationTokenSource = new CancellationTokenSource();
+            spanProcessor.Stop();
+
+            Assert.IsTrue(spanProcessor.cancellationTokenSource.Token.IsCancellationRequested);
+        }
+
+        private bool ValidateStartAction(Action y, SpanProcessor spanProcessor)
         {
             Assert.AreEqual(() => spanProcessor.LogSubmittedSpans(), y);
             return true;

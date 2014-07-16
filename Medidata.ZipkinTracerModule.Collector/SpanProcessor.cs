@@ -22,7 +22,7 @@ namespace Medidata.ZipkinTracerModule.Collector
         private BlockingCollection<Span> spanQueue;
         private IClientProvider clientProvider;
 
-        private CancellationTokenSource cancellationTokenSource;
+        internal CancellationTokenSource cancellationTokenSource;
         internal SpanProcessorTaskFactory spanProcessorTaskFactory;
         private readonly BlockingCollection<Span> queue;
 
