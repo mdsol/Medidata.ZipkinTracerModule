@@ -30,6 +30,7 @@ namespace Medidata.ZipkinTracerModule.Collector
         internal CancellationTokenSource cancellationTokenSource;
         internal SpanProcessorTaskFactory spanProcessorTaskFactory;
         internal int subsequentEmptyQueueCount;
+        internal int retries;
 
         public SpanProcessor(BlockingCollection<Span> spanQueue, IClientProvider clientProvider)
         {
@@ -101,11 +102,19 @@ namespace Medidata.ZipkinTracerModule.Collector
             try
             {
                 clientProvider.Log(logEntries);
+                retries = 0;
             }
             catch (TException tEx)
             {
-                //maybe retries?
-                throw tEx;
+                if ( retries < 3 )
+                {
+                    retries++;
+                    Log(client, logEntries);
+                }
+                else
+                {
+                    throw tEx;
+                }
             }
         }
 
