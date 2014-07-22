@@ -16,10 +16,10 @@ namespace Medidata.ZipkinTracerModule.Collector
         //wait time to poll for dequeuing
         private const int WAIT_INTERVAL_TO_DEQUEUE_MS = 1000;
 
-        //send contents of queue if it has been empty for 2 polls
-        internal const int MAX_SUBSEQUENT_EMPTY_QUEUE = 2;
+        //send contents of queue if it has been empty for number of polls
+        internal const int MAX_SUBSEQUENT_EMPTY_QUEUE = 5;
 
-        //# of spans we submit to scribe in one go
+        //# of spans we submit in one go
         internal const int MAX_BATCH_SIZE = 20;
 
         private TBinaryProtocol.Factory protocolFactory;
