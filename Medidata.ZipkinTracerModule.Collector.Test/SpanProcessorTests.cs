@@ -62,6 +62,16 @@ namespace Medidata.ZipkinTracerModule.Collector.Test
         }
 
         [TestMethod]
+        public void Stop_RemainingGetLoggedIfCancelled()
+        {
+            spanProcessor.cancellationTokenSource = new CancellationTokenSource();
+            spanProcessor.spanQueue.Add(new Span());
+            spanProcessor.Stop();
+
+            clientProvider.AssertWasCalled(x => x.Log(Arg<List<LogEntry>>.Is.Anything));
+        }
+
+        [TestMethod]
         public void Log_HandleThriftExceptionRetryIfLessThan3Tries()
         {
             spanProcessor.retries = 2;
@@ -106,16 +116,6 @@ namespace Medidata.ZipkinTracerModule.Collector.Test
             clientProvider.AssertWasCalled(x => x.Log(Arg<List<LogEntry>>.Is.Anything));
         }
 
-        [TestMethod]
-        public void LogSubmittedSpans_RemainingGetLoggedIfCancelled()
-        {
-            spanProcessor.cancellationTokenSource = new CancellationTokenSource();
-            spanProcessor.logEntries.Add(new LogEntry());
-            spanProcessor.cancellationTokenSource.Cancel();
-            spanProcessor.LogSubmittedSpans();
-
-            clientProvider.AssertWasCalled(x => x.Log(Arg<List<LogEntry>>.Is.Anything));
-        }
 
         private bool ValidateStartAction(Action y, SpanProcessor spanProcessor)
         {

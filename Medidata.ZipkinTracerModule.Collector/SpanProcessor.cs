@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Thrift;
 using Thrift.Protocol;
 using Thrift.Transport;
@@ -23,7 +24,7 @@ namespace Medidata.ZipkinTracerModule.Collector
         internal const int MAX_BATCH_SIZE = 20;
 
         private TBinaryProtocol.Factory protocolFactory;
-        private BlockingCollection<Span> spanQueue;
+        internal BlockingCollection<Span> spanQueue;
         private IClientProvider clientProvider;
 
         internal List<LogEntry> logEntries;
@@ -56,6 +57,7 @@ namespace Medidata.ZipkinTracerModule.Collector
             if (cancellationTokenSource != null)
             {
                 cancellationTokenSource.Cancel();
+                LogSubmittedSpans();
             }
         }
 
@@ -65,11 +67,12 @@ namespace Medidata.ZipkinTracerModule.Collector
             spanProcessorTaskFactory.CreateAndStart(() => LogSubmittedSpansWrapper(), cancellationTokenSource);
         }
 
-        internal void LogSubmittedSpansWrapper()
+        internal async void LogSubmittedSpansWrapper()
         {
             while(!cancellationTokenSource.Token.IsCancellationRequested )
             {
                 LogSubmittedSpans();
+                await Task.Delay(500, cancellationTokenSource.Token);
             } 
         }
 
@@ -113,7 +116,7 @@ namespace Medidata.ZipkinTracerModule.Collector
                 }
                 else
                 {
-                    throw tEx;
+                    throw;
                 }
             }
         }
