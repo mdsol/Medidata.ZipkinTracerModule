@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Medidata.ZipkinTracerModule
 {
-    public class ZipkinEndpoint 
+    public class ServiceEndpoint 
     {
         public virtual Endpoint GetEndpoint(string serviceName)
         {

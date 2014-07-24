@@ -47,14 +47,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HttpModule\RequestContextModule.cs" />
     <Compile Include="IZipkinConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpanTracer.cs" />
     <Compile Include="ZipkinClient.cs" />
     <Compile Include="ZipkinConfig.cs" />
-    <Compile Include="ZipkinEndpoint.cs" />
+    <Compile Include="ServiceEndpoint.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="HttpModule\web.config.transform" />
     <None Include="Medidata.ZipkinTracerModule.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>

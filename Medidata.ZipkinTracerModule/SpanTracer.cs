@@ -9,9 +9,9 @@ namespace Medidata.ZipkinTracerModule
     {
         private Collector.SpanCollector spanCollector;
         private string serviceName;
-        private ZipkinEndpoint zipkinEndpoint;
+        private ServiceEndpoint zipkinEndpoint;
 
-        public SpanTracer(Collector.SpanCollector spanCollector, string serviceName, ZipkinEndpoint zipkinEndpoint)
+        public SpanTracer(Collector.SpanCollector spanCollector, string serviceName, ServiceEndpoint zipkinEndpoint)
         {
             if ( spanCollector == null) 
             {

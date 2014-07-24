@@ -11,14 +11,14 @@ namespace Medidata.ZipkinTracerModule.Test
     {
         private IFixture fixture;
         private SpanCollector spanCollectorStub;
-        private ZipkinEndpoint zipkinEndpointStub;
+        private ServiceEndpoint zipkinEndpointStub;
 
         [TestInitialize]
         public void Init()
         {
             fixture = new Fixture();
             spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(MockRepository.GenerateStub<IClientProvider>());
-            zipkinEndpointStub = MockRepository.GenerateStub<ZipkinEndpoint>();
+            zipkinEndpointStub = MockRepository.GenerateStub<ServiceEndpoint>();
         }
 
         [TestMethod]

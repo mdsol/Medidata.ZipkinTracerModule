@@ -13,14 +13,14 @@ namespace Medidata.ZipkinTracerModule.Test
         private ISpanCollectorBuilder spanCollectorBuilder;
         private SpanCollector spanCollectorStub;
         private SpanTracer spanTracerStub;
-        private ZipkinEndpoint zipkinEndpoint;
+        private ServiceEndpoint zipkinEndpoint;
 
         [TestInitialize]
         public void Init()
         {
             fixture = new Fixture();
             spanCollectorBuilder = MockRepository.GenerateStub<ISpanCollectorBuilder>();
-            zipkinEndpoint = MockRepository.GenerateStub<ZipkinEndpoint>();
+            zipkinEndpoint = MockRepository.GenerateStub<ServiceEndpoint>();
         }
 
         [TestMethod]
@@ -95,7 +95,7 @@ namespace Medidata.ZipkinTracerModule.Test
             var parentSpanId = fixture.Create<string>();
 
             var zipkinClient = SetupZipkinClient();
-            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ZipkinEndpoint>());
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
             zipkinClient.spanTracer = spanTracerStub;
 
             var expectedSpan = new Span();
@@ -110,7 +110,7 @@ namespace Medidata.ZipkinTracerModule.Test
         public void EndClientSpan()
         {
             var zipkinClient = SetupZipkinClient();
-            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ZipkinEndpoint>());
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
             zipkinClient.spanTracer = spanTracerStub;
 
             var expectedSpan = new Span();
