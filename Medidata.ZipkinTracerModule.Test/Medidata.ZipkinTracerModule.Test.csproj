@@ -47,6 +47,7 @@
       <HintPath>..\packages\RhinoMocks.3.6\lib\Rhino.Mocks.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Web" />
     <Reference Include="Thrift">
       <HintPath>..\packages\Thrift.0.9.1.3\lib\net35\Thrift.dll</HintPath>
     </Reference>
@@ -64,6 +65,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="HttpModule\RequestContextModuleTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpanTracerTests.cs" />
     <Compile Include="ZipkinEndpointTests.cs" />

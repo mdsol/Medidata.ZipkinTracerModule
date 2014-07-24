@@ -11,6 +11,13 @@ namespace Medidata.ZipkinTracerModule.HttpModule
 {
     public class RequestContextModule : IHttpModule
     {
+        private IZipkinClient zipkinClient;
+
+        public RequestContextModule(IZipkinClient zipkinClient)
+        {
+            this.zipkinClient = zipkinClient;
+        }
+
         public void Init(HttpApplication context)
         {
 //            ILog log = LogManager.GetLogger("Zipkin");
@@ -24,27 +31,8 @@ namespace Medidata.ZipkinTracerModule.HttpModule
                     var parentSpanId = HttpContext.Current.Request.Headers["X-B3-Spanid"];
                     var sampled = HttpContext.Current.Request.Headers["X-B3-Sampled"];
 
-                    ZipkinClient zipkinClient = null;
-                    Span span = null;
+                    Span span = StartZipkinSpan(url, traceId, parentSpanId);
 
-                    if (Convert.ToBoolean(sampled) && traceId != null)
-                    {
-                        try
-                        {
-                            zipkinClient = new ZipkinClient(new ZipkinConfig(), new SpanCollectorBuilder());
-                            span = zipkinClient.StartClientSpan(url, traceId, parentSpanId);
-                        }
-                        catch (Exception ex)
-                        {
-                            // log.Error("Zipkin StartClientSpan : " + ex.Message, ex);
-                        }
-                    }
-                    else
-                    {
-                       // log.DebugFormat("Zipkin StartClientSpan : Span is not traced.\n TraceId - {0}, SpanId - {1}, Sampled - {2}", traceId, parentSpanId, sampled);
-                    }
-
-                    HttpContext.Current.Items["zipkinClient"] = zipkinClient;
                     HttpContext.Current.Items["span"] = span;
 
                     var stopwatch = new Stopwatch();
@@ -59,19 +47,46 @@ namespace Medidata.ZipkinTracerModule.HttpModule
 
                     var span = (Span)HttpContext.Current.Items["span"];
 
-                    if (span != null)
-                    {
-                        try
-                        {
-                            var zipkinClient = (ZipkinClient) HttpContext.Current.Items["zipkinClient"];
-                            zipkinClient.EndClientSpan(span, stopwatch.Elapsed.Milliseconds * 1000);
-                        }
-                        catch(Exception ex)
-                        {
-                            //log.Error("Zipkin EndClientSpan : " + ex.Message, ex);
-                        }
-                    }
+                    EndZipkinSpan(stopwatch, span);
                 };
+        }
+
+        internal void EndZipkinSpan(Stopwatch stopwatch, Span span)
+        {
+            if (span != null)
+            {
+                try
+                {
+                    zipkinClient.EndClientSpan(span, stopwatch.Elapsed.Milliseconds * 1000);
+                }
+                catch (Exception ex)
+                {
+                    //log.Error("Zipkin EndClientSpan : " + ex.Message, ex);
+                }
+            }
+        }
+
+        internal Span StartZipkinSpan(string url, string traceId, string parentSpanId)
+        {
+            Span span = null;
+
+            if (traceId != null)
+            {
+                try
+                {
+                    span = zipkinClient.StartClientSpan(url, traceId, parentSpanId);
+                }
+                catch (Exception ex)
+                {
+                    // log.Error("Zipkin StartClientSpan : " + ex.Message, ex);
+                }
+            }
+            else
+            {
+                // log.DebugFormat("Zipkin StartClientSpan : Span is not traced.\n TraceId - {0}, SpanId - {1}, Sampled - {2}", traceId, parentSpanId, sampled);
+            }
+
+            return span;
         }
 
         public void Dispose()
