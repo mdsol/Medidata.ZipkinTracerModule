@@ -7,9 +7,9 @@ using System.Text;
 
 namespace Medidata.ZipkinTracerModule
 {
-    public class ZipkinEndpoint : IZipkinEndpoint
+    public class ZipkinEndpoint 
     {
-        public Endpoint GetEndpoint(string serviceName)
+        public virtual Endpoint GetEndpoint(string serviceName)
         {
             var ipAddressStr = BitConverter.ToInt32(GetLocalIPAddress().GetAddressBytes(), 0);
             var hostIpAddressStr = (int) IPAddress.NetworkToHostOrder(ipAddressStr);
