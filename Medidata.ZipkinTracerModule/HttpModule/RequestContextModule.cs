@@ -1,4 +1,5 @@
 ﻿using Medidata.ZipkinTracerModule.Collector;
+using Medidata.ZipkinTracerModule.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,16 +13,16 @@ namespace Medidata.ZipkinTracerModule.HttpModule
     public class RequestContextModule : IHttpModule
     {
         private IZipkinClient zipkinClient;
+        private IMDLogger logger;
 
-        public RequestContextModule(IZipkinClient zipkinClient)
+        public RequestContextModule(IZipkinClient zipkinClient, IMDLogger logger)
         {
             this.zipkinClient = zipkinClient;
+            this.logger = logger;
         }
 
         public void Init(HttpApplication context)
         {
-//            ILog log = LogManager.GetLogger("Zipkin");
-
             context.BeginRequest += (sender, args) =>
                 {
                     string url = HttpContext.Current.Request.Path;
@@ -61,7 +62,7 @@ namespace Medidata.ZipkinTracerModule.HttpModule
                 }
                 catch (Exception ex)
                 {
-                    //log.Error("Zipkin EndClientSpan : " + ex.Message, ex);
+                    logger.Event("Zipkin EndClientSpan : " + ex.Message, null, null, ex);
                 }
             }
         }
@@ -78,12 +79,13 @@ namespace Medidata.ZipkinTracerModule.HttpModule
                 }
                 catch (Exception ex)
                 {
-                    // log.Error("Zipkin StartClientSpan : " + ex.Message, ex);
+                    logger.Event("Zipkin StartClientSpan : " + ex.Message, null,null, ex);
                 }
             }
             else
             {
-                // log.DebugFormat("Zipkin StartClientSpan : Span is not traced.\n TraceId - {0}, SpanId - {1}, Sampled - {2}", traceId, parentSpanId, sampled);
+                var message = string.Format("Zipkin StartClientSpan : Span is not traced.\n TraceId - {0}, SpanId - {1}", traceId, parentSpanId);
+                logger.Event(message, null, null);
             }
 
             return span;

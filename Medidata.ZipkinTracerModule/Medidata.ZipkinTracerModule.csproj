@@ -50,6 +50,7 @@
     <Compile Include="HttpModule\RequestContextModule.cs" />
     <Compile Include="IZipkinClient.cs" />
     <Compile Include="IZipkinConfig.cs" />
+    <Compile Include="Logging\IMDLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpanTracer.cs" />
     <Compile Include="ZipkinClient.cs" />
