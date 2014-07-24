@@ -20,7 +20,7 @@ namespace Medidata.ZipkinTracerModule.Test
         {
             var serviceName = fixture.Create<string>();
 
-            var zipkinEndpoint = new ZipkinEndpoint();
+            var zipkinEndpoint = new ServiceEndpoint();
             var endpoint = zipkinEndpoint.GetEndpoint(serviceName);
 
             Assert.IsNotNull(endpoint);

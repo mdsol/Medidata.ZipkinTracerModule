@@ -19,7 +19,7 @@ namespace Medidata.ZipkinTracerModule.HttpModule
                 {
                     string url = HttpContext.Current.Request.Path;
 
-                    //TODO: move this into a separate library to configure headers
+                    //TODO: move this into a separate library to get headers from HttpContext
                     var traceId = HttpContext.Current.Request.Headers["X-B3-Traceid"];
                     var parentSpanId = HttpContext.Current.Request.Headers["X-B3-Spanid"];
                     var sampled = HttpContext.Current.Request.Headers["X-B3-Sampled"];
