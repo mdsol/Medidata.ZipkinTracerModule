@@ -58,7 +58,8 @@
     <Compile Include="ServiceEndpoint.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="HttpModule\web.config.transform" />
+    <None Include="content\appsettings.template.config.transform" />
+    <None Include="content\web.config.transform" />
     <None Include="Medidata.ZipkinTracerModule.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
