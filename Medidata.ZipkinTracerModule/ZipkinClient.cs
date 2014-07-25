@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 
 namespace Medidata.ZipkinTracerModule
 {
-    public class ZipkinClient
+    public class ZipkinClient : IZipkinClient
     {
         internal SpanCollector spanCollector;
         internal SpanTracer spanTracer;
+
+        public ZipkinClient() : this(new ZipkinConfig(), new SpanCollectorBuilder()) { }
 
         public ZipkinClient(IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder)
         {
