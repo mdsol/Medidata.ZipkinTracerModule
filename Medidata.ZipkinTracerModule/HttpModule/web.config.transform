@@ -1,6 +1,6 @@
 ﻿<configuration>
   <system.webServer>
-    <modules runAllManagedModulesForAllRequests="true">
+    <modules>
       <add name="ZipkinRequestContextModule" type="Medidata.Cloud.Shared.Support.HttpModules.ZipkinRequestContextModule" />
     </modules>
   </system.webServer>
