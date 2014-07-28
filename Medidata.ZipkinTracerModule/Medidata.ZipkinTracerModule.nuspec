@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0"?>
 <package >
   <metadata>
-    <id>$id$</id>
-    <version>$version$</version>
-    <title>$title$</title>
-    <authors>$author$</authors>
-    <owners>$author$</owners>
+    <id>Medidata.ZipkinTracerModule</id>
+    <version>0.0.2-alpha</version>
+    <title></title>
+    <authors>Medidata Solutions Inc</authors>
+    <owners>Medidata Solutions Inc</owners>
     <projectUrl>https://github.com/mdsol/Medidata.ZipkinTracerModule</projectUrl>
     <description>Medidata Zipkin Tracer Module</description>
     <releaseNotes>Initial Beta Release of the ZipkinTracer HttpModule for .Net Projects</releaseNotes>
