@@ -9,6 +9,7 @@
 /*/obj/Debug/
 /*/obj/Release/TempPE
 /*/obj/Release
+/*/lib/*
 *.user
 *.suo
 *.pdb

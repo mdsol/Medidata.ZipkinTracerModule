@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Medidata.ZipkinTracerModule</id>
-    <version>0.0.2-alpha</version>
+    <version>0.0.4-alpha</version>
     <title></title>
     <authors>Medidata Solutions Inc</authors>
     <owners>Medidata Solutions Inc</owners>
@@ -11,5 +11,8 @@
     <releaseNotes>Initial Beta Release of the ZipkinTracer HttpModule for .Net Projects</releaseNotes>
     <copyright>Copyright 2014</copyright>
     <tags>ZipkinTracer HttpModule</tags>
+    <dependencies>
+      <dependency id="Thrift" version="0.9.1.3" />
+    </dependencies>
   </metadata>
 </package>
