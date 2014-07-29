@@ -14,7 +14,7 @@ namespace Medidata.ZipkinTracerModule.Test.HttpModule
     {
         private Fixture fixture;
         private IZipkinClient zipkinClient;
-        private RequestContextModule requestContextModule;
+        private ZipkinRequestContextModule requestContextModule;
         private IMDLogger logger;
 
         [TestInitialize]
@@ -25,7 +25,7 @@ namespace Medidata.ZipkinTracerModule.Test.HttpModule
             zipkinClient = MockRepository.GenerateStub<IZipkinClient>();
             logger = MockRepository.GenerateStub<IMDLogger>();
 
-            requestContextModule = new RequestContextModule(zipkinClient, logger);
+            requestContextModule = new ZipkinRequestContextModule(zipkinClient, logger);
         }
 
         [TestMethod]

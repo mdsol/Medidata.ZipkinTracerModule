@@ -10,12 +10,12 @@ using System.Web;
 
 namespace Medidata.ZipkinTracerModule.HttpModule
 {
-    public class RequestContextModule : IHttpModule
+    public class ZipkinRequestContextModule : IHttpModule
     {
         private IZipkinClient zipkinClient;
         private IMDLogger logger;
 
-        public RequestContextModule(IZipkinClient zipkinClient, IMDLogger logger)
+        public ZipkinRequestContextModule(IZipkinClient zipkinClient, IMDLogger logger)
         {
             this.zipkinClient = zipkinClient;
             this.logger = logger;
