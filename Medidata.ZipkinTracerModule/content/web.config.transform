@@ -1,7 +1,7 @@
 ﻿<configuration>
   <system.webServer>
     <modules>
-      <add name="ZipkinRequestContextModule" type="Medidata.Cloud.Shared.Support.HttpModules.ZipkinRequestContextModule" />
+      <add name="ZipkinRequestContextModule" type="Medidata.ZipkinTracerModule.HttpModule.ZipkinRequestContextModule" />
     </modules>
   </system.webServer>
 </configuration>
