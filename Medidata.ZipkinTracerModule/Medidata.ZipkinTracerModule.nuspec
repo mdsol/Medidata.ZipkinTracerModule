@@ -11,8 +11,5 @@
     <releaseNotes>Initial Beta Release of the ZipkinTracer HttpModule for .Net Projects</releaseNotes>
     <copyright>Copyright 2014</copyright>
     <tags>ZipkinTracer HttpModule</tags>
-    <dependencies>
-      <dependency id="Thrift" version="0.9.1.3" />
-    </dependencies>
   </metadata>
 </package>

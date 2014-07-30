@@ -61,7 +61,6 @@
   <ItemGroup>
     <None Include="content\appsettings.template.config.transform" />
     <None Include="content\parameters.xml.transform" />
-    <None Include="content\unity.config.transform" />
     <None Include="content\web.config.transform" />
     <None Include="Medidata.ZipkinTracerModule.nuspec" />
     <None Include="packages.config" />
@@ -82,7 +81,7 @@
   </Target>
   <PropertyGroup>
     <PostBuildEvent>mkdir $(ProjectDir)lib
-copy $(TargetDir)$(TargetFileName) $(ProjectDir)lib</PostBuildEvent>
+copy $(TargetDir)*.dll $(ProjectDir)lib</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -14,12 +14,6 @@ namespace Medidata.ZipkinTracerModule.HttpModule
     {
         internal IMDLogger logger;
 
-        //public ZipkinRequestContextModule(IZipkinClient zipkinClient, IMDLogger logger)
-        //{
-        //    this.zipkinClient = zipkinClient;
-        //    this.logger = logger;
-        //}
-
         public void Init(HttpApplication context)
         {
             //TODO: placeholder for the "new" logger
@@ -34,9 +28,9 @@ namespace Medidata.ZipkinTracerModule.HttpModule
                     var parentSpanId = HttpContext.Current.Request.Headers["X-B3-Spanid"];
                     var sampled = HttpContext.Current.Request.Headers["X-B3-Sampled"];
 
-                    var zipkinClient = new ZipkinClient();
+                    IZipkinClient zipkinClient = InitializeZipkinClient();
 
-                    Span span = StartZipkinSpan(zipkinClient, url, traceId, parentSpanId);
+                    var span = StartZipkinSpan(zipkinClient, url, traceId, parentSpanId);
 
                     HttpContext.Current.Items["zipkinClient"] = zipkinClient;
                     HttpContext.Current.Items["span"] = span;
@@ -56,6 +50,20 @@ namespace Medidata.ZipkinTracerModule.HttpModule
 
                     EndZipkinSpan(zipkinClient, stopwatch, span);
                 };
+        }
+
+        private IZipkinClient InitializeZipkinClient()
+        {
+            IZipkinClient zipkinClient = null;
+            try
+            {
+                zipkinClient = new ZipkinClient();
+            }
+            catch (Exception ex)
+            {
+                logger.Event("Initialize ZipkinClient : " + ex.Message, null, null, ex);
+            }
+            return zipkinClient;
         }
 
         internal void EndZipkinSpan(IZipkinClient zipkinClient, Stopwatch stopwatch, Span span)
