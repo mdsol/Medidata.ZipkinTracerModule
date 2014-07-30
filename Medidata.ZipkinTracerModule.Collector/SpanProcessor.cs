@@ -20,9 +20,6 @@ namespace Medidata.ZipkinTracerModule.Collector
         //send contents of queue if it has been empty for number of polls
         internal const int MAX_SUBSEQUENT_EMPTY_QUEUE = 5;
 
-        //# of spans we submit in one go
-        internal const int MAX_BATCH_SIZE = 20;
-
         private TBinaryProtocol.Factory protocolFactory;
         internal BlockingCollection<Span> spanQueue;
         private IClientProvider clientProvider;
@@ -32,8 +29,9 @@ namespace Medidata.ZipkinTracerModule.Collector
         internal SpanProcessorTaskFactory spanProcessorTaskFactory;
         internal int subsequentEmptyQueueCount;
         internal int retries;
+        internal int maxBatchSize;
 
-        public SpanProcessor(BlockingCollection<Span> spanQueue, IClientProvider clientProvider)
+        public SpanProcessor(BlockingCollection<Span> spanQueue, IClientProvider clientProvider, int maxBatchSize)
         {
             if ( spanQueue == null) 
             {
@@ -47,7 +45,8 @@ namespace Medidata.ZipkinTracerModule.Collector
 
             this.spanQueue = spanQueue;
             this.clientProvider = clientProvider;
-            logEntries = new List<LogEntry>(MAX_BATCH_SIZE);
+            this.maxBatchSize = maxBatchSize;
+            logEntries = new List<LogEntry>(maxBatchSize);
             protocolFactory = new TBinaryProtocol.Factory();
             spanProcessorTaskFactory = new SpanProcessorTaskFactory();
         }
@@ -90,7 +89,7 @@ namespace Medidata.ZipkinTracerModule.Collector
                 subsequentEmptyQueueCount++;
             }
 
-            if (logEntries.Count() >= MAX_BATCH_SIZE
+            if (logEntries.Count() >= maxBatchSize
                 || logEntries.Any() && cancellationTokenSource.Token.IsCancellationRequested
                 || logEntries.Any() && subsequentEmptyQueueCount > MAX_SUBSEQUENT_EMPTY_QUEUE)
             {

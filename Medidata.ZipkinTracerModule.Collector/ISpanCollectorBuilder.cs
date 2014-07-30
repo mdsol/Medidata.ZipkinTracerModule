@@ -8,6 +8,6 @@ namespace Medidata.ZipkinTracerModule.Collector
 {
     public interface ISpanCollectorBuilder
     {
-        SpanCollector Build(string zipkinServer, int zipkinPort);
+        SpanCollector Build(string zipkinServer, int zipkinPort, int maxProcessorBatchSize);
     }
 }

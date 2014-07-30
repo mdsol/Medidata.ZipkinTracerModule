@@ -16,28 +16,21 @@ namespace Medidata.ZipkinTracerModule
 
         public ZipkinClient(IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder)
         {
-            if ( String.IsNullOrEmpty(zipkinConfig.ZipkinServerName)) 
-            {
-                throw new ArgumentNullException("zipkinConfig.ZipkinServerName is null");
-            }
-            
-            if ( String.IsNullOrEmpty(zipkinConfig.ZipkinServerPort))
-            {
-                throw new ArgumentNullException("zipkinConfig.ZipkinServerPort is null");
-            }
+            CheckNullConfigValues(zipkinConfig);
 
-            if ( String.IsNullOrEmpty(zipkinConfig.ServiceName))
-            {
-                throw new ArgumentNullException("zipkinConfig.ServiceName value is null");
-            }
-            
             int port;
             if ( !int.TryParse(zipkinConfig.ZipkinServerPort, out port) )
             {
                 throw new ArgumentException("zipkinConfig port is not an int");
             }
 
-            spanCollector = spanCollectorBuilder.Build(zipkinConfig.ZipkinServerName, port);
+            int spanProcessorBatchSize;
+            if ( !int.TryParse(zipkinConfig.SpanProcessorBatchSize, out spanProcessorBatchSize) )
+            {
+                throw new ArgumentException("zipkinConfig spanProcessorBatchSize is not an int");
+            }
+
+            spanCollector = spanCollectorBuilder.Build(zipkinConfig.ZipkinServerName, port, spanProcessorBatchSize);
             spanTracer = new SpanTracer(spanCollector, zipkinConfig.ServiceName, new ServiceEndpoint());
         }
 
@@ -59,6 +52,29 @@ namespace Medidata.ZipkinTracerModule
         public void EndClientSpan(Span span, int duration)
         {
             spanTracer.EndClientSpan(span, duration);
+        }
+
+        private static void CheckNullConfigValues(IZipkinConfig zipkinConfig)
+        {
+            if (String.IsNullOrEmpty(zipkinConfig.ZipkinServerName))
+            {
+                throw new ArgumentNullException("zipkinConfig.ZipkinServerName is null");
+            }
+
+            if (String.IsNullOrEmpty(zipkinConfig.ZipkinServerPort))
+            {
+                throw new ArgumentNullException("zipkinConfig.ZipkinServerPort is null");
+            }
+
+            if (String.IsNullOrEmpty(zipkinConfig.ServiceName))
+            {
+                throw new ArgumentNullException("zipkinConfig.ServiceName value is null");
+            }
+
+            if (String.IsNullOrEmpty(zipkinConfig.SpanProcessorBatchSize))
+            {
+                throw new ArgumentNullException("zipkinConfig.SpanProcessorBatchSize value is null");
+            }
         }
     }
 }

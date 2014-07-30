@@ -46,6 +46,19 @@ namespace Medidata.ZipkinTracerModule.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
+        public void CTOR_WithNullSpanProcessorBatchSize()
+        {
+            var zipkinConfigStub = MockRepository.GenerateStub<IZipkinConfig>();
+            zipkinConfigStub.Expect(x => x.ZipkinServerName).Return(fixture.Create<string>());
+            zipkinConfigStub.Expect(x => x.ZipkinServerPort).Return("123");
+            zipkinConfigStub.Expect(x => x.ServiceName).Return(fixture.Create<string>());
+            zipkinConfigStub.Expect(x => x.SpanProcessorBatchSize).Return(null);
+
+            var zipkinClient = new ZipkinClient(zipkinConfigStub, spanCollectorBuilder);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullServiceName()
         {
             var zipkinConfigStub = MockRepository.GenerateStub<IZipkinConfig>();
@@ -63,6 +76,20 @@ namespace Medidata.ZipkinTracerModule.Test
             zipkinConfigStub.Expect(x => x.ZipkinServerName).Return(fixture.Create<string>());
             zipkinConfigStub.Expect(x => x.ZipkinServerPort).Return(fixture.Create<string>());
             zipkinConfigStub.Expect(x => x.ServiceName).Return(fixture.Create<string>());
+            zipkinConfigStub.Expect(x => x.SpanProcessorBatchSize).Return(fixture.Create<string>());
+
+            var zipkinClient = new ZipkinClient(zipkinConfigStub, spanCollectorBuilder);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void CTOR_WithNonIntegerSpanProcessorBatchSize()
+        {
+            var zipkinConfigStub = MockRepository.GenerateStub<IZipkinConfig>();
+            zipkinConfigStub.Expect(x => x.ZipkinServerName).Return(fixture.Create<string>());
+            zipkinConfigStub.Expect(x => x.ZipkinServerPort).Return("123");
+            zipkinConfigStub.Expect(x => x.ServiceName).Return(fixture.Create<string>());
+            zipkinConfigStub.Expect(x => x.SpanProcessorBatchSize).Return(fixture.Create<string>());
 
             var zipkinClient = new ZipkinClient(zipkinConfigStub, spanCollectorBuilder);
         }
@@ -123,8 +150,8 @@ namespace Medidata.ZipkinTracerModule.Test
 
         private ZipkinClient SetupZipkinClient()
         {
-            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(MockRepository.GenerateStub<IClientProvider>());
-            spanCollectorBuilder.Expect(x => x.Build(Arg<string>.Is.Anything, Arg<int>.Is.Anything)).Return(spanCollectorStub);
+            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(MockRepository.GenerateStub<IClientProvider>(), 0);
+            spanCollectorBuilder.Expect(x => x.Build(Arg<string>.Is.Anything, Arg<int>.Is.Anything, Arg<int>.Is.Anything)).Return(spanCollectorStub);
 
             return new ZipkinClient(CreateZipkinConfigWithValues(), spanCollectorBuilder);
         }
@@ -134,6 +161,7 @@ namespace Medidata.ZipkinTracerModule.Test
             var zipkinConfigStub = MockRepository.GenerateStub<IZipkinConfig>();
             zipkinConfigStub.Expect(x => x.ZipkinServerName).Return(fixture.Create<string>());
             zipkinConfigStub.Expect(x => x.ZipkinServerPort).Return("123");
+            zipkinConfigStub.Expect(x => x.SpanProcessorBatchSize).Return("123");
             zipkinConfigStub.Expect(x => x.ServiceName).Return(fixture.Create<string>());
             return zipkinConfigStub;
         }

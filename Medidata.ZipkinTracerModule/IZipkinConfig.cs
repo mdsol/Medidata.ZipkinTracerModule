@@ -11,5 +11,6 @@ namespace Medidata.ZipkinTracerModule
         string ZipkinServerName { get; }
         string ZipkinServerPort { get; }
         string ServiceName { get; }
+        string SpanProcessorBatchSize { get; }
     }
 }

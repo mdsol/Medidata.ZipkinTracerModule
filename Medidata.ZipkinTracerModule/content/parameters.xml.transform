@@ -5,7 +5,10 @@
   <parameter name="Zipkin Scribe Server Port" description="Zipkin scribe server port" defaultValue="9410">
     <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinScribeServerPort']/@value" />
   </parameter>
-  <parameter name="Zipkin Server Name" description="Service name to be traced in Zipkin" defaultValue="Gambit">
+  <parameter name="Service Name" description="Service name to be traced in Zipkin" defaultValue="Gambit">
     <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='ServiceName']/@value" />
+  </parameter>
+  <parameter name="Span Processor Batch Size" description="Number of spans to send to zipkin collector in one go" defaultValue="10">
+    <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='spanProcessorBatchSize']/@value" />
   </parameter>
 </parameters>
