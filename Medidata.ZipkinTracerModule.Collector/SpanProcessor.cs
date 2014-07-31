@@ -46,7 +46,7 @@ namespace Medidata.ZipkinTracerModule.Collector
             this.spanQueue = spanQueue;
             this.clientProvider = clientProvider;
             this.maxBatchSize = maxBatchSize;
-            logEntries = new List<LogEntry>(maxBatchSize);
+            logEntries = new List<LogEntry>();
             protocolFactory = new TBinaryProtocol.Factory();
             spanProcessorTaskFactory = new SpanProcessorTaskFactory();
         }
@@ -78,7 +78,7 @@ namespace Medidata.ZipkinTracerModule.Collector
         internal void LogSubmittedSpans()
         {
             Span span;
-            spanQueue.TryTake(out span, WAIT_INTERVAL_TO_DEQUEUE_MS);
+            spanQueue.TryTake(out span);
             if (span != null)
             {
                 logEntries.Add(Create(span));
@@ -93,9 +93,10 @@ namespace Medidata.ZipkinTracerModule.Collector
                 || logEntries.Any() && cancellationTokenSource.Token.IsCancellationRequested
                 || logEntries.Any() && subsequentEmptyQueueCount > MAX_SUBSEQUENT_EMPTY_QUEUE)
             {
-                Log(clientProvider, logEntries);
-                logEntries.Clear();
+                var entries = logEntries;
+                logEntries = new List<LogEntry>();
                 subsequentEmptyQueueCount = 0;
+                Log(clientProvider, entries);
             }
         }
 
