@@ -10,7 +10,7 @@ This nuget package implements the zipkin tracer client for .net applications.  I
 
 1) web.config 
 
-	The following will be added to add the httpModule to your project.  Please don't modify this.
+The following will be added to add the httpModule to your project.  Please don't modify this.
 
  ```
   <system.webServer>
@@ -23,7 +23,7 @@ This nuget package implements the zipkin tracer client for .net applications.  I
 
 2) appsettings.template.config
 
-	Add 4 additional configurations. Please verify these values and modify them according to your service/environment.
+Add 4 additional configurations. Please verify these values and modify them according to your service/environment.
 
 	```
 <appSettings>
@@ -45,9 +45,9 @@ This nuget package implements the zipkin tracer client for .net applications.  I
 	
 3) parameters.xml
 
-	This is used in opscode's xml when deploying service (i.e. Gambit) to customize the values to be used in appsettings.
+This is used in opscode's xml when deploying service (i.e. Gambit) to customize the values to be used in appsettings.
 
-	The values are the same as appsettings.template.config
+The values are the same as appsettings.template.config
 
 ```
 <parameters>
