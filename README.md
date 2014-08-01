@@ -11,6 +11,7 @@ This nuget package implements the zipkin tracer client for .net applications.  I
 1) web.config 
 
 	The following will be added to add the httpModule to your project.  Please don't modify this.
+
  ```
   <system.webServer>
     <modules>
@@ -19,9 +20,11 @@ This nuget package implements the zipkin tracer client for .net applications.  I
   </system.webServer>
   ```
 
+
 2) appsettings.template.config
 
 	Add 4 additional configurations. Please verify these values and modify them according to your service/environment.
+
 	```
 <appSettings>
   <add key="zipkinScribeServerName" value="zipkinvm.cloudapp.net" />
@@ -30,6 +33,7 @@ This nuget package implements the zipkin tracer client for .net applications.  I
   <add key="spanProcessorBatchSize" value="10" />
 </appSettings>
 	```
+
 	zipkinScribeServerName - the zipkin scribe/collector server name to connect to send the Spans
 
 	zipkinScribeServerPort - the zipkin scribe/collector server port to connect to send the Spans
@@ -42,7 +46,9 @@ This nuget package implements the zipkin tracer client for .net applications.  I
 3) parameters.xml
 
 	This is used in opscode's xml when deploying service (i.e. Gambit) to customize the values to be used in appsettings.
+
 	The values are the same as appsettings.template.config
+
 ```
 <parameters>
   <parameter name="Zipkin Scribe Server Name" description="Zipkin scribe server name" defaultValue="zipkinvm.cloudapp.net">
