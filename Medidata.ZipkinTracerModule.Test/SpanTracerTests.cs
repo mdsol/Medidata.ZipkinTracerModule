@@ -17,7 +17,7 @@ namespace Medidata.ZipkinTracerModule.Test
         public void Init()
         {
             fixture = new Fixture();
-            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(MockRepository.GenerateStub<IClientProvider>());
+            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(MockRepository.GenerateStub<IClientProvider>(), 0);
             zipkinEndpointStub = MockRepository.GenerateStub<ServiceEndpoint>();
         }
 

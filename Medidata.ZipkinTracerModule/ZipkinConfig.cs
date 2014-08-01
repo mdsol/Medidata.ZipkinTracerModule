@@ -24,5 +24,10 @@ namespace Medidata.ZipkinTracerModule
         {
             get {  return ConfigurationManager.AppSettings["zipkinScribeServerPort"];}
         }
+
+        public string SpanProcessorBatchSize
+        {
+            get {  return ConfigurationManager.AppSettings["spanProcessorBatchSize"];}
+        }
     }
 }

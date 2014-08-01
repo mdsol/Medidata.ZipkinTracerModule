@@ -18,6 +18,7 @@ namespace Medidata.ZipkinTracerModule.Collector.Test
         private SpanProcessorTaskFactory taskFactory;
         private IClientProvider clientProvider;
         private BlockingCollection<Span> queue;
+        private int testMaxBatchSize;
 
         [TestInitialize]
         public void Init()
@@ -26,7 +27,8 @@ namespace Medidata.ZipkinTracerModule.Collector.Test
 
             queue = new BlockingCollection<Span>();
             clientProvider = MockRepository.GenerateStub<IClientProvider>();
-            spanProcessor = new SpanProcessor(queue, clientProvider);
+            testMaxBatchSize = 10;
+            spanProcessor = new SpanProcessor(queue, clientProvider, testMaxBatchSize);
             taskFactory = MockRepository.GenerateStub<SpanProcessorTaskFactory>();
             spanProcessor.spanProcessorTaskFactory = taskFactory;
         }
@@ -35,14 +37,14 @@ namespace Medidata.ZipkinTracerModule.Collector.Test
         [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullSpanQueue()
         {
-            var spanProcessor = new SpanProcessor(null, MockRepository.GenerateStub<IClientProvider>());
+            var spanProcessor = new SpanProcessor(null, MockRepository.GenerateStub<IClientProvider>(), fixture.Create<int>());
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullClientProvider()
         {
-            var spanProcessor = new SpanProcessor(new BlockingCollection<Span>(), null);
+            var spanProcessor = new SpanProcessor(new BlockingCollection<Span>(), null, fixture.Create<int>());
         }
 
         [TestMethod]
@@ -125,7 +127,7 @@ namespace Medidata.ZipkinTracerModule.Collector.Test
 
         private void AddLogEntriesToMaxBatchSize()
         {
-            for (int i = 0; i < SpanProcessor.MAX_BATCH_SIZE + 1; i++)
+            for (int i = 0; i < testMaxBatchSize + 1; i++)
             {
                 spanProcessor.logEntries.Add(new LogEntry());
             }

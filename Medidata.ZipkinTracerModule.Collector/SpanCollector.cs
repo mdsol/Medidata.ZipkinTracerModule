@@ -16,7 +16,7 @@ namespace Medidata.ZipkinTracerModule.Collector
         internal SpanProcessor spanProcessor;
         internal IClientProvider clientProvider;
 
-        public SpanCollector(IClientProvider clientProvider)
+        public SpanCollector(IClientProvider clientProvider, int maxProcessorBatchSize)
         {
             this.clientProvider = clientProvider;
 
@@ -31,7 +31,7 @@ namespace Medidata.ZipkinTracerModule.Collector
             }
             
             spanQueue = new BlockingCollection<Span>(MAX_QUEUE_SIZE);
-            spanProcessor = new SpanProcessor(spanQueue, clientProvider);
+            spanProcessor = new SpanProcessor(spanQueue, clientProvider, maxProcessorBatchSize);
         }
 
         public virtual void Collect(Span span)
