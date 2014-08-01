@@ -25,14 +25,14 @@ The following will be added to add the httpModule to your project.  Please don't
 
 Add 4 additional configurations. Please verify these values and modify them according to your service/environment.
 
-	```
+```
 <appSettings>
   <add key="zipkinScribeServerName" value="zipkinvm.cloudapp.net" />
   <add key="zipkinScribeServerPort" value="9410" />
   <add key="ServiceName" value="Name of your Service i.e.Gambit" />
   <add key="spanProcessorBatchSize" value="10" />
 </appSettings>
-	```
+```
 
 	zipkinScribeServerName - the zipkin scribe/collector server name to connect to send the Spans
 
