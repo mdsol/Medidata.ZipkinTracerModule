@@ -48,6 +48,15 @@
     <Compile Include="IClientProvider.cs" />
     <Compile Include="ISpanCollectorBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Proxy\EventArgs\CreateConnectionAsyncCompletedEventArgs.cs" />
+    <Compile Include="Proxy\Exceptions\ProxyException.cs" />
+    <Compile Include="Proxy\HttpProxyClient.cs" />
+    <Compile Include="Proxy\IProxyClient.cs" />
+    <Compile Include="Proxy\ProxyClientFactory.cs" />
+    <Compile Include="Proxy\Socks4aProxyClient.cs" />
+    <Compile Include="Proxy\Socks4ProxyClient.cs" />
+    <Compile Include="Proxy\Socks5ProxyClient.cs" />
+    <Compile Include="Proxy\Utils.cs" />
     <Compile Include="SpanCollector.cs" />
     <Compile Include="SpanCollectorBuilder.cs" />
     <Compile Include="SpanProcessor.cs" />
