@@ -47,12 +47,11 @@ namespace Medidata.ZipkinTracerModule
             newSpan.Name = requestName;
             newSpan.Annotations = new List<Annotation>();
 
-            // set annotation - zipkinCoreConstants.CLIENT_SEND
             var annotation = new Annotation()
             {
                 Host = zipkinEndpoint.GetEndpoint(serviceName),
                 Timestamp = GetTimeStamp(),
-                Value = zipkinCoreConstants.CLIENT_SEND
+                Value = zipkinCoreConstants.SERVER_RECV
             };
 
             newSpan.Annotations.Add(annotation);
@@ -62,13 +61,12 @@ namespace Medidata.ZipkinTracerModule
 
         public virtual void EndClientSpan(Span span, int duration)
         {
-            // set annotation - zipkinCoreConstants.CLIENT_RECV
             var annotation = new Annotation()
             {
                 Host = zipkinEndpoint.GetEndpoint(serviceName),
                 Duration = duration,  //duration is currently not supported by zipkin UI
                 Timestamp = GetTimeStamp(),
-                Value = zipkinCoreConstants.CLIENT_RECV
+                Value = zipkinCoreConstants.SERVER_SEND
             };
 
             span.Annotations.Add(annotation);
