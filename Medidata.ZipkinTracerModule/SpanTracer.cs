@@ -33,11 +33,10 @@ namespace Medidata.ZipkinTracerModule
             this.zipkinEndpoint = zipkinEndpoint;
         }
 
-        public virtual Span StartClientSpan(string requestName, string traceId, string parentSpanId)
+        public virtual Span StartClientSpan(string requestName, string traceId, string parentSpanId, string spanId)
         {
-            //generate new span Id
             var newSpan = new Span();
-            newSpan.Id = LongRandom(0, long.MaxValue);
+            newSpan.Id = Convert.ToInt64(spanId);
             newSpan.Trace_id = Convert.ToInt64(traceId);
 
             if ( !String.IsNullOrEmpty(parentSpanId))

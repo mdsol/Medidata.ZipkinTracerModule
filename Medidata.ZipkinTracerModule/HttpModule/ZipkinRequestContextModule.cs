@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using Medidata.CrossApplicationTracer;
 
 namespace Medidata.ZipkinTracerModule.HttpModule
 {
@@ -23,14 +24,14 @@ namespace Medidata.ZipkinTracerModule.HttpModule
                 {
                     string url = HttpContext.Current.Request.Path;
 
-                    //TODO: move this into a separate library to get headers from HttpContext
-                    var traceId = HttpContext.Current.Request.Headers["X-B3-Traceid"];
-                    var parentSpanId = HttpContext.Current.Request.Headers["X-B3-Spanid"];
-                    var sampled = HttpContext.Current.Request.Headers["X-B3-Sampled"];
+                    var traceProvider = new TraceProvider(new System.Web.HttpContextWrapper(HttpContext.Current));
+                    var traceId = traceProvider.TraceId;
+                    var parentSpanId = traceProvider.ParentSpanId;
+                    var spanId = traceProvider.SpanId;
 
                     IZipkinClient zipkinClient = InitializeZipkinClient();
 
-                    var span = StartZipkinSpan(zipkinClient, url, traceId, parentSpanId);
+                    var span = StartZipkinSpan(zipkinClient, url, traceId, parentSpanId, spanId);
 
                     HttpContext.Current.Items["zipkinClient"] = zipkinClient;
                     HttpContext.Current.Items["span"] = span;
@@ -81,25 +82,28 @@ namespace Medidata.ZipkinTracerModule.HttpModule
             }
         }
 
-        internal Span StartZipkinSpan(IZipkinClient zipkinClient, string url, string traceId, string parentSpanId)
+        internal Span StartZipkinSpan(IZipkinClient zipkinClient, string url, string traceId, string parentSpanId, string spanId)
         {
             Span span = null;
 
-            if (traceId != null)
+            if ( string.IsNullOrEmpty(traceId))
             {
-                try
-                {
-                    span = zipkinClient.StartClientSpan(url, traceId, parentSpanId);
-                }
-                catch (Exception ex)
-                {
-                    logger.Event("Zipkin StartClientSpan : " + ex.Message, null,null, ex);
-                }
+                logger.Event("traceId is null or empty", null, null);
+            }
+            else if (string.IsNullOrEmpty(spanId))
+            {
+                logger.Event("spanId is null or empty", null, null);
             }
             else
             {
-                var message = string.Format("Zipkin StartClientSpan : Span is not traced.\n TraceId - {0}, SpanId - {1}", traceId, parentSpanId);
-                logger.Event(message, null, null);
+                try
+                {
+                    span = zipkinClient.StartClientSpan(url, traceId, parentSpanId, spanId);
+                }
+                catch (Exception ex)
+                {
+                    logger.Event("Zipkin StartClientSpan : " + ex.Message, null, null, ex);
+                }
             }
 
             return span;

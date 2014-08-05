@@ -8,7 +8,7 @@ namespace Medidata.ZipkinTracerModule
 {
     public interface IZipkinClient
     {
-        Span StartClientSpan(string requestName, string traceId, string parentSpanId);
+        Span StartClientSpan(string requestName, string traceId, string parentSpanId, string spanId);
         void EndClientSpan(Span span, int duration);
     }
 }
