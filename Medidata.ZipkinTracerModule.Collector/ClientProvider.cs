@@ -13,10 +13,9 @@ namespace Medidata.ZipkinTracerModule.Collector
         private readonly string host;
         private readonly int port;
         private TTransport transport;
+        internal ZipkinCollector.Client Client;
 
-        private ZipkinCollector.Client Client;
-
-        private static ClientProvider instance = null;
+        internal static ClientProvider instance = null;
 
         private ClientProvider(string host, int port) 
         {
