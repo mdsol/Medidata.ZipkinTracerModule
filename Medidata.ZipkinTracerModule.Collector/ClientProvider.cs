@@ -14,12 +14,23 @@ namespace Medidata.ZipkinTracerModule.Collector
         private readonly int port;
         private TTransport transport;
 
-        public ZipkinCollector.Client Client { get; private set; }
+        private ZipkinCollector.Client Client;
 
-        public ClientProvider(string host, int port) 
+        private static ClientProvider instance = null;
+
+        private ClientProvider(string host, int port) 
         {
             this.host = host;
             this.port = port;
+        }
+
+        public static ClientProvider GetInstance(string host, int port)
+        {
+            if (instance == null)
+            {
+                instance = new ClientProvider(host, port);
+            }
+            return instance;
         }
 
         public void Setup()
@@ -38,6 +49,7 @@ namespace Medidata.ZipkinTracerModule.Collector
                 transport.Close();
                 transport.Dispose();
             }
+            instance = null;
         }
 
         public void Log(List<LogEntry> logEntries)
