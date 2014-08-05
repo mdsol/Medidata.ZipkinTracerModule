@@ -66,7 +66,7 @@ namespace Medidata.ZipkinTracerModule.Test
 
             var annotation = resultSpan.Annotations[0] as Annotation;
             Assert.IsNotNull(annotation);
-            Assert.AreEqual(zipkinCoreConstants.CLIENT_SEND, annotation.Value);
+            Assert.AreEqual(zipkinCoreConstants.SERVER_RECV, annotation.Value);
             Assert.IsNotNull(annotation.Timestamp);
             Assert.IsNotNull(annotation.Host);
 
@@ -101,7 +101,7 @@ namespace Medidata.ZipkinTracerModule.Test
 
             Assert.AreEqual(serviceName, endpoint.Service_name);
             Assert.AreEqual(duration, annotation.Duration);
-            Assert.AreEqual(zipkinCoreConstants.CLIENT_RECV, annotation.Value);
+            Assert.AreEqual(zipkinCoreConstants.SERVER_SEND, annotation.Value);
             Assert.IsNotNull(annotation.Timestamp);
 
             return true;
