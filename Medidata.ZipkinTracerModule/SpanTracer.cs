@@ -79,11 +79,5 @@ namespace Medidata.ZipkinTracerModule
             var t = DateTime.UtcNow - new DateTime(1970, 1, 1);
             return Convert.ToInt64(t.TotalMilliseconds * 1000);
         }
-
-        private long LongRandom(long min, long max)
-        {
-            byte[] gb = Guid.NewGuid().ToByteArray();
-            return BitConverter.ToInt64(gb, 0);
-        }
     }
 }
