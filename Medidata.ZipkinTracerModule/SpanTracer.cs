@@ -33,11 +33,10 @@ namespace Medidata.ZipkinTracerModule
             this.zipkinEndpoint = zipkinEndpoint;
         }
 
-        public virtual Span StartClientSpan(string requestName, string traceId, string parentSpanId)
+        public virtual Span StartClientSpan(string requestName, string traceId, string parentSpanId, string spanId)
         {
-            //generate new span Id
             var newSpan = new Span();
-            newSpan.Id = LongRandom(0, long.MaxValue);
+            newSpan.Id = Convert.ToInt64(spanId);
             newSpan.Trace_id = Convert.ToInt64(traceId);
 
             if ( !String.IsNullOrEmpty(parentSpanId))
@@ -48,12 +47,11 @@ namespace Medidata.ZipkinTracerModule
             newSpan.Name = requestName;
             newSpan.Annotations = new List<Annotation>();
 
-            // set annotation - zipkinCoreConstants.CLIENT_SEND
             var annotation = new Annotation()
             {
                 Host = zipkinEndpoint.GetEndpoint(serviceName),
                 Timestamp = GetTimeStamp(),
-                Value = zipkinCoreConstants.CLIENT_SEND
+                Value = zipkinCoreConstants.SERVER_RECV
             };
 
             newSpan.Annotations.Add(annotation);
@@ -63,13 +61,12 @@ namespace Medidata.ZipkinTracerModule
 
         public virtual void EndClientSpan(Span span, int duration)
         {
-            // set annotation - zipkinCoreConstants.CLIENT_RECV
             var annotation = new Annotation()
             {
                 Host = zipkinEndpoint.GetEndpoint(serviceName),
                 Duration = duration,  //duration is currently not supported by zipkin UI
                 Timestamp = GetTimeStamp(),
-                Value = zipkinCoreConstants.CLIENT_RECV
+                Value = zipkinCoreConstants.SERVER_SEND
             };
 
             span.Annotations.Add(annotation);
@@ -81,12 +78,6 @@ namespace Medidata.ZipkinTracerModule
         {
             var t = DateTime.UtcNow - new DateTime(1970, 1, 1);
             return Convert.ToInt64(t.TotalMilliseconds * 1000);
-        }
-
-        private long LongRandom(long min, long max)
-        {
-            byte[] gb = Guid.NewGuid().ToByteArray();
-            return BitConverter.ToInt64(gb, 0);
         }
     }
 }

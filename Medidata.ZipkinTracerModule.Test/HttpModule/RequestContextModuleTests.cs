@@ -35,25 +35,41 @@ namespace Medidata.ZipkinTracerModule.Test.HttpModule
             var url = fixture.Create<string>();
             var traceId = fixture.Create<string>();
             var parentSpanId = fixture.Create<string>();
+            var spanId = fixture.Create<string>();
 
             var expectedSpan = new Span();
 
-            zipkinClient.Expect(x => x.StartClientSpan(url, traceId, parentSpanId)).Return(expectedSpan);
+            zipkinClient.Expect(x => x.StartClientSpan(url, traceId, parentSpanId, spanId)).Return(expectedSpan);
 
-            var resultSpan = requestContextModule.StartZipkinSpan(zipkinClient, url, traceId, parentSpanId);
+            var resultSpan = requestContextModule.StartZipkinSpan(zipkinClient, url, traceId, parentSpanId, spanId);
             Assert.AreEqual(expectedSpan, resultSpan);
         }
 
         [TestMethod]
-        public void StartZipkinSpan_nullTraceId()
+        public void StartZipkinSpan_EmptyTraceId()
         {
             var url = fixture.Create<string>();
-            string traceId = null;
+            string traceId = string.Empty;
             var parentSpanId = fixture.Create<string>();
+            var spanId = fixture.Create<string>();
 
-            var resultSpan = requestContextModule.StartZipkinSpan(zipkinClient,url, traceId, parentSpanId);
+            var resultSpan = requestContextModule.StartZipkinSpan(zipkinClient,url, traceId, parentSpanId, spanId);
 
-            zipkinClient.AssertWasNotCalled(x => x.StartClientSpan(Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything));
+            zipkinClient.AssertWasNotCalled(x => x.StartClientSpan(Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything));
+            logger.AssertWasCalled(x => x.Event(Arg<string>.Is.Anything, Arg<HashSet<string>>.Is.Null, Arg<object>.Is.Null));
+        }
+
+        [TestMethod]
+        public void StartZipkinSpan_EmptySpanId()
+        {
+            var url = fixture.Create<string>();
+            string traceId = fixture.Create<string>();
+            var parentSpanId = fixture.Create<string>();
+            var spanId = String.Empty;
+
+            var resultSpan = requestContextModule.StartZipkinSpan(zipkinClient,url, traceId, parentSpanId, spanId);
+
+            zipkinClient.AssertWasNotCalled(x => x.StartClientSpan(Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything));
             logger.AssertWasCalled(x => x.Event(Arg<string>.Is.Anything, Arg<HashSet<string>>.Is.Null, Arg<object>.Is.Null));
         }
 
@@ -63,12 +79,13 @@ namespace Medidata.ZipkinTracerModule.Test.HttpModule
             var url = fixture.Create<string>();
             var traceId = fixture.Create<string>();
             var parentSpanId = fixture.Create<string>();
+            var spanId = fixture.Create<string>();
 
             var exception = new Exception();
 
-            zipkinClient.Expect(x => x.StartClientSpan(Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Throw(exception);
+            zipkinClient.Expect(x => x.StartClientSpan(Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Throw(exception);
 
-            var resultSpan = requestContextModule.StartZipkinSpan(zipkinClient,url, traceId, parentSpanId);
+            var resultSpan = requestContextModule.StartZipkinSpan(zipkinClient,url, traceId, parentSpanId, spanId);
             Assert.IsNull(resultSpan);
 
             logger.AssertWasCalled(x => x.Event(Arg<string>.Is.Anything, Arg<HashSet<string>>.Is.Null, Arg<object>.Is.Null, Arg<Exception>.Is.Equal(exception)));

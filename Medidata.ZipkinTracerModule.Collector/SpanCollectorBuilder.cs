@@ -12,7 +12,7 @@ namespace Medidata.ZipkinTracerModule.Collector
     {
         public SpanCollector Build(string zipkinServer, int zipkinPort, int maxProcessorBatchSize)
         {
-            return new SpanCollector(new ClientProvider(zipkinServer, zipkinPort), maxProcessorBatchSize);
+            return new SpanCollector(ClientProvider.GetInstance(zipkinServer, zipkinPort), maxProcessorBatchSize);
         }
     }
 }

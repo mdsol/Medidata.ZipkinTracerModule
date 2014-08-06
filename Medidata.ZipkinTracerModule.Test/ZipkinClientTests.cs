@@ -120,15 +120,16 @@ namespace Medidata.ZipkinTracerModule.Test
             var requestName = fixture.Create<string>();
             var traceId = fixture.Create<string>();
             var parentSpanId = fixture.Create<string>();
+            var spanId = fixture.Create<string>();
 
             var zipkinClient = SetupZipkinClient();
             spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
             zipkinClient.spanTracer = spanTracerStub;
 
             var expectedSpan = new Span();
-            spanTracerStub.Expect(x => x.StartClientSpan(requestName, traceId, parentSpanId)).Return(expectedSpan);
+            spanTracerStub.Expect(x => x.StartClientSpan(requestName, traceId, parentSpanId, spanId)).Return(expectedSpan);
 
-            var resultSpan = zipkinClient.StartClientSpan(requestName, traceId, parentSpanId);
+            var resultSpan = zipkinClient.StartClientSpan(requestName, traceId, parentSpanId, spanId);
 
             Assert.AreEqual(expectedSpan, resultSpan);
         }
