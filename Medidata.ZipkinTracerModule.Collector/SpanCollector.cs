@@ -10,9 +10,9 @@ namespace Medidata.ZipkinTracerModule.Collector
 {
     public class SpanCollector
     {
-        internal BlockingCollection<Span> spanQueue;
-
         private const int MAX_QUEUE_SIZE = 100;
+        internal static BlockingCollection<Span> spanQueue = new BlockingCollection<Span>(MAX_QUEUE_SIZE);
+
         internal SpanProcessor spanProcessor;
         internal IClientProvider clientProvider;
 
@@ -30,7 +30,6 @@ namespace Medidata.ZipkinTracerModule.Collector
                 throw tEx;
             }
             
-            spanQueue = new BlockingCollection<Span>(MAX_QUEUE_SIZE);
             spanProcessor = new SpanProcessor(spanQueue, clientProvider, maxProcessorBatchSize);
         }
 

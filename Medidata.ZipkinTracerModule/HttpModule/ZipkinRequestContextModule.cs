@@ -86,6 +86,8 @@ namespace Medidata.ZipkinTracerModule.HttpModule
         {
             Span span = null;
 
+            logger.Event(String.Format("TraceId - {0}, ParentSpanId - {1}, SpanId - {2}", traceId, parentSpanId,  spanId), null, null);
+
             if ( string.IsNullOrEmpty(traceId))
             {
                 logger.Event("traceId is null or empty", null, null);

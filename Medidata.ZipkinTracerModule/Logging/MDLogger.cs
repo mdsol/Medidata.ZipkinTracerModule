@@ -1,4 +1,5 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,8 @@ namespace Medidata.ZipkinTracerModule.Logging
     //This class will allow the IMDLogger interface to get resolved in Unity since it is being injected into ZipkinTracerModule.
     public class MDLogger : IMDLogger
     {
+        ILog log = LogManager.GetLogger("Zipkin");
+
         public string Component
         {
             get { throw new NotImplementedException(); }
@@ -74,10 +77,12 @@ namespace Medidata.ZipkinTracerModule.Logging
 
         public void Event(string message, HashSet<string> tags, object data)
         {
+            log.Debug("TK message - " + message);
         }
 
         public void Event(string message, HashSet<string> tags, object data, Exception e)
         {
+            log.Error("TK message - " + message, e);
         }
 
         public string EventRow(string message, HashSet<string> tags, object data, Exception e)
