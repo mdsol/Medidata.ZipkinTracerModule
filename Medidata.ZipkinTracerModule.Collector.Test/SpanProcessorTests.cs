@@ -51,22 +51,21 @@ namespace Medidata.ZipkinTracerModule.Collector.Test
         public void Start()
         {
             spanProcessor.Start();
-            taskFactory.Expect(x => x.CreateAndStart(Arg<Action>.Matches(y => ValidateStartAction(y, spanProcessor)), Arg<CancellationTokenSource>.Is.Anything));
+            taskFactory.Expect(x => x.CreateAndStart(Arg<Action>.Matches(y => ValidateStartAction(y, spanProcessor))));
         }
 
         [TestMethod]
         public void Stop()
         {
-            spanProcessor.cancellationTokenSource = new CancellationTokenSource();
             spanProcessor.Stop();
-
-            Assert.IsTrue(spanProcessor.cancellationTokenSource.Token.IsCancellationRequested);
+            taskFactory.AssertWasCalled(x => x.StopTask());
         }
 
         [TestMethod]
         public void Stop_RemainingGetLoggedIfCancelled()
         {
-            spanProcessor.cancellationTokenSource = new CancellationTokenSource();
+            taskFactory.Expect(x => x.IsTaskCancelled()).Return(true);
+
             spanProcessor.spanQueue.Add(new Span());
             spanProcessor.Stop();
 
@@ -100,7 +99,6 @@ namespace Medidata.ZipkinTracerModule.Collector.Test
         [TestMethod]
         public void LogSubmittedSpans_WhenQueueIsSubsequentlyEmptyForMaxTimes()
         {
-            spanProcessor.cancellationTokenSource = new CancellationTokenSource();
             spanProcessor.subsequentEmptyQueueCount = SpanProcessor.MAX_SUBSEQUENT_EMPTY_QUEUE + 1;
             spanProcessor.logEntries.Add(new LogEntry());
             spanProcessor.LogSubmittedSpans();
@@ -111,7 +109,6 @@ namespace Medidata.ZipkinTracerModule.Collector.Test
         [TestMethod]
         public void LogSubmittedSpans_WhenLogEntriesReachMaxBatchSize()
         {
-            spanProcessor.cancellationTokenSource = new CancellationTokenSource();
             AddLogEntriesToMaxBatchSize();
             spanProcessor.LogSubmittedSpans();
 
@@ -121,7 +118,7 @@ namespace Medidata.ZipkinTracerModule.Collector.Test
 
         private bool ValidateStartAction(Action y, SpanProcessor spanProcessor)
         {
-            Assert.AreEqual(() => spanProcessor.LogSubmittedSpansWrapper(), y);
+            Assert.AreEqual(() => spanProcessor.LogSubmittedSpans(), y);
             return true;
         }
 

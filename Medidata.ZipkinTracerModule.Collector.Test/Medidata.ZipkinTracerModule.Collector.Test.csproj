@@ -68,6 +68,7 @@
     <Compile Include="SpanCollectorTests.cs" />
     <Compile Include="SpanProcessorTests.cs" />
     <Compile Include="ClientProviderTests.cs" />
+    <Compile Include="SpanProcesssorTaskFactoryTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Medidata.ZipkinTracerModule.Collector\Medidata.ZipkinTracerModule.Collector.csproj">

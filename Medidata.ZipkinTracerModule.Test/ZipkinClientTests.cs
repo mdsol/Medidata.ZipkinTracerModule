@@ -99,8 +99,6 @@ namespace Medidata.ZipkinTracerModule.Test
         {
             var zipkinClient = SetupZipkinClient();
 
-            zipkinClient.Init();
-
             spanCollectorStub.AssertWasCalled(x => x.Start()); 
         }
 
