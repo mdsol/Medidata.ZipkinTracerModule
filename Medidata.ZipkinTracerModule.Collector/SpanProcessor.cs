@@ -14,9 +14,6 @@ namespace Medidata.ZipkinTracerModule.Collector
 {
     public class SpanProcessor
     {
-        //wait time to poll for dequeuing
-        private const int WAIT_INTERVAL_TO_DEQUEUE_MS = 1000;
-
         //send contents of queue if it has been empty for number of polls
         internal const int MAX_SUBSEQUENT_EMPTY_QUEUE = 5;
 
@@ -25,7 +22,6 @@ namespace Medidata.ZipkinTracerModule.Collector
         private IClientProvider clientProvider;
 
         internal List<LogEntry> logEntries;
-        internal CancellationTokenSource cancellationTokenSource;
         internal SpanProcessorTaskFactory spanProcessorTaskFactory;
         internal int subsequentEmptyQueueCount;
         internal int retries;
@@ -53,29 +49,16 @@ namespace Medidata.ZipkinTracerModule.Collector
 
         public virtual void Stop()
         {
-            if (cancellationTokenSource != null)
-            {
-                cancellationTokenSource.Cancel();
-                LogSubmittedSpans();
-            }
+            spanProcessorTaskFactory.StopTask();
+            LogSubmittedSpans();
         }
 
         public virtual void Start()
         {
-            cancellationTokenSource = new CancellationTokenSource();
-            spanProcessorTaskFactory.CreateAndStart(() => LogSubmittedSpansWrapper(), cancellationTokenSource);
+            spanProcessorTaskFactory.CreateAndStart(() => LogSubmittedSpans());
         }
 
-        internal async void LogSubmittedSpansWrapper()
-        {
-            while(!cancellationTokenSource.Token.IsCancellationRequested )
-            {
-                LogSubmittedSpans();
-                await Task.Delay(500, cancellationTokenSource.Token);
-            } 
-        }
-
-        internal void LogSubmittedSpans()
+        internal virtual void LogSubmittedSpans()
         {
             Span span;
             spanQueue.TryTake(out span);
@@ -90,7 +73,7 @@ namespace Medidata.ZipkinTracerModule.Collector
             }
 
             if (logEntries.Count() >= maxBatchSize
-                || logEntries.Any() && cancellationTokenSource.Token.IsCancellationRequested
+                || logEntries.Any() && spanProcessorTaskFactory.IsTaskCancelled()
                 || logEntries.Any() && subsequentEmptyQueueCount > MAX_SUBSEQUENT_EMPTY_QUEUE)
             {
                 var entries = logEntries;

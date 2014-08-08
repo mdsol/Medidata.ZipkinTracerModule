@@ -49,10 +49,10 @@ namespace Medidata.ZipkinTracerModule.Collector.Test
 
             spanCollector.Collect(span);
 
-            Assert.AreEqual(1, spanCollector.spanQueue.Count);
+            Assert.AreEqual(1, SpanCollector.spanQueue.Count);
 
             Span queuedSpan;
-            var spanInQueue = spanCollector.spanQueue.TryTake(out queuedSpan);
+            var spanInQueue = SpanCollector.spanQueue.TryTake(out queuedSpan);
 
             Assert.AreEqual(span, queuedSpan);
         }
@@ -82,8 +82,8 @@ namespace Medidata.ZipkinTracerModule.Collector.Test
             clientProviderStub = MockRepository.GenerateStub<IClientProvider>();
             spanCollector = new SpanCollector(clientProviderStub, 0);
 
-            spanCollector.spanQueue = fixture.Create<BlockingCollection<Span>>();
-            spanProcessorStub = MockRepository.GenerateStub<SpanProcessor>(spanCollector.spanQueue, clientProviderStub, 0);
+            SpanCollector.spanQueue = fixture.Create<BlockingCollection<Span>>();
+            spanProcessorStub = MockRepository.GenerateStub<SpanProcessor>(SpanCollector.spanQueue, clientProviderStub, 0);
             spanCollector.spanProcessor = spanProcessorStub;
         }
     }
