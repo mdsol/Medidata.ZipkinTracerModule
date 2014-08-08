@@ -11,7 +11,7 @@ namespace Medidata.ZipkinTracerModule.Collector
     public class SpanProcessorTaskFactory
     {
         internal Task spanProcessorTaskInstance = null;
-        internal CancellationTokenSource cancellationTokenSource;
+        internal CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
         [ExcludeFromCodeCoverage]  //excluded from code coverage since this class is a 1 liner that starts up a background thread
         public virtual void CreateAndStart(Action action)
@@ -19,7 +19,6 @@ namespace Medidata.ZipkinTracerModule.Collector
             if (spanProcessorTaskInstance == null
                 || spanProcessorTaskInstance.Status == TaskStatus.Faulted)
             {
-                cancellationTokenSource = new CancellationTokenSource();
                 spanProcessorTaskInstance = new Task( () => ActionWrapper(action), cancellationTokenSource.Token, TaskCreationOptions.LongRunning);
                 spanProcessorTaskInstance.Start();
             }
@@ -27,15 +26,12 @@ namespace Medidata.ZipkinTracerModule.Collector
 
         public virtual void StopTask()
         {
-            if ( cancellationTokenSource != null)
-            {
-                cancellationTokenSource.Cancel();
-            }
+            cancellationTokenSource.Cancel();
         }
 
         internal async void ActionWrapper(Action action)
         {
-            while(!cancellationTokenSource.Token.IsCancellationRequested )
+            while(!IsTaskCancelled())
             {
                 action();
                 await Task.Delay(500, cancellationTokenSource.Token);
