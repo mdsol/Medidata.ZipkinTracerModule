@@ -73,7 +73,7 @@ namespace Medidata.ZipkinTracerModule.HttpModule
             {
                 try
                 {
-                    zipkinClient.EndClientSpan(span, stopwatch.Elapsed.Milliseconds * 1000);
+                    zipkinClient.EndSpan(span, stopwatch.Elapsed.Milliseconds * 1000);
                 }
                 catch (Exception ex)
                 {
@@ -100,7 +100,7 @@ namespace Medidata.ZipkinTracerModule.HttpModule
             {
                 try
                 {
-                    span = zipkinClient.StartClientSpan(url, traceId, parentSpanId, spanId);
+                    span = zipkinClient.StartSpan(url, traceId, parentSpanId, spanId);
                 }
                 catch (Exception ex)
                 {

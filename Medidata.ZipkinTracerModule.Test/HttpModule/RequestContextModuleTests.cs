@@ -39,7 +39,7 @@ namespace Medidata.ZipkinTracerModule.Test.HttpModule
 
             var expectedSpan = new Span();
 
-            zipkinClient.Expect(x => x.StartClientSpan(url, traceId, parentSpanId, spanId)).Return(expectedSpan);
+            zipkinClient.Expect(x => x.StartSpan(url, traceId, parentSpanId, spanId)).Return(expectedSpan);
 
             var resultSpan = requestContextModule.StartZipkinSpan(zipkinClient, url, traceId, parentSpanId, spanId);
             Assert.AreEqual(expectedSpan, resultSpan);
@@ -55,7 +55,7 @@ namespace Medidata.ZipkinTracerModule.Test.HttpModule
 
             var resultSpan = requestContextModule.StartZipkinSpan(zipkinClient,url, traceId, parentSpanId, spanId);
 
-            zipkinClient.AssertWasNotCalled(x => x.StartClientSpan(Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything));
+            zipkinClient.AssertWasNotCalled(x => x.StartSpan(Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything));
             logger.AssertWasCalled(x => x.Event(Arg<string>.Is.Anything, Arg<HashSet<string>>.Is.Null, Arg<object>.Is.Null), options => options.Repeat.Twice());
         }
 
@@ -69,7 +69,7 @@ namespace Medidata.ZipkinTracerModule.Test.HttpModule
 
             var resultSpan = requestContextModule.StartZipkinSpan(zipkinClient,url, traceId, parentSpanId, spanId);
 
-            zipkinClient.AssertWasNotCalled(x => x.StartClientSpan(Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything));
+            zipkinClient.AssertWasNotCalled(x => x.StartSpan(Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything));
             logger.AssertWasCalled(x => x.Event(Arg<string>.Is.Anything, Arg<HashSet<string>>.Is.Null, Arg<object>.Is.Null), options => options.Repeat.Twice());
         }
 
@@ -83,7 +83,7 @@ namespace Medidata.ZipkinTracerModule.Test.HttpModule
 
             var exception = new Exception();
 
-            zipkinClient.Expect(x => x.StartClientSpan(Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Throw(exception);
+            zipkinClient.Expect(x => x.StartSpan(Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Throw(exception);
 
             var resultSpan = requestContextModule.StartZipkinSpan(zipkinClient,url, traceId, parentSpanId, spanId);
             Assert.IsNull(resultSpan);
@@ -99,7 +99,7 @@ namespace Medidata.ZipkinTracerModule.Test.HttpModule
 
             requestContextModule.EndZipkinSpan(zipkinClient,stopWatch, span);
 
-            zipkinClient.AssertWasCalled(x => x.EndClientSpan(Arg<Span>.Is.Equal(span), Arg<int>.Is.Anything));
+            zipkinClient.AssertWasCalled(x => x.EndSpan(Arg<Span>.Is.Equal(span), Arg<int>.Is.Anything));
         }
 
         [TestMethod]
@@ -110,7 +110,7 @@ namespace Medidata.ZipkinTracerModule.Test.HttpModule
 
             var exception = new Exception();
 
-            zipkinClient.Expect(x => x.EndClientSpan(Arg<Span>.Is.Anything, Arg<int>.Is.Anything)).Throw(exception);
+            zipkinClient.Expect(x => x.EndSpan(Arg<Span>.Is.Anything, Arg<int>.Is.Anything)).Throw(exception);
 
             requestContextModule.EndZipkinSpan(zipkinClient,stopWatch, span);
 
@@ -125,7 +125,7 @@ namespace Medidata.ZipkinTracerModule.Test.HttpModule
 
             requestContextModule.EndZipkinSpan(zipkinClient,stopWatch, span);
 
-            zipkinClient.AssertWasNotCalled(x => x.EndClientSpan(Arg<Span>.Is.Anything, Arg<int>.Is.Anything));
+            zipkinClient.AssertWasNotCalled(x => x.EndSpan(Arg<Span>.Is.Anything, Arg<int>.Is.Anything));
             logger.AssertWasNotCalled(x => x.Event(Arg<string>.Is.Anything, Arg<HashSet<string>>.Is.Null, Arg<object>.Is.Null, Arg<Exception>.Is.Anything));
         }
 
@@ -137,7 +137,7 @@ namespace Medidata.ZipkinTracerModule.Test.HttpModule
 
             requestContextModule.EndZipkinSpan(null,stopWatch, span);
 
-            zipkinClient.AssertWasNotCalled(x => x.EndClientSpan(Arg<Span>.Is.Anything, Arg<int>.Is.Anything));
+            zipkinClient.AssertWasNotCalled(x => x.EndSpan(Arg<Span>.Is.Anything, Arg<int>.Is.Anything));
             logger.AssertWasNotCalled(x => x.Event(Arg<string>.Is.Anything, Arg<HashSet<string>>.Is.Null, Arg<object>.Is.Null, Arg<Exception>.Is.Anything));
         }
     }
