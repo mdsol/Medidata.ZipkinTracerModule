@@ -125,9 +125,9 @@ namespace Medidata.ZipkinTracerModule.Test
             zipkinClient.spanTracer = spanTracerStub;
 
             var expectedSpan = new Span();
-            spanTracerStub.Expect(x => x.StartClientSpan(requestName, traceId, parentSpanId, spanId)).Return(expectedSpan);
+            spanTracerStub.Expect(x => x.ReceiveServerSpan(requestName, traceId, parentSpanId, spanId)).Return(expectedSpan);
 
-            var resultSpan = zipkinClient.StartClientSpan(requestName, traceId, parentSpanId, spanId);
+            var resultSpan = zipkinClient.StartSpan(requestName, traceId, parentSpanId, spanId);
 
             Assert.AreEqual(expectedSpan, resultSpan);
         }
@@ -142,9 +142,9 @@ namespace Medidata.ZipkinTracerModule.Test
             var expectedSpan = new Span();
             var expectedDuration = fixture.Create<int>();
 
-            zipkinClient.EndClientSpan(expectedSpan, expectedDuration);
+            zipkinClient.EndSpan(expectedSpan, expectedDuration);
 
-            spanTracerStub.AssertWasCalled(x => x.EndClientSpan(expectedSpan, expectedDuration));
+            spanTracerStub.AssertWasCalled(x => x.SendServerSpan(expectedSpan, expectedDuration));
         }
 
         private ZipkinClient SetupZipkinClient()

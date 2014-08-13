@@ -40,14 +40,14 @@ namespace Medidata.ZipkinTracerModule
             spanCollector.Stop();
         }
         
-        public Span StartClientSpan(string requestName, string traceId, string parentSpanId, string spanId)
+        public Span StartSpan(string requestName, string traceId, string parentSpanId, string spanId)
         {
-            return spanTracer.StartClientSpan(requestName, traceId, parentSpanId, spanId);
+            return spanTracer.ReceiveServerSpan(requestName, traceId, parentSpanId, spanId);
         }
 
-        public void EndClientSpan(Span span, int duration)
+        public void EndSpan(Span span, int duration)
         {
-            spanTracer.EndClientSpan(span, duration);
+            spanTracer.SendServerSpan(span, duration);
         }
 
         private static void CheckNullConfigValues(IZipkinConfig zipkinConfig)

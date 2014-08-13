@@ -33,7 +33,7 @@ namespace Medidata.ZipkinTracerModule
             this.zipkinEndpoint = zipkinEndpoint;
         }
 
-        public virtual Span StartClientSpan(string requestName, string traceId, string parentSpanId, string spanId)
+        public virtual Span ReceiveServerSpan(string requestName, string traceId, string parentSpanId, string spanId)
         {
             var newSpan = new Span();
             newSpan.Id = Convert.ToInt64(spanId);
@@ -59,7 +59,7 @@ namespace Medidata.ZipkinTracerModule
             return newSpan;
         }
 
-        public virtual void EndClientSpan(Span span, int duration)
+        public virtual void SendServerSpan(Span span, int duration)
         {
             var annotation = new Annotation()
             {

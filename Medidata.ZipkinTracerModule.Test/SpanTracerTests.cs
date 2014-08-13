@@ -55,7 +55,7 @@ namespace Medidata.ZipkinTracerModule.Test
 
             zipkinEndpointStub.Expect(x => x.GetEndpoint(serviceName)).Return(new Endpoint() { Service_name = serviceName });
 
-            var resultSpan = spanTracer.StartClientSpan(requestName, traceId, parentSpanId, spanId);
+            var resultSpan = spanTracer.ReceiveServerSpan(requestName, traceId, parentSpanId, spanId);
 
             Assert.AreEqual(requestName, resultSpan.Name);
             Assert.AreEqual(traceId, resultSpan.Trace_id.ToString());
@@ -86,7 +86,7 @@ namespace Medidata.ZipkinTracerModule.Test
 
             zipkinEndpointStub.Expect(x => x.GetEndpoint(serviceName)).Return(new Endpoint() { Service_name = serviceName });
 
-            spanTracer.EndClientSpan(expectedSpan, expectedDuration);
+            spanTracer.SendServerSpan(expectedSpan, expectedDuration);
 
             spanCollectorStub.AssertWasCalled(x => x.Collect(Arg<Span>.Matches(y =>
                     ValidateSpan(y, serviceName, expectedDuration)
