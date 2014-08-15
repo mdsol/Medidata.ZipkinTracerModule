@@ -36,12 +36,12 @@ namespace Medidata.ZipkinTracerModule
         public virtual Span ReceiveServerSpan(string requestName, string traceId, string parentSpanId, string spanId)
         {
             var newSpan = new Span();
-            newSpan.Id = Convert.ToInt64(spanId);
-            newSpan.Trace_id = Convert.ToInt64(traceId);
+            newSpan.Id = Int64.Parse(spanId, System.Globalization.NumberStyles.HexNumber);
+            newSpan.Trace_id = Int64.Parse(traceId, System.Globalization.NumberStyles.HexNumber);
 
             if ( !String.IsNullOrEmpty(parentSpanId))
             {
-                newSpan.Parent_id = Convert.ToInt64(parentSpanId);
+                newSpan.Parent_id = Int64.Parse(parentSpanId, System.Globalization.NumberStyles.HexNumber);
             }
 
             newSpan.Name = requestName;
