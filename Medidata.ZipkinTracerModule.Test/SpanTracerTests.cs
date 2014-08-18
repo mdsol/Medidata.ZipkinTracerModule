@@ -56,11 +56,10 @@ namespace Medidata.ZipkinTracerModule.Test
             zipkinEndpointStub.Expect(x => x.GetEndpoint(serviceName)).Return(new Endpoint() { Service_name = serviceName });
 
             var resultSpan = spanTracer.ReceiveServerSpan(requestName, traceId, parentSpanId, spanId);
-
             Assert.AreEqual(requestName, resultSpan.Name);
-            Assert.AreEqual(traceId, resultSpan.Trace_id.ToString());
-            Assert.AreEqual(parentSpanId, resultSpan.Parent_id.ToString());
-            Assert.AreEqual(spanId, resultSpan.Id.ToString());
+            Assert.AreEqual(Int64.Parse(traceId, System.Globalization.NumberStyles.HexNumber), resultSpan.Trace_id);
+            Assert.AreEqual(Int64.Parse(parentSpanId, System.Globalization.NumberStyles.HexNumber), resultSpan.Parent_id);
+            Assert.AreEqual(Int64.Parse(spanId, System.Globalization.NumberStyles.HexNumber), resultSpan.Id);
 
             Assert.AreEqual(1, resultSpan.Annotations.Count);
 
