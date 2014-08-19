@@ -40,12 +40,12 @@ namespace Medidata.ZipkinTracerModule
             spanCollector.Stop();
         }
         
-        public Span StartSpan(string requestName, string traceId, string parentSpanId, string spanId)
+        public Span StartServerSpan(string requestName, string traceId, string parentSpanId, string spanId)
         {
             return spanTracer.ReceiveServerSpan(requestName, traceId, parentSpanId, spanId);
         }
 
-        public void EndSpan(Span span, int duration)
+        public void EndServerSpan(Span span, int duration)
         {
             spanTracer.SendServerSpan(span, duration);
         }
