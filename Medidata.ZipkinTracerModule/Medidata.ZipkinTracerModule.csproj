@@ -36,9 +36,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="Medidata.CrossApplicationTracer, Version=1.0.0.6, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Medidata.CrossApplicationTracer, Version=1.0.0.7, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Medidata.CrossApplicationTracer.1.0.0.6\lib\net40\Medidata.CrossApplicationTracer.dll</HintPath>
+      <HintPath>..\packages\Medidata.CrossApplicationTracer.1.0.0.7\lib\net40\Medidata.CrossApplicationTracer.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -67,6 +67,7 @@
     <Compile Include="ServiceEndpoint.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="content\appsettings.config.transform" />
     <None Include="content\appsettings.template.config.transform" />
     <None Include="content\parameters.xml.transform" />
     <None Include="content\web.config.transform" />
