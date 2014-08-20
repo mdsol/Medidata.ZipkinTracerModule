@@ -15,12 +15,12 @@
       <dependency id="Thrift" version="0.9.1.3" />
     </dependencies>
     <references>
-      <reference file="Medidata.ZipkinTracerModule.dll" />
+      <reference file="Medidata.ZipkinTracer.Core.dll" />
       <reference file="Medidata.ZipkinTracerModule.Collector.dll" />
     </references>
   </metadata>
   <files>
-    <file src="\bin\Release\Medidata.ZipkinTracerModule.dll" target="lib\net40" />
+    <file src="\bin\Release\Medidata.ZipkinTracer.Core.dll" target="lib\net40" />
     <file src="\bin\Release\Medidata.ZipkinTracerModule.Collector.dll" target="lib\net40" />
     <file src="\bin\Release\Medidata.ZipkinTracerModule.Collector.dll" target="lib\net45" />
     <file src="\content\appsettings.template.config.transform" target="content" />

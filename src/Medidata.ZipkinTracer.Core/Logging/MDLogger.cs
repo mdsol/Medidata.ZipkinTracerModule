@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Medidata.ZipkinTracerModule.Logging
+namespace Medidata.ZipkinTracer.Core.Logging
 {
     //This class is just a placeholder.  
     //Once the .NET logging module is completed, that will have the concrete class for logging

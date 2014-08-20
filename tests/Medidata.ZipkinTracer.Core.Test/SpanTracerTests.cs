@@ -4,7 +4,7 @@ using Ploeh.AutoFixture;
 using Medidata.ZipkinTracerModule.Collector;
 using Rhino.Mocks;
 
-namespace Medidata.ZipkinTracerModule.Test
+namespace Medidata.ZipkinTracer.Core.Test
 {
     [TestClass]
     public class SpanTracerTests

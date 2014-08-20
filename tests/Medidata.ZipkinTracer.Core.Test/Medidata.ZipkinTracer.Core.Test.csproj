@@ -6,8 +6,8 @@
     <ProjectGuid>{0158C8BD-D881-4EE8-A8C6-54707A67A00D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Medidata.ZipkinTracerModule.Test</RootNamespace>
-    <AssemblyName>Medidata.ZipkinTracerModule.Test</AssemblyName>
+    <RootNamespace>Medidata.ZipkinTracer.Core.Test</RootNamespace>
+    <AssemblyName>Medidata.ZipkinTracer.Core.Test</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -76,9 +76,9 @@
       <Project>{12e57184-b43e-43c5-ac19-06ad1dc25e96}</Project>
       <Name>Medidata.ZipkinTracerModule.Collector</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Medidata.ZipkinTracer.Core\Medidata.ZipkinTracerModule.csproj">
+    <ProjectReference Include="..\..\src\Medidata.ZipkinTracer.Core\Medidata.ZipkinTracer.Core.csproj">
       <Project>{eb432891-204b-4b97-bfb1-a820e424284e}</Project>
-      <Name>Medidata.ZipkinTracerModule</Name>
+      <Name>Medidata.ZipkinTracer.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

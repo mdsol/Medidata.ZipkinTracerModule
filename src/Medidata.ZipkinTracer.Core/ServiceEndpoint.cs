@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-namespace Medidata.ZipkinTracerModule
+namespace Medidata.ZipkinTracer.Core
 {
     public class ServiceEndpoint 
     {

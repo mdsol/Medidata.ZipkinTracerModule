@@ -1,13 +1,13 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
-using Medidata.ZipkinTracerModule.HttpModule;
+using Medidata.ZipkinTracer.Core.HttpModule;
 using Rhino.Mocks;
 using System.Diagnostics;
-using Medidata.ZipkinTracerModule.Logging;
+using Medidata.ZipkinTracer.Core.Logging;
 using System.Collections.Generic;
 
-namespace Medidata.ZipkinTracerModule.Test.HttpModule
+namespace Medidata.ZipkinTracer.Core.Test.HttpModule
 {
     [TestClass]
     public class RequestContextModuleTests

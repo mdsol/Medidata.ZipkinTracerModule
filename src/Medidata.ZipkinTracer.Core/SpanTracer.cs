@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Medidata.ZipkinTracerModule
+namespace Medidata.ZipkinTracer.Core
 {
     public class SpanTracer
     {
-        private Collector.SpanCollector spanCollector;
+        private Medidata.ZipkinTracerModule.Collector.SpanCollector spanCollector;
         private string serviceName;
         private ServiceEndpoint zipkinEndpoint;
 
-        public SpanTracer(Collector.SpanCollector spanCollector, string serviceName, ServiceEndpoint zipkinEndpoint)
+        public SpanTracer(Medidata.ZipkinTracerModule.Collector.SpanCollector spanCollector, string serviceName, ServiceEndpoint zipkinEndpoint)
         {
             if ( spanCollector == null) 
             {

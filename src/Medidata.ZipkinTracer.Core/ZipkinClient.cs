@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Medidata.ZipkinTracerModule
+namespace Medidata.ZipkinTracer.Core
 {
     public class ZipkinClient : IZipkinClient
     {
