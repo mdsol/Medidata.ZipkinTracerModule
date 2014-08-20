@@ -71,7 +71,7 @@
     <Compile Include="SpanProcesssorTaskFactoryTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Medidata.ZipkinTracerModule.Collector\Medidata.ZipkinTracerModule.Collector.csproj">
+    <ProjectReference Include="..\..\src\Medidata.ZipkinTracerModule.Collector\Medidata.ZipkinTracerModule.Collector.csproj">
       <Project>{12e57184-b43e-43c5-ac19-06ad1dc25e96}</Project>
       <Name>Medidata.ZipkinTracerModule.Collector</Name>
     </ProjectReference>
