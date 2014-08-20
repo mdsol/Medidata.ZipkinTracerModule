@@ -5,7 +5,7 @@ using Thrift.Transport;
 using System.Collections.Generic;
 using Rhino.Mocks;
 
-namespace Medidata.ZipkinTracerModule.Collector.Test
+namespace Medidata.ZipkinTracer.Core.Collector.Test
 {
     [TestClass]
     public class ClientProviderTests

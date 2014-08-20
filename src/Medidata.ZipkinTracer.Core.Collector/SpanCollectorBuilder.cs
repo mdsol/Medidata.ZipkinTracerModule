@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Medidata.ZipkinTracerModule.Collector
+namespace Medidata.ZipkinTracer.Core.Collector
 {
     [ExcludeFromCodeCoverage]  //excluded from code coverage since this class is a 1 liner to new up SpanCollector
     public class SpanCollectorBuilder : ISpanCollectorBuilder

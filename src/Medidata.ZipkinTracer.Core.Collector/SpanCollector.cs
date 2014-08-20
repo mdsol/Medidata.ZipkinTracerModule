@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Thrift;
 
-namespace Medidata.ZipkinTracerModule.Collector
+namespace Medidata.ZipkinTracer.Core.Collector
 {
     public class SpanCollector
     {

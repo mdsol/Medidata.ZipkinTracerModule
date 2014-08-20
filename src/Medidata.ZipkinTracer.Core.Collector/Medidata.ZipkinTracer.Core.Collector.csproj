@@ -7,8 +7,8 @@
     <ProjectGuid>{12E57184-B43E-43C5-AC19-06AD1DC25E96}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Medidata.ZipkinTracerModule.Collector</RootNamespace>
-    <AssemblyName>Medidata.ZipkinTracerModule.Collector</AssemblyName>
+    <RootNamespace>Medidata.ZipkinTracer.Core.Collector</RootNamespace>
+    <AssemblyName>Medidata.ZipkinTracer.Core.Collector</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>

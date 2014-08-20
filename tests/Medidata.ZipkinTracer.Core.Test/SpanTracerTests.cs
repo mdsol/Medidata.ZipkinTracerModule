@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
-using Medidata.ZipkinTracerModule.Collector;
+using Medidata.ZipkinTracer.Core.Collector;
 using Rhino.Mocks;
 
 namespace Medidata.ZipkinTracer.Core.Test

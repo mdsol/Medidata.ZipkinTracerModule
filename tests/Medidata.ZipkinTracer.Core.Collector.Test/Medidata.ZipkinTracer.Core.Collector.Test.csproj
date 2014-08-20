@@ -6,8 +6,8 @@
     <ProjectGuid>{A6AFE0F7-F1DE-4E0B-B6F6-CFDC293CAE2D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Medidata.ZipkinTracerModule.Collector.Test</RootNamespace>
-    <AssemblyName>Medidata.ZipkinTracerModule.Collector.Test</AssemblyName>
+    <RootNamespace>Medidata.ZipkinTracer.Core.Collector.Test</RootNamespace>
+    <AssemblyName>Medidata.ZipkinTracer.Core.Collector.Test</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -71,9 +71,9 @@
     <Compile Include="SpanProcesssorTaskFactoryTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Medidata.ZipkinTracer.Core.Collector\Medidata.ZipkinTracerModule.Collector.csproj">
+    <ProjectReference Include="..\..\src\Medidata.ZipkinTracer.Core.Collector\Medidata.ZipkinTracer.Core.Collector.csproj">
       <Project>{12e57184-b43e-43c5-ac19-06ad1dc25e96}</Project>
-      <Name>Medidata.ZipkinTracerModule.Collector</Name>
+      <Name>Medidata.ZipkinTracer.Core.Collector</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

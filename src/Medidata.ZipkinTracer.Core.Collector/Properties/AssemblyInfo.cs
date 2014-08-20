@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Medidata.ZipkinTracerModule.Collector")]
+[assembly: AssemblyTitle("Medidata.ZipkinTracer.Core.Collector")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Medidata Solutions Inc")]
-[assembly: AssemblyProduct("Medidata.ZipkinTracerModule.Collector")]
+[assembly: AssemblyProduct("Medidata.ZipkinTracer.Core.Collector")]
 [assembly: AssemblyCopyright("Copyright © Medidata Solutions Inc 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -35,4 +35,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("0.0.1")]
 [assembly: AssemblyFileVersion("0.0.1")]
 [assembly: AssemblyInformationalVersion("0.0.1-alpha")]
-[assembly: InternalsVisibleTo("Medidata.ZipkinTracerModule.Collector.Test")]
+[assembly: InternalsVisibleTo("Medidata.ZipkinTracer.Core.Collector.Test")]

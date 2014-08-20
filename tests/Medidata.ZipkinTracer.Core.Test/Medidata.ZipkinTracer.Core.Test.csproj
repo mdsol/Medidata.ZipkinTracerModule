@@ -72,9 +72,9 @@
     <Compile Include="ZipkinClientTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Medidata.ZipkinTracer.Core.Collector\Medidata.ZipkinTracerModule.Collector.csproj">
+    <ProjectReference Include="..\..\src\Medidata.ZipkinTracer.Core.Collector\Medidata.ZipkinTracer.Core.Collector.csproj">
       <Project>{12e57184-b43e-43c5-ac19-06ad1dc25e96}</Project>
-      <Name>Medidata.ZipkinTracerModule.Collector</Name>
+      <Name>Medidata.ZipkinTracer.Core.Collector</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Medidata.ZipkinTracer.Core\Medidata.ZipkinTracer.Core.csproj">
       <Project>{eb432891-204b-4b97-bfb1-a820e424284e}</Project>

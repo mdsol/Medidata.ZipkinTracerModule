@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Medidata.ZipkinTracerModule.Collector
+namespace Medidata.ZipkinTracer.Core.Collector
 {
     public interface ISpanCollectorBuilder
     {

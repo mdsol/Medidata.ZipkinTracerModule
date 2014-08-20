@@ -10,7 +10,7 @@ using Thrift;
 using Thrift.Protocol;
 using Thrift.Transport;
 
-namespace Medidata.ZipkinTracerModule.Collector
+namespace Medidata.ZipkinTracer.Core.Collector
 {
     public class SpanProcessor
     {

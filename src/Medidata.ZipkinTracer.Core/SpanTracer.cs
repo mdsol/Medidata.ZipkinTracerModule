@@ -7,11 +7,11 @@ namespace Medidata.ZipkinTracer.Core
 {
     public class SpanTracer
     {
-        private Medidata.ZipkinTracerModule.Collector.SpanCollector spanCollector;
+        private Medidata.ZipkinTracer.Core.Collector.SpanCollector spanCollector;
         private string serviceName;
         private ServiceEndpoint zipkinEndpoint;
 
-        public SpanTracer(Medidata.ZipkinTracerModule.Collector.SpanCollector spanCollector, string serviceName, ServiceEndpoint zipkinEndpoint)
+        public SpanTracer(Medidata.ZipkinTracer.Core.Collector.SpanCollector spanCollector, string serviceName, ServiceEndpoint zipkinEndpoint)
         {
             if ( spanCollector == null) 
             {

@@ -77,9 +77,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Medidata.ZipkinTracer.Core.Collector\Medidata.ZipkinTracerModule.Collector.csproj">
+    <ProjectReference Include="..\Medidata.ZipkinTracer.Core.Collector\Medidata.ZipkinTracer.Core.Collector.csproj">
       <Project>{12e57184-b43e-43c5-ac19-06ad1dc25e96}</Project>
-      <Name>Medidata.ZipkinTracerModule.Collector</Name>
+      <Name>Medidata.ZipkinTracer.Core.Collector</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

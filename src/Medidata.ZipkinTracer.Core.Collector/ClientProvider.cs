@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Thrift.Protocol;
 using Thrift.Transport;
 
-namespace Medidata.ZipkinTracerModule.Collector
+namespace Medidata.ZipkinTracer.Core.Collector
 {
     public class ClientProvider : IClientProvider
     {

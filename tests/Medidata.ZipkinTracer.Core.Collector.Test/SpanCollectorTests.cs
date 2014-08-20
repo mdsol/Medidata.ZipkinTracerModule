@@ -5,7 +5,7 @@ using Rhino.Mocks;
 using System.Collections.Concurrent;
 using Thrift;
 
-namespace Medidata.ZipkinTracerModule.Collector.Test
+namespace Medidata.ZipkinTracer.Core.Collector.Test
 {
     [TestClass]
     public class SpanCollectorTests

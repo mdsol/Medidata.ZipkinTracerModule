@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Thrift;
 using System.Collections.Generic;
 
-namespace Medidata.ZipkinTracerModule.Collector.Test
+namespace Medidata.ZipkinTracer.Core.Collector.Test
 {
     [TestClass]
     public class SpanProcessorTests

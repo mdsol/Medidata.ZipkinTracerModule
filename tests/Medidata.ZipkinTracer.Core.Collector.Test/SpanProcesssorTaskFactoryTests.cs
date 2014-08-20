@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
 using System.Threading;
 
-namespace Medidata.ZipkinTracerModule.Collector.Test
+namespace Medidata.ZipkinTracer.Core.Collector.Test
 {
     [TestClass]
     public class SpanProcesssorTaskFactoryTests

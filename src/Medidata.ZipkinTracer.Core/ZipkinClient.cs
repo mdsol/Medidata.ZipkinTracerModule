@@ -1,4 +1,4 @@
-﻿using Medidata.ZipkinTracerModule.Collector;
+﻿using Medidata.ZipkinTracer.Core.Collector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
