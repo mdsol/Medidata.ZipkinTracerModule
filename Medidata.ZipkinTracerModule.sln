@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracerModule", "src\Medidata.ZipkinTracerModule\Medidata.ZipkinTracerModule.csproj", "{EB432891-204B-4B97-BFB1-A820E424284E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracerModule", "src\Medidata.ZipkinTracer.Core\Medidata.ZipkinTracerModule.csproj", "{EB432891-204B-4B97-BFB1-A820E424284E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{ACDBD61A-453C-4AA4-97FB-CD1520DD1D16}"
 	ProjectSection(SolutionItems) = preProject
@@ -13,11 +13,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{ACDBD6
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracerModule.Test", "tests\Medidata.ZipkinTracerModule.Test\Medidata.ZipkinTracerModule.Test.csproj", "{0158C8BD-D881-4EE8-A8C6-54707A67A00D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracerModule.Test", "tests\Medidata.ZipkinTracer.Core.Test\Medidata.ZipkinTracerModule.Test.csproj", "{0158C8BD-D881-4EE8-A8C6-54707A67A00D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracerModule.Collector", "src\Medidata.ZipkinTracerModule.Collector\Medidata.ZipkinTracerModule.Collector.csproj", "{12E57184-B43E-43C5-AC19-06AD1DC25E96}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracerModule.Collector", "src\Medidata.ZipkinTracer.Core.Collector\Medidata.ZipkinTracerModule.Collector.csproj", "{12E57184-B43E-43C5-AC19-06AD1DC25E96}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracerModule.Collector.Test", "tests\Medidata.ZipkinTracerModule.Collector.Test\Medidata.ZipkinTracerModule.Collector.Test.csproj", "{A6AFE0F7-F1DE-4E0B-B6F6-CFDC293CAE2D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracerModule.Collector.Test", "tests\Medidata.ZipkinTracer.Core.Collector.Test\Medidata.ZipkinTracerModule.Collector.Test.csproj", "{A6AFE0F7-F1DE-4E0B-B6F6-CFDC293CAE2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

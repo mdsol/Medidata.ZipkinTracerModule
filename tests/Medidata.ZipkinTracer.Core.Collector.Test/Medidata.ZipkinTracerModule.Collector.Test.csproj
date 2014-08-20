@@ -3,11 +3,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0158C8BD-D881-4EE8-A8C6-54707A67A00D}</ProjectGuid>
+    <ProjectGuid>{A6AFE0F7-F1DE-4E0B-B6F6-CFDC293CAE2D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Medidata.ZipkinTracerModule.Test</RootNamespace>
-    <AssemblyName>Medidata.ZipkinTracerModule.Test</AssemblyName>
+    <RootNamespace>Medidata.ZipkinTracerModule.Collector.Test</RootNamespace>
+    <AssemblyName>Medidata.ZipkinTracerModule.Collector.Test</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -16,7 +16,7 @@
     <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
     <IsCodedUITest>False</IsCodedUITest>
     <TestProjectType>UnitTest</TestProjectType>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">.\</SolutionDir>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -47,7 +47,6 @@
       <HintPath>..\packages\RhinoMocks.3.6\lib\Rhino.Mocks.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Web" />
     <Reference Include="Thrift">
       <HintPath>..\packages\Thrift.0.9.1.3\lib\net35\Thrift.dll</HintPath>
     </Reference>
@@ -65,20 +64,16 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="HttpModule\RequestContextModuleTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SpanTracerTests.cs" />
-    <Compile Include="ZipkinEndpointTests.cs" />
-    <Compile Include="ZipkinClientTests.cs" />
+    <Compile Include="SpanCollectorTests.cs" />
+    <Compile Include="SpanProcessorTests.cs" />
+    <Compile Include="ClientProviderTests.cs" />
+    <Compile Include="SpanProcesssorTaskFactoryTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Medidata.ZipkinTracerModule.Collector\Medidata.ZipkinTracerModule.Collector.csproj">
+    <ProjectReference Include="..\..\src\Medidata.ZipkinTracer.Core.Collector\Medidata.ZipkinTracerModule.Collector.csproj">
       <Project>{12e57184-b43e-43c5-ac19-06ad1dc25e96}</Project>
       <Name>Medidata.ZipkinTracerModule.Collector</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\Medidata.ZipkinTracerModule\Medidata.ZipkinTracerModule.csproj">
-      <Project>{eb432891-204b-4b97-bfb1-a820e424284e}</Project>
-      <Name>Medidata.ZipkinTracerModule</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
