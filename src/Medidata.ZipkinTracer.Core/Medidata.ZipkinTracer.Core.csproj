@@ -56,7 +56,7 @@
     <Compile Include="ServiceEndpoint.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Medidata.ZipkinTracerModule.nuspec">
+    <None Include="Medidata.ZipkinTracer.Core.nuspec">
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />

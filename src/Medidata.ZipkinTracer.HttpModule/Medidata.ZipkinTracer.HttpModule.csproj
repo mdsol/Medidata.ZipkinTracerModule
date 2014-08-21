@@ -62,6 +62,7 @@
     <None Include="content\appsettings.template.config.transform" />
     <None Include="content\parameters.xml.transform" />
     <None Include="content\web.config.transform" />
+    <None Include="Medidata.ZipkinTracer.HttpModule.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
