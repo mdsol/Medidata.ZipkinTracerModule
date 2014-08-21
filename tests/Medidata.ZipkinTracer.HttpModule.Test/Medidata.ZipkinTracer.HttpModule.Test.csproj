@@ -3,11 +3,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0158C8BD-D881-4EE8-A8C6-54707A67A00D}</ProjectGuid>
+    <ProjectGuid>{C8372FD9-C9C4-4159-814B-5B3F53DABF23}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Medidata.ZipkinTracer.Core.Test</RootNamespace>
-    <AssemblyName>Medidata.ZipkinTracer.Core.Test</AssemblyName>
+    <RootNamespace>Medidata.ZipkinTracer.HttpModule.Test</RootNamespace>
+    <AssemblyName>Medidata.ZipkinTracer.HttpModule.Test</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -16,7 +16,7 @@
     <ReferencePath>$(ProgramFiles)\Common Files\microsoft shared\VSTT\$(VisualStudioVersion)\UITestExtensionPackages</ReferencePath>
     <IsCodedUITest>False</IsCodedUITest>
     <TestProjectType>UnitTest</TestProjectType>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">.\</SolutionDir>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -38,10 +38,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Ploeh.AutoFixture">
-      <HintPath>..\..\packages\AutoFixture.3.19.1\lib\net40\Ploeh.AutoFixture.dll</HintPath>
+      <HintPath>..\..\packages\AutoFixture.3.20.0\lib\net40\Ploeh.AutoFixture.dll</HintPath>
     </Reference>
     <Reference Include="Ploeh.AutoFixture.AutoRhinoMock">
-      <HintPath>..\..\packages\AutoFixture.AutoRhinoMocks.3.19.1\lib\net40\Ploeh.AutoFixture.AutoRhinoMock.dll</HintPath>
+      <HintPath>..\..\packages\AutoFixture.AutoRhinoMocks.3.20.0\lib\net40\Ploeh.AutoFixture.AutoRhinoMock.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.Mocks">
       <HintPath>..\..\packages\RhinoMocks.3.6\lib\Rhino.Mocks.dll</HintPath>
@@ -66,9 +66,10 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SpanTracerTests.cs" />
-    <Compile Include="ZipkinEndpointTests.cs" />
-    <Compile Include="ZipkinClientTests.cs" />
+    <Compile Include="RequestContextModuleTests.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Medidata.ZipkinTracer.Core.Collector\Medidata.ZipkinTracer.Core.Collector.csproj">
@@ -79,9 +80,10 @@
       <Project>{eb432891-204b-4b97-bfb1-a820e424284e}</Project>
       <Name>Medidata.ZipkinTracer.Core</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="..\..\src\Medidata.ZipkinTracer.HttpModule\Medidata.ZipkinTracer.HttpModule.csproj">
+      <Project>{44ef130e-7549-4860-abbb-17050fc09f5c}</Project>
+      <Name>Medidata.ZipkinTracer.HttpModule</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
