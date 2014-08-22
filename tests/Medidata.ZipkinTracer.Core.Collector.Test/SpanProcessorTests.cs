@@ -76,7 +76,7 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         public void Log_HandleThriftExceptionRetryIfLessThan3Tries()
         {
             spanProcessor.retries = 2;
-            clientProvider.Expect(x => x.Log(Arg<List<LogEntry>>.Is.Anything)).Throw(new TException());
+            clientProvider.Expect(x => x.Log(Arg<List<LogEntry>>.Is.Anything)).Throw(new TException()).Repeat.Once();
             spanProcessor.Log(clientProvider, new List<LogEntry>());
         }
 
