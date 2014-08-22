@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Medidata.ZipkinTracer.Core.Logging
+namespace Medidata.ZipkinTracer.HttpModule.Logging
 {
     public interface IMDLogger
     {

@@ -1,6 +1,4 @@
-﻿using Medidata.ZipkinTracer.Core.Collector;
-using Medidata.ZipkinTracer.Core.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -8,8 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using Medidata.CrossApplicationTracer;
+using Medidata.ZipkinTracer.HttpModule.Logging;
+using Medidata.ZipkinTracer.Core;
 
-namespace Medidata.ZipkinTracer.Core.HttpModule
+namespace Medidata.ZipkinTracer.HttpModule
 {
     public class ZipkinRequestContextModule : IHttpModule
     {
