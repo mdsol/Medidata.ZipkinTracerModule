@@ -52,12 +52,12 @@ namespace Medidata.ZipkinTracer.Core
 
         public Span StartClientSpan(string requestName, string traceId, string parentSpanId, string spanId)
         {
-            throw new NotImplementedException();
+            return spanTracer.SendClientSpan(requestName, traceId, parentSpanId, spanId);
         }
 
         public void EndClientSpan(Span span, int duration)
         {
-            throw new NotImplementedException();
+            spanTracer.ReceiveClientSpan(span, duration);
         }
 
         private static void CheckNullConfigValues(IZipkinConfig zipkinConfig)

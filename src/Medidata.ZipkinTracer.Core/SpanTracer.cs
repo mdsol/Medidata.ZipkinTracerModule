@@ -64,7 +64,7 @@ namespace Medidata.ZipkinTracer.Core
             spanCollector.Collect(span);
         }
 
-        internal virtual Span SendClientSpan(string requestName, string traceId, string parentSpanId, string spanId)
+        public virtual Span SendClientSpan(string requestName, string traceId, string parentSpanId, string spanId)
         {
             var newSpan = CreateNewSpan(requestName, traceId, parentSpanId, spanId);
 
@@ -80,7 +80,7 @@ namespace Medidata.ZipkinTracer.Core
             return newSpan;
         }
 
-        internal void ReceiveClientSpan(Span span, int duration)
+        public virtual void ReceiveClientSpan(Span span, int duration)
         {
             var annotation = new Annotation()
             {
