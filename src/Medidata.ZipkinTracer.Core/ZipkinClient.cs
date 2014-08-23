@@ -55,6 +55,11 @@ namespace Medidata.ZipkinTracer.Core
             throw new NotImplementedException();
         }
 
+        public void EndClientSpan(Span span, int duration)
+        {
+            throw new NotImplementedException();
+        }
+
         private static void CheckNullConfigValues(IZipkinConfig zipkinConfig)
         {
             if (String.IsNullOrEmpty(zipkinConfig.ZipkinServerName))

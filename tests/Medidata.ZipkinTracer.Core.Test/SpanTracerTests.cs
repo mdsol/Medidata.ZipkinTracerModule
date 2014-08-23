@@ -88,7 +88,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             spanTracer.SendServerSpan(expectedSpan, expectedDuration);
 
             spanCollectorStub.AssertWasCalled(x => x.Collect(Arg<Span>.Matches(y =>
-                    ValidateSpan(y, serviceName, expectedDuration)
+                    ValidateSendServerSpan(y, serviceName, expectedDuration)
                     ))
                 );
         }
@@ -125,7 +125,39 @@ namespace Medidata.ZipkinTracer.Core.Test
             Assert.AreEqual(serviceName, endpoint.Service_name);
         }
 
-        private bool ValidateSpan(Span y, string serviceName, int duration)
+        [TestMethod]
+        public void ReceiveClientSpan()
+        {
+            var serviceName = fixture.Create<string>();
+            var spanTracer = new SpanTracer(spanCollectorStub, serviceName, zipkinEndpointStub);
+
+            var expectedSpan = new Span() { Annotations = new System.Collections.Generic.List<Annotation>() };
+            var expectedDuration = fixture.Create<int>();
+
+            zipkinEndpointStub.Expect(x => x.GetEndpoint(serviceName)).Return(new Endpoint() { Service_name = serviceName });
+
+            spanTracer.ReceiveClientSpan(expectedSpan, expectedDuration);
+
+            spanCollectorStub.AssertWasCalled(x => x.Collect(Arg<Span>.Matches(y =>
+                    ValidateReceiveClientSpan(y, serviceName, expectedDuration)
+                    ))
+                );
+        }
+
+        private bool ValidateReceiveClientSpan(Span y, string serviceName, int duration)
+        {
+            var annotation = (Annotation)y.Annotations[0];
+            var endpoint = (Endpoint)annotation.Host;
+
+            Assert.AreEqual(serviceName, endpoint.Service_name);
+            Assert.AreEqual(duration, annotation.Duration);
+            Assert.AreEqual(zipkinCoreConstants.CLIENT_RECV, annotation.Value);
+            Assert.IsNotNull(annotation.Timestamp);
+
+            return true;
+        }
+
+        private bool ValidateSendServerSpan(Span y, string serviceName, int duration)
         {
             var annotation = (Annotation)y.Annotations[0];
             var endpoint = (Endpoint)annotation.Host;

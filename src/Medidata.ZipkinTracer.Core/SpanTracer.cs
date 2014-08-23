@@ -80,6 +80,21 @@ namespace Medidata.ZipkinTracer.Core
             return newSpan;
         }
 
+        internal void ReceiveClientSpan(Span span, int duration)
+        {
+            var annotation = new Annotation()
+            {
+                Host = zipkinEndpoint.GetEndpoint(serviceName),
+                Duration = duration,  //duration is currently not supported by zipkin UI
+                Timestamp = GetTimeStamp(),
+                Value = zipkinCoreConstants.CLIENT_RECV
+            };
+
+            span.Annotations.Add(annotation);
+
+            spanCollector.Collect(span);
+        }
+
         private Span CreateNewSpan(string requestName, string traceId, string parentSpanId, string spanId)
         {
             var newSpan = new Span();
