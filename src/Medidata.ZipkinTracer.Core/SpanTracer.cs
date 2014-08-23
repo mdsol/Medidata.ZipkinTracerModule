@@ -35,17 +35,7 @@ namespace Medidata.ZipkinTracer.Core
 
         public virtual Span ReceiveServerSpan(string requestName, string traceId, string parentSpanId, string spanId)
         {
-            var newSpan = new Span();
-            newSpan.Id = Int64.Parse(spanId, System.Globalization.NumberStyles.HexNumber);
-            newSpan.Trace_id = Int64.Parse(traceId, System.Globalization.NumberStyles.HexNumber);
-
-            if ( !String.IsNullOrEmpty(parentSpanId))
-            {
-                newSpan.Parent_id = Int64.Parse(parentSpanId, System.Globalization.NumberStyles.HexNumber);
-            }
-
-            newSpan.Name = requestName;
-            newSpan.Annotations = new List<Annotation>();
+            var newSpan = CreateNewSpan(requestName, traceId, parentSpanId, spanId);
 
             var annotation = new Annotation()
             {
@@ -72,6 +62,38 @@ namespace Medidata.ZipkinTracer.Core
             span.Annotations.Add(annotation);
 
             spanCollector.Collect(span);
+        }
+
+        internal virtual Span SendClientSpan(string requestName, string traceId, string parentSpanId, string spanId)
+        {
+            var newSpan = CreateNewSpan(requestName, traceId, parentSpanId, spanId);
+
+            var annotation = new Annotation()
+            {
+                Host = zipkinEndpoint.GetEndpoint(serviceName),
+                Timestamp = GetTimeStamp(),
+                Value = zipkinCoreConstants.CLIENT_SEND
+            };
+
+            newSpan.Annotations.Add(annotation);
+
+            return newSpan;
+        }
+
+        private Span CreateNewSpan(string requestName, string traceId, string parentSpanId, string spanId)
+        {
+            var newSpan = new Span();
+            newSpan.Id = Int64.Parse(spanId, System.Globalization.NumberStyles.HexNumber);
+            newSpan.Trace_id = Int64.Parse(traceId, System.Globalization.NumberStyles.HexNumber);
+
+            if (!String.IsNullOrEmpty(parentSpanId))
+            {
+                newSpan.Parent_id = Int64.Parse(parentSpanId, System.Globalization.NumberStyles.HexNumber);
+            }
+
+            newSpan.Name = requestName;
+            newSpan.Annotations = new List<Annotation>();
+            return newSpan;
         }
 
         private long GetTimeStamp()
