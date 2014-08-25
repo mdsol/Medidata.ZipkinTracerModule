@@ -50,6 +50,16 @@ namespace Medidata.ZipkinTracer.Core
             spanTracer.SendServerSpan(span, duration);
         }
 
+        public Span StartClientSpan(string requestName, string traceId, string parentSpanId, string spanId)
+        {
+            return spanTracer.SendClientSpan(requestName, traceId, parentSpanId, spanId);
+        }
+
+        public void EndClientSpan(Span span, int duration)
+        {
+            spanTracer.ReceiveClientSpan(span, duration);
+        }
+
         private static void CheckNullConfigValues(IZipkinConfig zipkinConfig)
         {
             if (String.IsNullOrEmpty(zipkinConfig.ZipkinServerName))

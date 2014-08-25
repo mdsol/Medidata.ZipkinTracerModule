@@ -10,5 +10,7 @@ namespace Medidata.ZipkinTracer.Core
     {
         Span StartServerSpan(string requestName, string traceId, string parentSpanId, string spanId);
         void EndServerSpan(Span span, int duration);
+        Span StartClientSpan(string requestName, string traceId, string parentSpanId, string spanId);
+        void EndClientSpan(Span span, int duration);
     }
 }
