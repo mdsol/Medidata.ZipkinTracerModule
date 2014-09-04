@@ -1,5 +1,0 @@
-﻿<appSettings>
-  <add key="zipkinScribeServerName" value="zipkinvm.cloudapp.net" />
-  <add key="zipkinScribeServerPort" value="9410" />
-  <add key="ServiceName" value="Gambit" />
-</appSettings>
