@@ -81,6 +81,11 @@ namespace Medidata.ZipkinTracer.Core
             {
                 throw new ArgumentNullException("zipkinConfig.SpanProcessorBatchSize value is null");
             }
+
+            if (String.IsNullOrEmpty(zipkinConfig.WhiteListCsv))
+            {
+                throw new ArgumentNullException("zipkinConfig.WhiteListCsv value is null");
+            }
         }
     }
 }

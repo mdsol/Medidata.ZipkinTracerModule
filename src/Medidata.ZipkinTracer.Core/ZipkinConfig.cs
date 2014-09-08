@@ -29,5 +29,10 @@ namespace Medidata.ZipkinTracer.Core
         {
             get {  return ConfigurationManager.AppSettings["spanProcessorBatchSize"];}
         }
+
+        public string WhiteListCsv
+        {
+            get {  return ConfigurationManager.AppSettings["mAuthPrivateKeyPath"];}
+        }
     }
 }
