@@ -34,5 +34,10 @@ namespace Medidata.ZipkinTracer.Core
         {
             get {  return ConfigurationManager.AppSettings["mAuthPrivateKeyPath"];}
         }
+
+        public string ZipkinSampleRate
+        {
+            get {  return ConfigurationManager.AppSettings["zipkinSampleRate"];}
+        }
     }
 }
