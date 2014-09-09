@@ -106,6 +106,14 @@ namespace Medidata.ZipkinTracer.Core.Test
         }
 
         [TestMethod]
+        public void CTOR_PopulateFilterList()
+        {
+            var zipkinClient = SetupZipkinClient();
+
+            Assert.AreEqual(3, zipkinClient.filterList.Count);
+        }
+
+        [TestMethod]
         public void Init_StartCollector()
         {
             var zipkinClient = SetupZipkinClient();
