@@ -12,7 +12,7 @@ namespace Medidata.ZipkinTracer.Core
         string ZipkinServerPort { get; }
         string ServiceName { get; }
         string SpanProcessorBatchSize { get; }
-        string FilterListCsv { get; }
+        string DontSampleListCsv { get; }
         string ZipkinSampleRate { get; }
     }
 }

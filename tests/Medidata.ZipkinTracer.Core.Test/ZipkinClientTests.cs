@@ -71,7 +71,6 @@ namespace Medidata.ZipkinTracer.Core.Test
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullWhiteListCsv()
         {
             var zipkinConfigStub = CreateZipkinConfigWithValues(fixture.Create<string>(), "123", "123", fixture.Create<string>(), null , "0.5");
@@ -154,7 +153,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             var zipkinClient = SetupZipkinClient();
 
-            Assert.AreEqual(3, zipkinClient.filterList.Count);
+            Assert.AreEqual(3, zipkinClient.dontSampleList.Count);
         }
 
         [TestMethod]
@@ -260,7 +259,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             zipkinConfigStub.Expect(x => x.ZipkinServerPort).Return("123");
             zipkinConfigStub.Expect(x => x.SpanProcessorBatchSize).Return("123");
             zipkinConfigStub.Expect(x => x.ServiceName).Return(fixture.Create<string>());
-            zipkinConfigStub.Expect(x => x.FilterListCsv).Return("foo,bar,baz");
+            zipkinConfigStub.Expect(x => x.DontSampleListCsv).Return("foo,bar,baz");
             zipkinConfigStub.Expect(x => x.ZipkinSampleRate).Return("0.5");
             return zipkinConfigStub;
         }
@@ -272,7 +271,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             zipkinConfigStub.Expect(x => x.ZipkinServerPort).Return(zipkinServerPort);
             zipkinConfigStub.Expect(x => x.SpanProcessorBatchSize).Return(spanProcessorBatchSize);
             zipkinConfigStub.Expect(x => x.ServiceName).Return(serviceName);
-            zipkinConfigStub.Expect(x => x.FilterListCsv).Return(filterListCsv);
+            zipkinConfigStub.Expect(x => x.DontSampleListCsv).Return(filterListCsv);
             zipkinConfigStub.Expect(x => x.ZipkinSampleRate).Return(zipkinSampleRate);
             return zipkinConfigStub;
         }
