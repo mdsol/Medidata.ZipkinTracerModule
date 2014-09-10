@@ -57,11 +57,6 @@ namespace Medidata.ZipkinTracer.Core
             spanCollector.Stop();
         }
         
-        public bool ShouldBeSampled()
-        {
-            return false;
-        }
-
         public Span StartServerSpan(string requestName, string traceId, string parentSpanId, string spanId)
         {
             return spanTracer.ReceiveServerSpan(requestName, traceId, parentSpanId, spanId);
