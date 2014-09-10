@@ -71,7 +71,6 @@ namespace Medidata.ZipkinTracer.Core.Test
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullWhiteListCsv()
         {
             var zipkinConfigStub = CreateZipkinConfigWithValues(fixture.Create<string>(), "123", "123", fixture.Create<string>(), null , "0.5");

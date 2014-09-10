@@ -99,11 +99,6 @@ namespace Medidata.ZipkinTracer.Core
                 throw new ArgumentNullException("zipkinConfig.SpanProcessorBatchSize value is null");
             }
 
-            if (String.IsNullOrEmpty(zipkinConfig.DontSampleListCsv))
-            {
-                throw new ArgumentNullException("zipkinConfig.DontSampleListCsv value is null");
-            }
-
             if (String.IsNullOrEmpty(zipkinConfig.ZipkinSampleRate))
             {
                 throw new ArgumentNullException("zipkinConfig.ZipkinSampleRate value is null");
