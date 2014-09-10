@@ -32,7 +32,7 @@ namespace Medidata.ZipkinTracer.Core
 
         public string FilterListCsv
         {
-            get {  return ConfigurationManager.AppSettings["mAuthPrivateKeyPath"];}
+            get {  return ConfigurationManager.AppSettings["mAuthWhitelist"];}
         }
 
         public string ZipkinSampleRate
