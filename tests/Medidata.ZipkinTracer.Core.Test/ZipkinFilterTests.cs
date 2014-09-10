@@ -18,7 +18,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         [TestMethod]
         public void IsInNonSampleList()
         {
-            var zipkinFilter = new ZipkinFilter(filterList, 0.5f);
+            var zipkinFilter = new ZipkinSampler(filterList, 0.5f);
 
             Assert.IsTrue(zipkinFilter.IsInDontSampleList("foo/anything"));
         }
@@ -26,7 +26,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         [TestMethod]
         public void IsInNonSampleList_NotInList()
         {
-            var zipkinFilter = new ZipkinFilter(filterList, 0.5f);
+            var zipkinFilter = new ZipkinSampler(filterList, 0.5f);
 
             Assert.IsFalse(zipkinFilter.IsInDontSampleList("notFoo/anything"));
         }
@@ -35,7 +35,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         public void ShouldBeSampled_InNonSampleList()
         {
             var path = "foo/anything";
-            var zipkinFilter = new ZipkinFilter(filterList, 0.5f);
+            var zipkinFilter = new ZipkinSampler(filterList, 0.5f);
 
             Assert.IsFalse(zipkinFilter.ShouldBeSampled(path));
         }
@@ -44,7 +44,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         public void ShouldBeSampled_With100PercentSampleRate()
         {
             var path = "notfoo/anything";
-            var zipkinFilter = new ZipkinFilter(filterList, 1.0f);
+            var zipkinFilter = new ZipkinSampler(filterList, 1.0f);
 
             Assert.IsTrue(zipkinFilter.ShouldBeSampled(path));
         }
@@ -53,7 +53,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         public void ShouldBeSampled_With0PercentSampleRate()
         {
             var path = "notfoo/anything";
-            var zipkinFilter = new ZipkinFilter(filterList, 0.0f);
+            var zipkinFilter = new ZipkinSampler(filterList, 0.0f);
 
             Assert.IsFalse(zipkinFilter.ShouldBeSampled(path));
         }

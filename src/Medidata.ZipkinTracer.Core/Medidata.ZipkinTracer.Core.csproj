@@ -54,7 +54,7 @@
     <Compile Include="ZipkinClient.cs" />
     <Compile Include="ZipkinConfig.cs" />
     <Compile Include="ServiceEndpoint.cs" />
-    <Compile Include="ZipkinFilter.cs" />
+    <Compile Include="ZipkinSampler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Medidata.ZipkinTracer.Core.nuspec">

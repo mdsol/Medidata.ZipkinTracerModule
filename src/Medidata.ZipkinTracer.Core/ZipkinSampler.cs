@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace Medidata.ZipkinTracer.Core
 {
-    public class ZipkinFilter
+    public class ZipkinSampler
     {
         private static Random random = new Random();
  
         private readonly List<string> dontSampleList;
         private readonly float sampleRate;
       
-        public ZipkinFilter(List<string> dontSampleList, float sampleRate)
+        public ZipkinSampler(List<string> dontSampleList, float sampleRate)
         {
             this.dontSampleList = dontSampleList;
             this.sampleRate = sampleRate;
