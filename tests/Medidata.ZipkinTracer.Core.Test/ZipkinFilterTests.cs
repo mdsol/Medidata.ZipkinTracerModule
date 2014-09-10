@@ -20,7 +20,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             var zipkinFilter = new ZipkinFilter(filterList, 0.5f);
 
-            Assert.IsTrue(zipkinFilter.IsInNonSampleList("foo/anything"));
+            Assert.IsTrue(zipkinFilter.IsInDontSampleList("foo/anything"));
         }
 
         [TestMethod]
@@ -28,7 +28,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             var zipkinFilter = new ZipkinFilter(filterList, 0.5f);
 
-            Assert.IsFalse(zipkinFilter.IsInNonSampleList("notFoo/anything"));
+            Assert.IsFalse(zipkinFilter.IsInDontSampleList("notFoo/anything"));
         }
 
         [TestMethod]

@@ -11,7 +11,7 @@ namespace Medidata.ZipkinTracer.Core
     {
         internal SpanCollector spanCollector;
         internal SpanTracer spanTracer;
-        internal List<string> filterList = new List<string>();
+        internal List<string> dontSampleList = new List<string>();
 
         public ZipkinClient() : this(new ZipkinConfig(), new SpanCollectorBuilder()) { }
 
@@ -31,9 +31,9 @@ namespace Medidata.ZipkinTracer.Core
                 throw new ArgumentException("zipkinConfig spanProcessorBatchSize is not an int");
             }
 
-            if (!String.IsNullOrWhiteSpace(zipkinConfig.FilterListCsv))
+            if (!String.IsNullOrWhiteSpace(zipkinConfig.DontSampleListCsv))
             {
-                filterList.AddRange(zipkinConfig.FilterListCsv.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(w => w.Trim().ToLowerInvariant()));
+                dontSampleList.AddRange(zipkinConfig.DontSampleListCsv.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(w => w.Trim().ToLowerInvariant()));
             }
 
             float zipkinSampleRate;
@@ -99,9 +99,9 @@ namespace Medidata.ZipkinTracer.Core
                 throw new ArgumentNullException("zipkinConfig.SpanProcessorBatchSize value is null");
             }
 
-            if (String.IsNullOrEmpty(zipkinConfig.FilterListCsv))
+            if (String.IsNullOrEmpty(zipkinConfig.DontSampleListCsv))
             {
-                throw new ArgumentNullException("zipkinConfig.WhiteListCsv value is null");
+                throw new ArgumentNullException("zipkinConfig.DontSampleListCsv value is null");
             }
 
             if (String.IsNullOrEmpty(zipkinConfig.ZipkinSampleRate))

@@ -10,20 +10,20 @@ namespace Medidata.ZipkinTracer.Core
     {
         private static Random random = new Random();
  
-        private readonly List<string> filterList;
+        private readonly List<string> dontSampleList;
         private readonly float sampleRate;
       
-        public ZipkinFilter(List<string> filterList, float sampleRate)
+        public ZipkinFilter(List<string> dontSampleList, float sampleRate)
         {
-            this.filterList = filterList;
+            this.dontSampleList = dontSampleList;
             this.sampleRate = sampleRate;
         }
 
-        internal bool IsInNonSampleList(string path)
+        internal bool IsInDontSampleList(string path)
         {
             if (path != null)
             {
-                if (filterList.Any(uri => path.StartsWith(uri, StringComparison.InvariantCultureIgnoreCase)))
+                if (dontSampleList.Any(uri => path.StartsWith(uri, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     return true;
                 }
@@ -33,7 +33,7 @@ namespace Medidata.ZipkinTracer.Core
 
         internal bool ShouldBeSampled(string path)
         {
-            if ( ! IsInNonSampleList(path))
+            if ( ! IsInDontSampleList(path))
             {
                 var randomNumber = random.Next(10);
                 
