@@ -35,9 +35,7 @@ namespace Medidata.ZipkinTracer.Core
         {
             if ( ! IsInDontSampleList(path))
             {
-                var randomNumber = random.Next(10);
-                
-                if ( (float) (randomNumber * 0.1) <= sampleRate )
+                if ( random.NextDouble() <= sampleRate )
                 {
                     return true;
                 }
