@@ -28,10 +28,11 @@ namespace Medidata.ZipkinTracer.HttpModule
                     var traceId = traceProvider.TraceId;
                     var parentSpanId = traceProvider.ParentSpanId;
                     var spanId = traceProvider.SpanId;
+                    var isSampled = traceProvider.IsSampled;
 
                     IZipkinClient zipkinClient = InitializeZipkinClient();
 
-                    var span = StartZipkinSpan(zipkinClient, url, traceId, parentSpanId, spanId);
+                    var span = StartZipkinSpan(zipkinClient, url, traceId, parentSpanId, spanId, isSampled);
 
                     HttpContext.Current.Items["zipkinClient"] = zipkinClient;
                     HttpContext.Current.Items["span"] = span;
@@ -82,11 +83,11 @@ namespace Medidata.ZipkinTracer.HttpModule
             }
         }
 
-        internal Span StartZipkinSpan(IZipkinClient zipkinClient, string url, string traceId, string parentSpanId, string spanId)
+        internal Span StartZipkinSpan(IZipkinClient zipkinClient, string url, string traceId, string parentSpanId, string spanId, bool isSampled)
         {
             Span span = null;
 
-            logger.Event(String.Format("TraceId - {0}, ParentSpanId - {1}, SpanId - {2}", traceId, parentSpanId,  spanId), null, null);
+            logger.Event(String.Format("TraceId - {0}, ParentSpanId - {1}, SpanId - {2}, IsSampled - {3}", traceId, parentSpanId,  spanId, isSampled), null, null);
 
             if ( string.IsNullOrEmpty(traceId))
             {
@@ -96,7 +97,7 @@ namespace Medidata.ZipkinTracer.HttpModule
             {
                 logger.Event("spanId is null or empty", null, null);
             }
-            else
+            else if ( isSampled )
             {
                 try
                 {
