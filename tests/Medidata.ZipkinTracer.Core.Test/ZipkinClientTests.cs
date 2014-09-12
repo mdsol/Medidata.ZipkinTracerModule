@@ -116,47 +116,6 @@ namespace Medidata.ZipkinTracer.Core.Test
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void CTOR_WithNonFloatZipkinSampleRate()
-        {
-            var zipkinConfigStub = CreateZipkinConfigWithValues(fixture.Create<string>(), "123", "123", fixture.Create<string>(), "asfdsa" , "asdf");
-
-            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(MockRepository.GenerateStub<IClientProvider>(), 0);
-            spanCollectorBuilder.Expect(x => x.Build(Arg<string>.Is.Anything, Arg<int>.Is.Anything, Arg<int>.Is.Anything)).Return(spanCollectorStub);
-            var zipkinClient = new ZipkinClient(zipkinConfigStub, spanCollectorBuilder);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void CTOR_WithZipkinSampleRateLessThan0()
-        {
-            var zipkinConfigStub = CreateZipkinConfigWithValues(fixture.Create<string>(), "123", "123", fixture.Create<string>(), "asfdsa" , "-1.5");
-
-            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(MockRepository.GenerateStub<IClientProvider>(), 0);
-            spanCollectorBuilder.Expect(x => x.Build(Arg<string>.Is.Anything, Arg<int>.Is.Anything, Arg<int>.Is.Anything)).Return(spanCollectorStub);
-            var zipkinClient = new ZipkinClient(zipkinConfigStub, spanCollectorBuilder);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
-        public void CTOR_WithZipkinSampleRateGreaterThan1()
-        {
-            var zipkinConfigStub = CreateZipkinConfigWithValues(fixture.Create<string>(), "123", "123", fixture.Create<string>(), "asfdsa" , "5.5");
-
-            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(MockRepository.GenerateStub<IClientProvider>(), 0);
-            spanCollectorBuilder.Expect(x => x.Build(Arg<string>.Is.Anything, Arg<int>.Is.Anything, Arg<int>.Is.Anything)).Return(spanCollectorStub);
-            var zipkinClient = new ZipkinClient(zipkinConfigStub, spanCollectorBuilder);
-        }
-
-        [TestMethod]
-        public void CTOR_PopulateFilterList()
-        {
-            var zipkinClient = SetupZipkinClient();
-
-            Assert.AreEqual(3, zipkinClient.dontSampleList.Count);
-        }
-
-        [TestMethod]
         public void Init_StartCollector()
         {
             var zipkinClient = SetupZipkinClient();

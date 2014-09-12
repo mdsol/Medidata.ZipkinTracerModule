@@ -11,7 +11,6 @@ namespace Medidata.ZipkinTracer.Core
     {
         internal SpanCollector spanCollector;
         internal SpanTracer spanTracer;
-        internal List<string> dontSampleList = new List<string>();
 
         public ZipkinClient() : this(new ZipkinConfig(), new SpanCollectorBuilder()) { }
 
@@ -31,32 +30,17 @@ namespace Medidata.ZipkinTracer.Core
                 throw new ArgumentException("zipkinConfig spanProcessorBatchSize is not an int");
             }
 
-            if (!String.IsNullOrWhiteSpace(zipkinConfig.DontSampleListCsv))
-            {
-                dontSampleList.AddRange(zipkinConfig.DontSampleListCsv.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(w => w.Trim().ToLowerInvariant()));
-            }
-
-            float zipkinSampleRate;
-            if ( !float.TryParse(zipkinConfig.ZipkinSampleRate, out zipkinSampleRate) )
-            {
-                throw new ArgumentException("zipkinConfig zipkinSampleRate is not a float");
-            }
-
-            if ( zipkinSampleRate < 0 || zipkinSampleRate > 1)
-            {
-                throw new ArgumentException("zipkinConfig zipkinSampleRate is not between 0 and 1");
-            }
-
             spanCollector = spanCollectorBuilder.Build(zipkinConfig.ZipkinServerName, port, spanProcessorBatchSize);
-            spanTracer = new SpanTracer(spanCollector, zipkinConfig.ServiceName, new ServiceEndpoint());
             spanCollector.Start();
+
+            spanTracer = new SpanTracer(spanCollector, zipkinConfig.ServiceName, new ServiceEndpoint());
         }
 
         public void ShutDown()
         {
             spanCollector.Stop();
         }
-        
+
         public Span StartServerSpan(string requestName, string traceId, string parentSpanId, string spanId)
         {
             return spanTracer.ReceiveServerSpan(requestName, traceId, parentSpanId, spanId);
@@ -104,5 +88,7 @@ namespace Medidata.ZipkinTracer.Core
                 throw new ArgumentNullException("zipkinConfig.ZipkinSampleRate value is null");
             }
         }
+
+
     }
 }
