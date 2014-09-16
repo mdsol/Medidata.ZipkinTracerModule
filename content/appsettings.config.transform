@@ -3,4 +3,5 @@
   <add key="zipkinScribeServerPort" value="9410" />
   <add key="ServiceName" value="***Service Name Here***" />
   <add key="spanProcessorBatchSize" value="10" />
+  <add key="zipkinSampleRate" value="0.5" />
 </appSettings>
