@@ -26,7 +26,7 @@ namespace Medidata.ZipkinTracer.HttpModule
 
                     var zipkinConfig = new ZipkinConfig();
 
-                    var traceProvider = new TraceProvider(zipkinConfig.DontSampleListCsv, zipkinConfig.ZipkinSampleRate, new System.Web.HttpContextWrapper(HttpContext.Current));
+                    var traceProvider = new TraceProvider(new System.Web.HttpContextWrapper(HttpContext.Current), zipkinConfig.DontSampleListCsv, zipkinConfig.ZipkinSampleRate);
                     var traceId = traceProvider.TraceId;
                     var parentSpanId = traceProvider.ParentSpanId;
                     var spanId = traceProvider.SpanId;
