@@ -10,8 +10,8 @@ namespace Medidata.ZipkinTracer.Core
 {
     public class ZipkinClient : ITracerClient
     {
-        internal readonly SpanCollector spanCollector;
         internal readonly bool isTraceOn;
+        internal SpanCollector spanCollector;
         internal SpanTracer spanTracer;
         internal Span clientSpan;
         internal Span serverSpan;
@@ -49,20 +49,6 @@ namespace Medidata.ZipkinTracer.Core
             }
         }
 
-        private bool IsTraceProviderValidAndSamplingOn(ITraceProvider traceProvider)
-        {
-            if (traceProvider == null)
-            {
-                //log("traceProvider value is null");
-                return false;
-            }
-            else if (string.IsNullOrEmpty(traceProvider.TraceId) || !traceProvider.IsSampled)
-            {
-                return false;
-            }
-            return true;
-        }
-
         public void StartClientTrace()
         {
             if ( isTraceOn )
@@ -97,7 +83,10 @@ namespace Medidata.ZipkinTracer.Core
 
         public void ShutDown()
         {
-            spanCollector.Stop();
+            if (spanCollector != null)
+            {
+                spanCollector.Stop();
+            }
         }
 
         private bool IsConfigValuesNull(IZipkinConfig zipkinConfig)
@@ -147,6 +136,20 @@ namespace Medidata.ZipkinTracer.Core
             if (!int.TryParse(zipkinConfig.SpanProcessorBatchSize, out spanProcessorBatchSize))
             {
                 //log("zipkinConfig spanProcessorBatchSize is not an int");
+                return false;
+            }
+            return true;
+        }
+
+        private bool IsTraceProviderValidAndSamplingOn(ITraceProvider traceProvider)
+        {
+            if (traceProvider == null)
+            {
+                //log("traceProvider value is null");
+                return false;
+            }
+            else if (string.IsNullOrEmpty(traceProvider.TraceId) || !traceProvider.IsSampled)
+            {
                 return false;
             }
             return true;

@@ -183,6 +183,15 @@ namespace Medidata.ZipkinTracer.Core.Test
         }
 
         [TestMethod]
+        public void Shutdown_CollectorNullDoesntThrow()
+        {
+            var zipkinClient = (ZipkinClient) SetupZipkinClient();
+            zipkinClient.spanCollector = null;
+
+            zipkinClient.ShutDown();
+        }
+
+        [TestMethod]
         public void StartServerSpan()
         {
             var tracerClient = SetupZipkinClient();
