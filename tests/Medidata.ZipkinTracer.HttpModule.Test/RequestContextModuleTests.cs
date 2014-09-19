@@ -13,7 +13,7 @@ namespace Medidata.ZipkinTracer.HttpModule.Test
     public class RequestContextModuleTests
     {
         private Fixture fixture;
-        private IZipkinClient zipkinClient;
+        private ITracerClient zipkinClient;
         private ZipkinRequestContextModule requestContextModule;
         private IMDLogger logger;
 
@@ -22,7 +22,7 @@ namespace Medidata.ZipkinTracer.HttpModule.Test
         {
             fixture = new Fixture();
 
-            zipkinClient = MockRepository.GenerateStub<IZipkinClient>();
+            zipkinClient = MockRepository.GenerateStub<ITracerClient>();
             logger = MockRepository.GenerateStub<IMDLogger>();
 
             requestContextModule = new ZipkinRequestContextModule();

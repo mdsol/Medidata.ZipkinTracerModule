@@ -21,8 +21,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracer.Core.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracer.HttpModule", "src\Medidata.ZipkinTracer.HttpModule\Medidata.ZipkinTracer.HttpModule.csproj", "{44EF130E-7549-4860-ABBB-17050FC09F5C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracer.HttpModule.Test", "tests\Medidata.ZipkinTracer.HttpModule.Test\Medidata.ZipkinTracer.HttpModule.Test.csproj", "{C8372FD9-C9C4-4159-814B-5B3F53DABF23}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,10 +47,6 @@ Global
 		{44EF130E-7549-4860-ABBB-17050FC09F5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44EF130E-7549-4860-ABBB-17050FC09F5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44EF130E-7549-4860-ABBB-17050FC09F5C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C8372FD9-C9C4-4159-814B-5B3F53DABF23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C8372FD9-C9C4-4159-814B-5B3F53DABF23}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C8372FD9-C9C4-4159-814B-5B3F53DABF23}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C8372FD9-C9C4-4159-814B-5B3F53DABF23}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
