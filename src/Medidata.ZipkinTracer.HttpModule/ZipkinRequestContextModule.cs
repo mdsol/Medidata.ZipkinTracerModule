@@ -32,13 +32,13 @@ namespace Medidata.ZipkinTracer.HttpModule
                     HttpContext.Current.Items["zipkinClient"] = zipkinClient;
 
                     var stopwatch = new Stopwatch();
-                    HttpContext.Current.Items["stopwatch"] = stopwatch;
+                    HttpContext.Current.Items["zipkinStopwatch"] = stopwatch;
                     stopwatch.Start();
                 };
 
             context.EndRequest += (sender, args) =>
                 {
-                    var stopwatch = (Stopwatch)HttpContext.Current.Items["stopwatch"];
+                    var stopwatch = (Stopwatch)HttpContext.Current.Items["zipkinStopwatch"];
                     stopwatch.Stop();
 
                     var zipkinClient = (ITracerClient)HttpContext.Current.Items["zipkinClient"];
@@ -50,7 +50,7 @@ namespace Medidata.ZipkinTracer.HttpModule
         public void Dispose()
         {
             if (HttpContext.Current == null) return;
-            HttpContext.Current.Items["stopwatch"] = null;
+            HttpContext.Current.Items["zipkinStopwatch"] = null;
             HttpContext.Current.Items["zipkinClient"] = null;
         }
     }
