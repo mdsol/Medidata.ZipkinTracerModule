@@ -165,11 +165,27 @@ namespace Medidata.ZipkinTracer.Core.Test
         }
 
         [TestMethod]
-        public void Init_StartCollector()
+        public void CTOR_StartCollector()
         {
             var zipkinClient = SetupZipkinClient();
 
             spanCollectorStub.AssertWasCalled(x => x.Start()); 
+        }
+
+        [TestMethod]
+        public void CTOR_Collector_Exception()
+        {
+            var zipkinConfigStub = CreateZipkinConfigWithDefaultValues();
+
+            traceProvider.Expect(x => x.TraceId).Return(fixture.Create<string>());
+            traceProvider.Expect(x => x.IsSampled).Return(true);
+
+            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(MockRepository.GenerateStub<IClientProvider>(), 0);
+            spanCollectorStub.Expect(x => x.Start()).Throw(new Exception()); 
+            spanCollectorBuilder.Expect(x => x.Build(Arg<string>.Is.Anything, Arg<int>.Is.Anything, Arg<int>.Is.Anything)).Return(spanCollectorStub);
+
+            var zipkinClient = new ZipkinClient(traceProvider, requestName, zipkinConfigStub, spanCollectorBuilder);
+            Assert.IsFalse(zipkinClient.isTraceOn);
         }
 
         [TestMethod]
