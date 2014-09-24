@@ -51,10 +51,7 @@ namespace Medidata.ZipkinTracer.Core
 
         public void StartClientTrace()
         {
-            if ( isTraceOn )
-            {
-                clientSpan = spanTracer.SendClientSpan(requestName, traceProvider.TraceId, traceProvider.ParentSpanId, traceProvider.SpanId);
-            }
+            clientSpan = StartTrace(spanTracer.SendClientSpan, requestName, traceProvider.TraceId, traceProvider.ParentSpanId, traceProvider.SpanId);
         }
 
         public void EndClientTrace(int duration)
