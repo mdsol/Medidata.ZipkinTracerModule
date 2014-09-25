@@ -1,4 +1,5 @@
-﻿using Medidata.ZipkinTracer.Core.Collector;
+﻿using Medidata.CrossApplicationTracer;
+using Medidata.ZipkinTracer.Core.Collector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,80 +8,171 @@ using System.Threading.Tasks;
 
 namespace Medidata.ZipkinTracer.Core
 {
-    public class ZipkinClient : IZipkinClient
+    public class ZipkinClient : ITracerClient
     {
+        internal readonly bool isTraceOn;
         internal SpanCollector spanCollector;
         internal SpanTracer spanTracer;
+        internal Span clientSpan;
+        internal Span serverSpan;
 
-        public ZipkinClient() : this(new ZipkinConfig(), new SpanCollectorBuilder()) { }
+        private string requestName;
+        private ITraceProvider traceProvider;
 
-        public ZipkinClient(IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder)
+        public ZipkinClient(ITraceProvider tracerProvider, string requestName) : this(tracerProvider, requestName, new ZipkinConfig(), new SpanCollectorBuilder()) { }
+
+        public ZipkinClient(ITraceProvider traceProvider, string requestName, IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder)
         {
-            CheckNullConfigValues(zipkinConfig);
+            isTraceOn = true;
 
-            int port;
-            if ( !int.TryParse(zipkinConfig.ZipkinServerPort, out port) )
+            if ( IsConfigValuesNull(zipkinConfig) || !IsConfigValuesValid(zipkinConfig) || !IsTraceProviderValidAndSamplingOn(traceProvider))
             {
-                throw new ArgumentException("zipkinConfig port is not an int");
+                isTraceOn = false;
             }
 
-            int spanProcessorBatchSize;
-            if ( !int.TryParse(zipkinConfig.SpanProcessorBatchSize, out spanProcessorBatchSize) )
+            if (isTraceOn)
             {
-                throw new ArgumentException("zipkinConfig spanProcessorBatchSize is not an int");
-            }
+                try
+                {
+                    spanCollector = spanCollectorBuilder.Build(zipkinConfig.ZipkinServerName, int.Parse(zipkinConfig.ZipkinServerPort), int.Parse(zipkinConfig.SpanProcessorBatchSize));
+                    spanCollector.Start();
 
-            spanCollector = spanCollectorBuilder.Build(zipkinConfig.ZipkinServerName, port, spanProcessorBatchSize);
-            spanTracer = new SpanTracer(spanCollector, zipkinConfig.ServiceName, new ServiceEndpoint());
-            spanCollector.Start();
+                    spanTracer = new SpanTracer(spanCollector, zipkinConfig.ServiceName, new ServiceEndpoint());
+
+                    this.requestName = requestName;
+                    this.traceProvider = traceProvider;
+                }
+                catch (Exception ex)
+                {
+                    isTraceOn = false;
+                }
+            }
+        }
+
+        public void StartClientTrace()
+        {
+            clientSpan = StartTrace(spanTracer.SendClientSpan, requestName, traceProvider.TraceId, traceProvider.ParentSpanId, traceProvider.SpanId);
+        }
+
+        public void EndClientTrace(int duration)
+        {
+            EndTrace(spanTracer.ReceiveClientSpan, clientSpan, duration);
+        }
+
+        public void StartServerTrace()
+        {
+            serverSpan = StartTrace(spanTracer.ReceiveServerSpan, requestName, traceProvider.TraceId, traceProvider.ParentSpanId, traceProvider.SpanId);
+        }
+
+        public void EndServerTrace(int duration)
+        {
+            EndTrace(spanTracer.SendServerSpan, serverSpan, duration);
+        }
+
+        private Span StartTrace(Func<string, string, string, string, Span> func, string requestName, string traceId, string parentSpanId, string spanId) 
+        {
+            if ( isTraceOn )
+            {
+                try
+                {
+                    return func(requestName, traceId, parentSpanId, spanId);
+                }
+                catch(Exception ex)
+                {
+                    //log
+                }
+            }
+            return null;
+        }
+            
+        private void EndTrace(Action<Span, int> action, Span span, int duration)
+        {
+            if ( isTraceOn )
+            {
+                try
+                {
+                    action(span, duration);
+                }
+                catch(Exception ex)
+                {
+                    //log
+                }
+            }
         }
 
         public void ShutDown()
         {
-            spanCollector.Stop();
-        }
-        
-        public Span StartServerSpan(string requestName, string traceId, string parentSpanId, string spanId)
-        {
-            return spanTracer.ReceiveServerSpan(requestName, traceId, parentSpanId, spanId);
+            if (spanCollector != null)
+            {
+                spanCollector.Stop();
+            }
         }
 
-        public void EndServerSpan(Span span, int duration)
-        {
-            spanTracer.SendServerSpan(span, duration);
-        }
-
-        public Span StartClientSpan(string requestName, string traceId, string parentSpanId, string spanId)
-        {
-            return spanTracer.SendClientSpan(requestName, traceId, parentSpanId, spanId);
-        }
-
-        public void EndClientSpan(Span span, int duration)
-        {
-            spanTracer.ReceiveClientSpan(span, duration);
-        }
-
-        private static void CheckNullConfigValues(IZipkinConfig zipkinConfig)
+        private bool IsConfigValuesNull(IZipkinConfig zipkinConfig)
         {
             if (String.IsNullOrEmpty(zipkinConfig.ZipkinServerName))
             {
-                throw new ArgumentNullException("zipkinConfig.ZipkinServerName is null");
+                //log("zipkinConfig.ZipkinServerName is null");
+                return true;
             }
 
             if (String.IsNullOrEmpty(zipkinConfig.ZipkinServerPort))
             {
-                throw new ArgumentNullException("zipkinConfig.ZipkinServerPort is null");
+                //log("zipkinConfig.ZipkinServerPort is null");
+                return true;
             }
 
             if (String.IsNullOrEmpty(zipkinConfig.ServiceName))
             {
-                throw new ArgumentNullException("zipkinConfig.ServiceName value is null");
+                //log("zipkinConfig.ServiceName value is null");
+                return true;
             }
 
             if (String.IsNullOrEmpty(zipkinConfig.SpanProcessorBatchSize))
             {
-                throw new ArgumentNullException("zipkinConfig.SpanProcessorBatchSize value is null");
+                //log("zipkinConfig.SpanProcessorBatchSize value is null");
+                return true;
             }
+
+            if (String.IsNullOrEmpty(zipkinConfig.ZipkinSampleRate))
+            {
+                //log("zipkinConfig.ZipkinSampleRate value is null");
+                return true;
+            }
+            return false;
         }
+
+        private bool IsConfigValuesValid(IZipkinConfig zipkinConfig)
+        {
+            int port;
+            int spanProcessorBatchSize;
+            if (!int.TryParse(zipkinConfig.ZipkinServerPort, out port))
+            {
+                //log("zipkinConfig port is not an int");
+                return false;
+            }
+
+            if (!int.TryParse(zipkinConfig.SpanProcessorBatchSize, out spanProcessorBatchSize))
+            {
+                //log("zipkinConfig spanProcessorBatchSize is not an int");
+                return false;
+            }
+            return true;
+        }
+
+        private bool IsTraceProviderValidAndSamplingOn(ITraceProvider traceProvider)
+        {
+            if (traceProvider == null)
+            {
+                //log("traceProvider value is null");
+                return false;
+            }
+            else if (string.IsNullOrEmpty(traceProvider.TraceId) || !traceProvider.IsSampled)
+            {
+                return false;
+            }
+            return true;
+        }
+
     }
 }

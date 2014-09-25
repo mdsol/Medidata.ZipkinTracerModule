@@ -8,115 +8,49 @@ using System.Web;
 using Medidata.CrossApplicationTracer;
 using Medidata.ZipkinTracer.HttpModule.Logging;
 using Medidata.ZipkinTracer.Core;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Medidata.ZipkinTracer.HttpModule
 {
+    [ExcludeFromCodeCoverage]
     public class ZipkinRequestContextModule : IHttpModule
     {
-        internal IMDLogger logger;
-
         public void Init(HttpApplication context)
         {
-            //TODO: placeholder for the "new" logger
-            logger = new MDLogger();
-
             context.BeginRequest += (sender, args) =>
                 {
                     string url = HttpContext.Current.Request.Path;
 
-                    var traceProvider = new TraceProvider(new System.Web.HttpContextWrapper(HttpContext.Current));
-                    var traceId = traceProvider.TraceId;
-                    var parentSpanId = traceProvider.ParentSpanId;
-                    var spanId = traceProvider.SpanId;
+                    var zipkinConfig = new ZipkinConfig();
 
-                    IZipkinClient zipkinClient = InitializeZipkinClient();
+                    var traceProvider = new TraceProvider(new System.Web.HttpContextWrapper(HttpContext.Current), zipkinConfig.DontSampleListCsv, zipkinConfig.ZipkinSampleRate);
 
-                    var span = StartZipkinSpan(zipkinClient, url, traceId, parentSpanId, spanId);
+                    ITracerClient zipkinClient = new ZipkinClient(traceProvider, url);
+
+                    zipkinClient.StartServerTrace();
 
                     HttpContext.Current.Items["zipkinClient"] = zipkinClient;
-                    HttpContext.Current.Items["span"] = span;
 
                     var stopwatch = new Stopwatch();
-                    HttpContext.Current.Items["stopwatch"] = stopwatch;
+                    HttpContext.Current.Items["zipkinStopwatch"] = stopwatch;
                     stopwatch.Start();
                 };
 
             context.EndRequest += (sender, args) =>
                 {
-                    var stopwatch = (Stopwatch)HttpContext.Current.Items["stopwatch"];
+                    var stopwatch = (Stopwatch)HttpContext.Current.Items["zipkinStopwatch"];
                     stopwatch.Stop();
 
-                    var zipkinClient = (IZipkinClient)HttpContext.Current.Items["zipkinClient"];
-                    var span = (Span)HttpContext.Current.Items["span"];
+                    var zipkinClient = (ITracerClient)HttpContext.Current.Items["zipkinClient"];
 
-                    EndZipkinSpan(zipkinClient, stopwatch, span);
+                    zipkinClient.EndServerTrace(stopwatch.Elapsed.Milliseconds * 1000);
                 };
-        }
-
-        private IZipkinClient InitializeZipkinClient()
-        {
-            IZipkinClient zipkinClient = null;
-            try
-            {
-                zipkinClient = new ZipkinClient();
-            }
-            catch (Exception ex)
-            {
-                logger.Event("Initialize ZipkinClient : " + ex.Message, null, null, ex);
-            }
-            return zipkinClient;
-        }
-
-        internal void EndZipkinSpan(IZipkinClient zipkinClient, Stopwatch stopwatch, Span span)
-        {
-            if (zipkinClient != null && span != null)
-            {
-                try
-                {
-                    zipkinClient.EndServerSpan(span, stopwatch.Elapsed.Milliseconds * 1000);
-                }
-                catch (Exception ex)
-                {
-                    logger.Event("Zipkin EndClientSpan : " + ex.Message, null, null, ex);
-                }
-            }
-        }
-
-        internal Span StartZipkinSpan(IZipkinClient zipkinClient, string url, string traceId, string parentSpanId, string spanId)
-        {
-            Span span = null;
-
-            logger.Event(String.Format("TraceId - {0}, ParentSpanId - {1}, SpanId - {2}", traceId, parentSpanId,  spanId), null, null);
-
-            if ( string.IsNullOrEmpty(traceId))
-            {
-                logger.Event("traceId is null or empty", null, null);
-            }
-            else if (string.IsNullOrEmpty(spanId))
-            {
-                logger.Event("spanId is null or empty", null, null);
-            }
-            else
-            {
-                try
-                {
-                    span = zipkinClient.StartServerSpan(url, traceId, parentSpanId, spanId);
-                }
-                catch (Exception ex)
-                {
-                    logger.Event("Zipkin StartClientSpan : " + ex.Message, null, null, ex);
-                }
-            }
-
-            return span;
         }
 
         public void Dispose()
         {
-
             if (HttpContext.Current == null) return;
-            HttpContext.Current.Items["stopwatch"] = null;
-            HttpContext.Current.Items["span"] = null;
+            HttpContext.Current.Items["zipkinStopwatch"] = null;
             HttpContext.Current.Items["zipkinClient"] = null;
         }
     }
