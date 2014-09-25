@@ -51,33 +51,52 @@ namespace Medidata.ZipkinTracer.Core
 
         public void StartClientTrace()
         {
-            if ( isTraceOn )
-            {
-                clientSpan = spanTracer.SendClientSpan(requestName, traceProvider.TraceId, traceProvider.ParentSpanId, traceProvider.SpanId);
-            }
+            clientSpan = StartTrace(spanTracer.SendClientSpan, requestName, traceProvider.TraceId, traceProvider.ParentSpanId, traceProvider.SpanId);
         }
 
         public void EndClientTrace(int duration)
         {
-            if ( isTraceOn )
-            {
-                spanTracer.ReceiveClientSpan(clientSpan, duration);
-            }
+            EndTrace(spanTracer.ReceiveClientSpan, clientSpan, duration);
         }
 
         public void StartServerTrace()
         {
-            if ( isTraceOn )
-            {
-                serverSpan = spanTracer.ReceiveServerSpan(requestName, traceProvider.TraceId, traceProvider.ParentSpanId, traceProvider.SpanId);
-            }
+            serverSpan = StartTrace(spanTracer.ReceiveServerSpan, requestName, traceProvider.TraceId, traceProvider.ParentSpanId, traceProvider.SpanId);
         }
 
         public void EndServerTrace(int duration)
         {
+            EndTrace(spanTracer.SendServerSpan, serverSpan, duration);
+        }
+
+        private Span StartTrace(Func<string, string, string, string, Span> func, string requestName, string traceId, string parentSpanId, string spanId) 
+        {
             if ( isTraceOn )
             {
-                spanTracer.SendServerSpan(serverSpan, duration);
+                try
+                {
+                    return func(requestName, traceId, parentSpanId, spanId);
+                }
+                catch(Exception ex)
+                {
+                    //log
+                }
+            }
+            return null;
+        }
+            
+        private void EndTrace(Action<Span, int> action, Span span, int duration)
+        {
+            if ( isTraceOn )
+            {
+                try
+                {
+                    action(span, duration);
+                }
+                catch(Exception ex)
+                {
+                    //log
+                }
             }
         }
 
