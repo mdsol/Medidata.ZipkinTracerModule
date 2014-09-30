@@ -28,7 +28,7 @@ namespace Medidata.ZipkinTracer.Core
             this.logger = logger;
             isTraceOn = true;
 
-            if ( IsConfigValuesNull(zipkinConfig) || !IsConfigValuesValid(zipkinConfig) || !IsTraceProviderValidAndSamplingOn(traceProvider))
+            if ( logger == null || IsConfigValuesNull(zipkinConfig) || !IsConfigValuesValid(zipkinConfig) || !IsTraceProviderValidAndSamplingOn(traceProvider))
             {
                 isTraceOn = false;
             }
