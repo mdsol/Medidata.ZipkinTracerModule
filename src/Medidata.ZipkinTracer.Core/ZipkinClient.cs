@@ -1,4 +1,5 @@
 ﻿using Medidata.CrossApplicationTracer;
+using Medidata.MDLogging;
 using Medidata.ZipkinTracer.Core.Collector;
 using System;
 using System.Collections.Generic;
@@ -18,11 +19,13 @@ namespace Medidata.ZipkinTracer.Core
 
         private string requestName;
         private ITraceProvider traceProvider;
+        private IMDLogger logger;
 
-        public ZipkinClient(ITraceProvider tracerProvider, string requestName) : this(tracerProvider, requestName, new ZipkinConfig(), new SpanCollectorBuilder()) { }
+        public ZipkinClient(ITraceProvider tracerProvider, string requestName, IMDLogger logger) : this(tracerProvider, requestName, logger, new ZipkinConfig(), new SpanCollectorBuilder()) { }
 
-        public ZipkinClient(ITraceProvider traceProvider, string requestName, IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder)
+        public ZipkinClient(ITraceProvider traceProvider, string requestName, IMDLogger logger, IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder)
         {
+            this.logger = logger;
             isTraceOn = true;
 
             if ( IsConfigValuesNull(zipkinConfig) || !IsConfigValuesValid(zipkinConfig) || !IsTraceProviderValidAndSamplingOn(traceProvider))
@@ -44,6 +47,7 @@ namespace Medidata.ZipkinTracer.Core
                 }
                 catch (Exception ex)
                 {
+                    logger.Error("Error Building Zipkin Client Provider", ex);
                     isTraceOn = false;
                 }
             }
@@ -79,7 +83,7 @@ namespace Medidata.ZipkinTracer.Core
                 }
                 catch(Exception ex)
                 {
-                    //log
+                    logger.Error("Error Starting Trace", ex);
                 }
             }
             return null;
@@ -95,7 +99,7 @@ namespace Medidata.ZipkinTracer.Core
                 }
                 catch(Exception ex)
                 {
-                    //log
+                    logger.Error("Error Ending Trace", ex);
                 }
             }
         }
@@ -112,31 +116,31 @@ namespace Medidata.ZipkinTracer.Core
         {
             if (String.IsNullOrEmpty(zipkinConfig.ZipkinServerName))
             {
-                //log("zipkinConfig.ZipkinServerName is null");
+                logger.Error("zipkinConfig.ZipkinServerName is null");
                 return true;
             }
 
             if (String.IsNullOrEmpty(zipkinConfig.ZipkinServerPort))
             {
-                //log("zipkinConfig.ZipkinServerPort is null");
+                logger.Error("zipkinConfig.ZipkinServerPort is null");
                 return true;
             }
 
             if (String.IsNullOrEmpty(zipkinConfig.ServiceName))
             {
-                //log("zipkinConfig.ServiceName value is null");
+                logger.Error("zipkinConfig.ServiceName value is null");
                 return true;
             }
 
             if (String.IsNullOrEmpty(zipkinConfig.SpanProcessorBatchSize))
             {
-                //log("zipkinConfig.SpanProcessorBatchSize value is null");
+                logger.Error("zipkinConfig.SpanProcessorBatchSize value is null");
                 return true;
             }
 
             if (String.IsNullOrEmpty(zipkinConfig.ZipkinSampleRate))
             {
-                //log("zipkinConfig.ZipkinSampleRate value is null");
+                logger.Error("zipkinConfig.ZipkinSampleRate value is null");
                 return true;
             }
             return false;
@@ -148,13 +152,13 @@ namespace Medidata.ZipkinTracer.Core
             int spanProcessorBatchSize;
             if (!int.TryParse(zipkinConfig.ZipkinServerPort, out port))
             {
-                //log("zipkinConfig port is not an int");
+                logger.Error("zipkinConfig port is not an int");
                 return false;
             }
 
             if (!int.TryParse(zipkinConfig.SpanProcessorBatchSize, out spanProcessorBatchSize))
             {
-                //log("zipkinConfig spanProcessorBatchSize is not an int");
+                logger.Error("zipkinConfig spanProcessorBatchSize is not an int");
                 return false;
             }
             return true;
@@ -164,7 +168,7 @@ namespace Medidata.ZipkinTracer.Core
         {
             if (traceProvider == null)
             {
-                //log("traceProvider value is null");
+                logger.Error("traceProvider value is null");
                 return false;
             }
             else if (string.IsNullOrEmpty(traceProvider.TraceId) || !traceProvider.IsSampled)
