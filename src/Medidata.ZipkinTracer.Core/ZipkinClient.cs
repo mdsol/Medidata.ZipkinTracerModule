@@ -11,7 +11,7 @@ namespace Medidata.ZipkinTracer.Core
 {
     public class ZipkinClient : ITracerClient
     {
-        internal readonly bool isTraceOn;
+        internal bool isTraceOn;
         internal SpanCollector spanCollector;
         internal SpanTracer spanTracer;
         internal Span clientSpan;
@@ -55,12 +55,18 @@ namespace Medidata.ZipkinTracer.Core
 
         public void StartClientTrace()
         {
-            clientSpan = StartTrace(spanTracer.SendClientSpan, requestName, traceProvider.TraceId, traceProvider.ParentSpanId, traceProvider.SpanId);
+            if (isTraceOn)
+            {
+                clientSpan = StartTrace(spanTracer.SendClientSpan, requestName, traceProvider.TraceId, traceProvider.ParentSpanId, traceProvider.SpanId);
+            }
         }
 
         public void EndClientTrace(int duration)
         {
-            EndTrace(spanTracer.ReceiveClientSpan, clientSpan, duration);
+            if (isTraceOn)
+            {
+                EndTrace(spanTracer.ReceiveClientSpan, clientSpan, duration);
+            }
         }
 
         public void StartServerTrace()

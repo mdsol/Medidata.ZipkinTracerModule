@@ -266,6 +266,18 @@ namespace Medidata.ZipkinTracer.Core.Test
         }
 
         [TestMethod]
+        public void StartServerSpan_IsTraceOnIsFalse()
+        {
+            var tracerClient = SetupZipkinClient();
+            var zipkinClient = (ZipkinClient)tracerClient;
+            zipkinClient.isTraceOn = false;
+
+            tracerClient.StartServerTrace();
+
+            Assert.AreEqual(null, zipkinClient.serverSpan);
+        }
+
+        [TestMethod]
         public void EndServerSpan()
         {
             var tracerClient = SetupZipkinClient();
@@ -295,6 +307,16 @@ namespace Medidata.ZipkinTracer.Core.Test
             spanTracerStub.Expect(x => x.SendServerSpan(zipkinClient.serverSpan, expectedDuration)).Throw(new Exception());
 
             tracerClient.EndServerTrace(expectedDuration);
+        }
+
+        [TestMethod]
+        public void EndServerSpan_IsTraceOnIsFalse_DoesntThrow()
+        {
+            var tracerClient = SetupZipkinClient();
+            var zipkinClient = (ZipkinClient)tracerClient;
+            zipkinClient.isTraceOn = false;
+
+            tracerClient.EndServerTrace(10);
         }
 
         [TestMethod]
@@ -330,6 +352,18 @@ namespace Medidata.ZipkinTracer.Core.Test
         }
 
         [TestMethod]
+        public void StartClientSpan_IsTraceOnIsFalse()
+        {
+            var tracerClient = SetupZipkinClient();
+            var zipkinClient = (ZipkinClient)tracerClient;
+            zipkinClient.isTraceOn = false;
+
+            tracerClient.StartClientTrace();
+
+            Assert.AreEqual(null, zipkinClient.serverSpan);
+        }
+
+        [TestMethod]
         public void EndClientSpan()
         {
             var tracerClient = SetupZipkinClient();
@@ -359,6 +393,16 @@ namespace Medidata.ZipkinTracer.Core.Test
             spanTracerStub.Expect(x => x.ReceiveClientSpan(zipkinClient.clientSpan, expectedDuration)).Throw(new Exception());
 
             tracerClient.EndClientTrace(expectedDuration);
+        }
+
+        [TestMethod]
+        public void EndClientSpan_IsTraceOnIsFalse_DoesntThrow()
+        {
+            var tracerClient = SetupZipkinClient();
+            var zipkinClient = (ZipkinClient)tracerClient;
+            zipkinClient.isTraceOn = false;
+
+            tracerClient.EndClientTrace(10);
         }
 
         private ITracerClient SetupZipkinClient()
