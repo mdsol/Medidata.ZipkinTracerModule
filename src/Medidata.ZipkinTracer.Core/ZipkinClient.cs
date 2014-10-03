@@ -65,42 +65,42 @@ namespace Medidata.ZipkinTracer.Core
 
         public void StartServerTrace()
         {
-            serverSpan = StartTrace(spanTracer.ReceiveServerSpan, requestName, traceProvider.TraceId, traceProvider.ParentSpanId, traceProvider.SpanId);
+            if (isTraceOn)
+            {
+                serverSpan = StartTrace(spanTracer.ReceiveServerSpan, requestName, traceProvider.TraceId, traceProvider.ParentSpanId, traceProvider.SpanId);
+            }
         }
 
         public void EndServerTrace(int duration)
         {
-            EndTrace(spanTracer.SendServerSpan, serverSpan, duration);
+            if (isTraceOn)
+            {
+                EndTrace(spanTracer.SendServerSpan, serverSpan, duration);
+            }
         }
 
-        private Span StartTrace(Func<string, string, string, string, Span> func, string requestName, string traceId, string parentSpanId, string spanId) 
+        private Span StartTrace(Func<string, string, string, string, Span> func, string requestName, string traceId, string parentSpanId, string spanId)
         {
-            if ( isTraceOn )
+            try
             {
-                try
-                {
-                    return func(requestName, traceId, parentSpanId, spanId);
-                }
-                catch(Exception ex)
-                {
-                    logger.Error("Error Starting Trace", ex);
-                }
+                return func(requestName, traceId, parentSpanId, spanId);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error Starting Trace", ex);
             }
             return null;
         }
-            
+
         private void EndTrace(Action<Span, int> action, Span span, int duration)
         {
-            if ( isTraceOn )
+            try
             {
-                try
-                {
-                    action(span, duration);
-                }
-                catch(Exception ex)
-                {
-                    logger.Error("Error Ending Trace", ex);
-                }
+                action(span, duration);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error Ending Trace", ex);
             }
         }
 
