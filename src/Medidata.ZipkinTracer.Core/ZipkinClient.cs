@@ -57,7 +57,7 @@ namespace Medidata.ZipkinTracer.Core
         {
             if (isTraceOn)
             {
-                clientSpan = StartTrace(spanTracer.SendClientSpan, requestName, traceProvider.TraceId, traceProvider.ParentSpanId, traceProvider.SpanId);
+                clientSpan = StartTrace(spanTracer.SendClientSpan);
             }
         }
 
@@ -73,7 +73,7 @@ namespace Medidata.ZipkinTracer.Core
         {
             if (isTraceOn)
             {
-                serverSpan = StartTrace(spanTracer.ReceiveServerSpan, requestName, traceProvider.TraceId, traceProvider.ParentSpanId, traceProvider.SpanId);
+                serverSpan = StartTrace(spanTracer.ReceiveServerSpan);
             }
         }
 
@@ -85,11 +85,11 @@ namespace Medidata.ZipkinTracer.Core
             }
         }
 
-        private Span StartTrace(Func<string, string, string, string, Span> func, string requestName, string traceId, string parentSpanId, string spanId)
+        private Span StartTrace(Func<string, string, string, string, Span> func)
         {
             try
             {
-                return func(requestName, traceId, parentSpanId, spanId);
+                return func(requestName, traceProvider.TraceId, traceProvider.ParentSpanId, traceProvider.SpanId);
             }
             catch (Exception ex)
             {
