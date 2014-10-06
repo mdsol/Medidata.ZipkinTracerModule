@@ -11,6 +11,19 @@ This nuget package implements the zipkin tracer client for .net applications.  T
 ### Further documentation and diagrams
 Further documentation about zipkin in general and .net implementation, please take a look at : https://sites.google.com/a/mdsol.com/knowledgebase/home/general/personal-pages-medidata-white-pages/tomoko-kwan/zomg-tomokos-blog
 
+### Enable/Disable zipkin tracing
+
+Zipkin relies on CrossApplicationTracer library (https://github.com/mdsol/Medidata.CrossApplicationTracer)'s TraceProvider to retrieve ids which are passed through the http request headers.
+
+Zipkin will record traces if TraceProvider's IsSampled is true.  
+
+This will happen if :
+
+a) the caller of the app has set the IsSampled http header value to true.
+
+OR
+
+b) the url request is not in the mAuthWhitelist appsetting config, and using the zipkinSampleRate, CrossApplicationTracer will determine whether or not to trace this request. zipkinSampleRate is the approximate percentage of traces being recorded in zipkin.
 
 ### Config transformations
 Below are the config transformations that is needed.  
