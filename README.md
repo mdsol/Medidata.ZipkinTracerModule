@@ -2,28 +2,23 @@
 A .NET implementation of the Zipkin Tracer client.
 
 ## Overview
-This nuget package implements the zipkin tracer client for .net applications.  Includes a HttpModule which injects zipkin trace into every request which has a zipkin traceId in the header. 
+This nuget package implements the zipkin tracer client for .net applications.  This sln produces 2 nuget packages.
+
+1) Medidata.ZipkinTracer.Core : core library for generating zipkin spans from ids sent through from CrossApplicationTracer and sending it to the zipkin collector using thrift protocol
+2) Medidata.ZipkinTracer.HttpModule : httpModule injects zipkin trace into every request which has a zipkin traceId and isSampled of true in the header. Includes config transforms that automatically modifies the config for zipkin to work.
+
+### Further documentation and diagrams
+Further documentation about zipkin in general and .net implementation, please take a look at : https://sites.google.com/a/mdsol.com/knowledgebase/home/general/personal-pages-medidata-white-pages/tomoko-kwan/zomg-tomokos-blog
+
 
 ### Config transformations
-3 config files will be automatically updated when installing this nuget package. 
+Below are the config transformations that is needed.  
 
+These transformations will be made automatically if the Medidata.ZipkinTracer.HttpModule nuget package is installed.  These changes will need to be made manually for Medidata.ZipkinTracer.Core nuget package.
 
-1) web.config 
+1) appsettings.template.config, app.config
 
-The following will be added to add the httpModule to your project.  Please don't modify this.
-
- ```
-  <system.webServer>
-    <modules>
-      <add name="ZipkinRequestContextModule" type="Medidata.ZipkinTracerModule.HttpModule.ZipkinRequestContextModule" />
-    </modules>
-  </system.webServer>
-  ```
-
-
-2) appsettings.template.config
-
-Add 4 additional configurations. Please verify these values and modify them according to your service/environment.
+Add the below additional configurations. Please verify these values and modify them according to your service/environment.
 
 ```
 <appSettings>
@@ -31,6 +26,7 @@ Add 4 additional configurations. Please verify these values and modify them acco
   <add key="zipkinScribeServerPort" value="9410" />
   <add key="ServiceName" value="Name of your Service i.e.Gambit" />
   <add key="spanProcessorBatchSize" value="10" />
+  <add key="zipkinSampleRate" value="0.5" />
 </appSettings>
 ```
 
@@ -41,9 +37,11 @@ Add 4 additional configurations. Please verify these values and modify them acco
 	ServiceName- name of your Service that zipkin will use to label the trace
 
 	spanProcessorBatchSize - how many Spans should be sent to the zipkin scribe/collector in one go.
+	
+	zipkinSampleRate - 1 decimal point float value between 0 and 1.  this value will determine randomly if the current request will be traced or not.
 
 	
-3) parameters.xml
+2) parameters.xml
 
 This is used in opscode's xml when deploying service (i.e. Gambit) to customize the values to be used in appsettings.
 
@@ -63,8 +61,25 @@ The values are the same as appsettings.template.config
   <parameter name="Span Processor Batch Size" description="Number of spans to send to zipkin collector in one go" defaultValue="10">
     <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='spanProcessorBatchSize']/@value" />
   </parameter>
+  <parameter name="Zipkin Sample Rate" description="float between 0 and 1 to determine whether to send a zipkin trace" defaultValue="0.5">
+    <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinSampleRate']/@value" />
+  </parameter>
 </parameters>
 ```
+
+#### Config transformations for HttpModule package
+
+1) web.config 
+
+The following will be added to add the httpModule to your project.  Please don't modify this.
+
+ ```
+  <system.webServer>
+    <modules>
+      <add name="ZipkinRequestContextModule" type="Medidata.ZipkinTracerModule.HttpModule.ZipkinRequestContextModule" />
+    </modules>
+  </system.webServer>
+  ```
 
 ### Contact
 sauce-forge@msdol.com
