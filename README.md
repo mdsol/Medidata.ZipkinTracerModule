@@ -5,6 +5,7 @@ A .NET implementation of the Zipkin Tracer client.
 This nuget package implements the zipkin tracer client for .net applications.  This sln produces 2 nuget packages.
 
 1) Medidata.ZipkinTracer.Core : core library for generating zipkin spans from ids sent through from CrossApplicationTracer and sending it to the zipkin collector using thrift protocol
+
 2) Medidata.ZipkinTracer.HttpModule : httpModule injects zipkin trace into every request which has a zipkin traceId and isSampled of true in the header. Includes config transforms that automatically modifies the config for zipkin to work.
 
 ### Further documentation and diagrams
