@@ -206,12 +206,11 @@ namespace Medidata.ZipkinTracer.Core.Test
             spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(MockRepository.GenerateStub<IClientProvider>(), 0);
 
             var expectedException = new Exception();
-            spanCollectorStub.Expect(x => x.Start()).Throw(expectedException); 
             spanCollectorBuilder.Expect(x => x.Build(Arg<string>.Is.Anything, Arg<int>.Is.Anything, Arg<int>.Is.Anything)).Return(spanCollectorStub);
+            spanCollectorStub.Expect(x => x.Start()).Throw(expectedException); 
 
             var zipkinClient = new ZipkinClient(traceProvider, requestName, logger,zipkinConfigStub, spanCollectorBuilder);
             Assert.IsFalse(zipkinClient.isTraceOn);
-            logger.AssertWasCalled(x => x.Error(Arg<string>.Is.Anything, Arg<Exception>.Is.Equal(expectedException)));
         }
 
         [TestMethod]
