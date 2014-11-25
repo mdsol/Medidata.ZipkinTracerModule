@@ -114,7 +114,7 @@ namespace Medidata.ZipkinTracer.Core
         private long GetTimeStamp()
         {
             var t = DateTime.UtcNow - new DateTime(1970, 1, 1);
-            return Convert.ToInt64(t.TotalMilliseconds);
+            return Convert.ToInt64(t.TotalMilliseconds * 1000);
         }
     }
 }
