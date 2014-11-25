@@ -24,16 +24,6 @@ namespace Medidata.ZipkinTracer.Core.Collector
             }
 
             this.clientProvider = clientProvider;
-
-            try
-            {
-                clientProvider.Setup();
-            }
-            catch (TException tEx)
-            {
-                clientProvider.Close();
-                throw tEx;
-            }
             
             spanProcessor = new SpanProcessor(spanQueue, clientProvider, maxProcessorBatchSize);
         }
