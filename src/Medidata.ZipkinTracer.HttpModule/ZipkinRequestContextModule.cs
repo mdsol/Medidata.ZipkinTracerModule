@@ -25,7 +25,7 @@ namespace Medidata.ZipkinTracer.HttpModule
                     var zipkinConfig = new ZipkinConfig();
 
                     var traceProvider = new TraceProvider(new System.Web.HttpContextWrapper(HttpContext.Current), zipkinConfig.DontSampleListCsv, zipkinConfig.ZipkinSampleRate);
-                    var logger = new MDLogger(LogManager.GetLogger(this.GetType()), traceProvider);
+                    var logger = new MDLogger(LogManager.GetLogger(this.GetType()), traceProvider, new AssemblyInformation());
 
                     ITracerClient zipkinClient = new ZipkinClient(traceProvider, url, logger);
 
