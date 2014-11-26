@@ -22,16 +22,6 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         }
 
         [TestMethod]
-        [ExpectedException(typeof(TException))]
-        public void CTOR_clientProviderSetupException()
-        {
-            clientProviderStub = MockRepository.GenerateStub<IClientProvider>();
-            clientProviderStub.Expect(x => x.Setup()).Throw(new TException());
-
-            spanCollector = new SpanCollector(clientProviderStub, fixture.Create<int>());
-        }
-
-        [TestMethod]
         public void CTOR_initializesSpanCollector()
         {
             SpanCollector.spanQueue = null;
