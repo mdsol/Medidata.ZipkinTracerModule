@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Thrift;
 using Thrift.Protocol;
 using Thrift.Transport;
 
@@ -28,6 +29,15 @@ namespace Medidata.ZipkinTracer.Core.Collector
             if (instance == null)
             {
                 instance = new ClientProvider(host, port);
+                try
+                {
+                    instance.Setup();
+                }
+                catch (TException tEx)
+                {
+                    instance.Close();
+                    throw tEx;
+                }
             }
             return instance;
         }
