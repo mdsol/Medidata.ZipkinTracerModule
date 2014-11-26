@@ -33,10 +33,11 @@ namespace Medidata.ZipkinTracer.Core.Collector
                 {
                     instance.Setup();
                 }
-                catch (TException tEx)
+                catch (Exception ex)
                 {
                     instance.Close();
-                    throw tEx;
+                    instance = null;
+                    throw ex;
                 }
             }
             return instance;
@@ -58,7 +59,6 @@ namespace Medidata.ZipkinTracer.Core.Collector
                 transport.Close();
                 transport.Dispose();
             }
-            instance = null;
         }
 
         public void Log(List<LogEntry> logEntries)
