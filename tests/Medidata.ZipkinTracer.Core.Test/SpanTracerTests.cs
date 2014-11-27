@@ -180,12 +180,12 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             Assert.AreEqual(3, list.Count);
 
-            Assert.AreEqual(traceId, list.Where(x => x.Key.Equals("trace_id")).Select(x => ConvertTotString(x.Value)).First());
-            Assert.AreEqual(spanId, list.Where(x => x.Key.Equals("span_id")).Select(x => ConvertTotString(x.Value)).First());
-            Assert.AreEqual(parentSpanId, list.Where(x => x.Key.Equals("parent_id")).Select(x => ConvertTotString(x.Value)).First());
+            Assert.AreEqual(traceId, list.Where(x => x.Key.Equals("trace_id")).Select(x => ConvertToString(x.Value)).First());
+            Assert.AreEqual(spanId, list.Where(x => x.Key.Equals("span_id")).Select(x => ConvertToString(x.Value)).First());
+            Assert.AreEqual(parentSpanId, list.Where(x => x.Key.Equals("parent_id")).Select(x => ConvertToString(x.Value)).First());
         }
 
-        private string ConvertTotString(byte[] bytes)
+        private string ConvertToString(byte[] bytes)
         {
             char[] chars = new char[bytes.Length / sizeof(char)];
             System.Buffer.BlockCopy(bytes, 0, chars, 0, bytes.Length);
