@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
 using Medidata.ZipkinTracer.Core.Collector;
 using Rhino.Mocks;
+using System.Linq;
 
 namespace Medidata.ZipkinTracer.Core.Test
 {
@@ -56,6 +57,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             zipkinEndpointStub.Expect(x => x.GetEndpoint(serviceName)).Return(new Endpoint() { Service_name = serviceName });
 
             var resultSpan = spanTracer.ReceiveServerSpan(requestName, traceId, parentSpanId, spanId);
+
             Assert.AreEqual(requestName, resultSpan.Name);
             Assert.AreEqual(Int64.Parse(traceId, System.Globalization.NumberStyles.HexNumber), resultSpan.Trace_id);
             Assert.AreEqual(Int64.Parse(parentSpanId, System.Globalization.NumberStyles.HexNumber), resultSpan.Parent_id);
@@ -72,6 +74,8 @@ namespace Medidata.ZipkinTracer.Core.Test
             var endpoint = annotation.Host as Endpoint;
             Assert.IsNotNull(endpoint);
             Assert.AreEqual(serviceName, endpoint.Service_name);
+
+            AssertBinaryAnnotations(resultSpan.Binary_annotations, traceId, spanId, parentSpanId);
         }
 
         [TestMethod]
@@ -123,6 +127,8 @@ namespace Medidata.ZipkinTracer.Core.Test
             var endpoint = annotation.Host as Endpoint;
             Assert.IsNotNull(endpoint);
             Assert.AreEqual(serviceName, endpoint.Service_name);
+
+            AssertBinaryAnnotations(resultSpan.Binary_annotations, traceId, spanId, parentSpanId);
         }
 
         [TestMethod]
@@ -168,6 +174,22 @@ namespace Medidata.ZipkinTracer.Core.Test
             Assert.IsNotNull(annotation.Timestamp);
 
             return true;
+        }
+
+        private void AssertBinaryAnnotations(System.Collections.Generic.List<BinaryAnnotation> list, string traceId, string spanId, string parentSpanId)
+        {
+            Assert.AreEqual(3, list.Count);
+
+            Assert.AreEqual(traceId, list.Where(x => x.Key.Equals("trace_id")).Select(x => ConvertToString(x.Value)).First());
+            Assert.AreEqual(spanId, list.Where(x => x.Key.Equals("span_id")).Select(x => ConvertToString(x.Value)).First());
+            Assert.AreEqual(parentSpanId, list.Where(x => x.Key.Equals("parent_id")).Select(x => ConvertToString(x.Value)).First());
+        }
+
+        private string ConvertToString(byte[] bytes)
+        {
+            char[] chars = new char[bytes.Length / sizeof(char)];
+            System.Buffer.BlockCopy(bytes, 0, chars, 0, bytes.Length);
+            return new string(chars);
         }
     }
 }

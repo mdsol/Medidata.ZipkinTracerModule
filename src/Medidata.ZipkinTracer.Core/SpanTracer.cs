@@ -43,8 +43,11 @@ namespace Medidata.ZipkinTracer.Core
                 Timestamp = GetTimeStamp(),
                 Value = zipkinCoreConstants.SERVER_RECV
             };
-
             newSpan.Annotations.Add(annotation);
+
+            AddBinaryAnnotation("trace_id", traceId, newSpan);
+            AddBinaryAnnotation("span_id", spanId, newSpan);
+            AddBinaryAnnotation("parent_id", parentSpanId, newSpan);
 
             return newSpan;
         }
@@ -77,6 +80,10 @@ namespace Medidata.ZipkinTracer.Core
 
             newSpan.Annotations.Add(annotation);
 
+            AddBinaryAnnotation("trace_id", traceId, newSpan);
+            AddBinaryAnnotation("span_id", spanId, newSpan);
+            AddBinaryAnnotation("parent_id", parentSpanId, newSpan);
+
             return newSpan;
         }
 
@@ -108,13 +115,36 @@ namespace Medidata.ZipkinTracer.Core
 
             newSpan.Name = requestName;
             newSpan.Annotations = new List<Annotation>();
+            newSpan.Binary_annotations = new List<BinaryAnnotation>();
             return newSpan;
         }
 
         private long GetTimeStamp()
         {
             var t = DateTime.UtcNow - new DateTime(1970, 1, 1);
-            return Convert.ToInt64(t.TotalMilliseconds * 1000);
+
+            //the version in sandbox expects milliseconds.  The new versions of zipkin expects microseconds.
+            return Convert.ToInt64(t.TotalMilliseconds);
+        }
+
+        internal static byte[] ConvertToBytes(string str)
+        {
+            byte[] bytes = new byte[str.Length * sizeof(char)];
+            System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
+            return bytes;
+        }
+
+        private void AddBinaryAnnotation(string key, string value, Span span)
+        {
+            var binaryAnnotation = new BinaryAnnotation()
+            {
+                Host = zipkinEndpoint.GetEndpoint(serviceName),
+                Annotation_type = AnnotationType.STRING,
+                Key = key,
+                Value = ConvertToBytes(value)
+            };
+
+            span.Binary_annotations.Add(binaryAnnotation);
         }
     }
 }
