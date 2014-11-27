@@ -122,7 +122,6 @@ namespace Medidata.ZipkinTracer.Core
         private long GetTimeStamp()
         {
             var t = DateTime.UtcNow - new DateTime(1970, 1, 1);
-            //return Convert.ToInt64(t.TotalMilliseconds * 1000);
 
             //the version in sandbox expects milliseconds.  The new versions of zipkin expects microseconds.
             return Convert.ToInt64(t.TotalMilliseconds);
