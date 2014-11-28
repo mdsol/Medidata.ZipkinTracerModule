@@ -4,6 +4,7 @@ using Ploeh.AutoFixture;
 using Medidata.ZipkinTracer.Core.Collector;
 using Rhino.Mocks;
 using System.Linq;
+using System.Text;
 
 namespace Medidata.ZipkinTracer.Core.Test
 {
@@ -180,16 +181,9 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             Assert.AreEqual(3, list.Count);
 
-            Assert.AreEqual(traceId, list.Where(x => x.Key.Equals("trace_id")).Select(x => ConvertToString(x.Value)).First());
-            Assert.AreEqual(spanId, list.Where(x => x.Key.Equals("span_id")).Select(x => ConvertToString(x.Value)).First());
-            Assert.AreEqual(parentSpanId, list.Where(x => x.Key.Equals("parent_id")).Select(x => ConvertToString(x.Value)).First());
-        }
-
-        private string ConvertToString(byte[] bytes)
-        {
-            char[] chars = new char[bytes.Length / sizeof(char)];
-            System.Buffer.BlockCopy(bytes, 0, chars, 0, bytes.Length);
-            return new string(chars);
+            Assert.AreEqual(traceId, list.Where(x => x.Key.Equals("trace_id")).Select(x => Encoding.Default.GetString(x.Value)).First());
+            Assert.AreEqual(spanId, list.Where(x => x.Key.Equals("span_id")).Select(x => Encoding.Default.GetString(x.Value)).First());
+            Assert.AreEqual(parentSpanId, list.Where(x => x.Key.Equals("parent_id")).Select(x => Encoding.Default.GetString(x.Value)).First());
         }
     }
 }
