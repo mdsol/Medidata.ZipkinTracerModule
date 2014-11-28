@@ -125,13 +125,6 @@ namespace Medidata.ZipkinTracer.Core
             return Convert.ToInt64(t.TotalMilliseconds * 1000);
         }
 
-        internal static byte[] ConvertToBytes(string str)
-        {
-            byte[] bytes = new byte[str.Length * sizeof(char)];
-            System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
-            return bytes;
-        }
-
         private void AddBinaryAnnotation(string key, string value, Span span)
         {
             var binaryAnnotation = new BinaryAnnotation()
@@ -139,7 +132,7 @@ namespace Medidata.ZipkinTracer.Core
                 Host = zipkinEndpoint.GetEndpoint(serviceName),
                 Annotation_type = AnnotationType.STRING,
                 Key = key,
-                Value = ConvertToBytes(value)
+                Value = Encoding.Default.GetBytes(value)
             };
 
             span.Binary_annotations.Add(binaryAnnotation);
