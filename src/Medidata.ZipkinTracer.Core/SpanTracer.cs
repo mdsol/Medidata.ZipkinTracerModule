@@ -122,16 +122,7 @@ namespace Medidata.ZipkinTracer.Core
         private long GetTimeStamp()
         {
             var t = DateTime.UtcNow - new DateTime(1970, 1, 1);
-
-            //the version in sandbox expects milliseconds.  The new versions of zipkin expects microseconds.
-            return Convert.ToInt64(t.TotalMilliseconds);
-        }
-
-        internal static byte[] ConvertToBytes(string str)
-        {
-            byte[] bytes = new byte[str.Length * sizeof(char)];
-            System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
-            return bytes;
+            return Convert.ToInt64(t.TotalMilliseconds * 1000);
         }
 
         private void AddBinaryAnnotation(string key, string value, Span span)
@@ -141,7 +132,7 @@ namespace Medidata.ZipkinTracer.Core
                 Host = zipkinEndpoint.GetEndpoint(serviceName),
                 Annotation_type = AnnotationType.STRING,
                 Key = key,
-                Value = ConvertToBytes(value)
+                Value = Encoding.Default.GetBytes(value)
             };
 
             span.Binary_annotations.Add(binaryAnnotation);
