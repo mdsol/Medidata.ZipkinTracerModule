@@ -39,9 +39,6 @@
     <Reference Include="Medidata.CrossApplicationTracer">
       <HintPath>..\..\packages\Medidata.CrossApplicationTracer.1.0.0.8\lib\net40\Medidata.CrossApplicationTracer.dll</HintPath>
     </Reference>
-    <Reference Include="Medidata.MDLogging">
-      <HintPath>..\..\packages\Medidata.MDLogging.0.0.5.0\lib\net45\Medidata.MDLogging.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -73,7 +70,9 @@
     <None Include="Medidata.ZipkinTracer.Core.nuspec">
       <SubType>Designer</SubType>
     </None>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Medidata.ZipkinTracer.Core.Collector\Medidata.ZipkinTracer.Core.Collector.csproj">

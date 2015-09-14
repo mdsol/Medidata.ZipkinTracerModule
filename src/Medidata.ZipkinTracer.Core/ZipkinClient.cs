@@ -1,6 +1,6 @@
 ﻿using Medidata.CrossApplicationTracer;
-using Medidata.MDLogging;
 using Medidata.ZipkinTracer.Core.Collector;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,11 +19,11 @@ namespace Medidata.ZipkinTracer.Core
 
         private string requestName;
         private ITraceProvider traceProvider;
-        private IMDLogger logger;
+        private ILog logger;
 
-        public ZipkinClient(ITraceProvider tracerProvider, string requestName, IMDLogger logger) : this(tracerProvider, requestName, logger, new ZipkinConfig(), new SpanCollectorBuilder()) { }
+        public ZipkinClient(ITraceProvider tracerProvider, string requestName, ILog logger) : this(tracerProvider, requestName, logger, new ZipkinConfig(), new SpanCollectorBuilder()) { }
 
-        public ZipkinClient(ITraceProvider traceProvider, string requestName, IMDLogger logger, IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder)
+        public ZipkinClient(ITraceProvider traceProvider, string requestName, ILog logger, IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder)
         {
             this.logger = logger;
             isTraceOn = true;

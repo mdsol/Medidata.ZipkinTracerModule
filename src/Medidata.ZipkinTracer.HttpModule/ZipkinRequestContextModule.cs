@@ -8,7 +8,6 @@ using System.Web;
 using Medidata.CrossApplicationTracer;
 using Medidata.ZipkinTracer.Core;
 using System.Diagnostics.CodeAnalysis;
-using Medidata.MDLogging;
 using log4net;
 
 namespace Medidata.ZipkinTracer.HttpModule
@@ -25,7 +24,7 @@ namespace Medidata.ZipkinTracer.HttpModule
                     var zipkinConfig = new ZipkinConfig();
 
                     var traceProvider = new TraceProvider(new System.Web.HttpContextWrapper(HttpContext.Current), zipkinConfig.DontSampleListCsv, zipkinConfig.ZipkinSampleRate);
-                    var logger = new MDLogger(LogManager.GetLogger(this.GetType()), traceProvider, new AssemblyInformation());
+                    var logger = LogManager.GetLogger(this.GetType());
 
                     ITracerClient zipkinClient = new ZipkinClient(traceProvider, url, logger);
 
