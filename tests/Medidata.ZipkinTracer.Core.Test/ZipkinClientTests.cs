@@ -4,7 +4,7 @@ using Ploeh.AutoFixture;
 using Rhino.Mocks;
 using Medidata.ZipkinTracer.Core.Collector;
 using Medidata.CrossApplicationTracer;
-using Medidata.MDLogging;
+using log4net;
 
 namespace Medidata.ZipkinTracer.Core.Test
 {
@@ -18,7 +18,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         private ServiceEndpoint zipkinEndpoint;
         private ITraceProvider traceProvider;
         private string requestName;
-        private IMDLogger logger;
+        private ILog logger;
 
         [TestInitialize]
         public void Init()
@@ -27,7 +27,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             spanCollectorBuilder = MockRepository.GenerateStub<ISpanCollectorBuilder>();
             zipkinEndpoint = MockRepository.GenerateStub<ServiceEndpoint>();
             traceProvider = MockRepository.GenerateStub<ITraceProvider>();
-            logger = MockRepository.GenerateStub<IMDLogger>();
+            logger = MockRepository.GenerateStub<ILog>();
             requestName = fixture.Create<string>();
         }
 
