@@ -8,8 +8,7 @@ This nuget package implements the zipkin tracer client for .net applications.  T
 
 2) Medidata.ZipkinTracer.HttpModule : httpModule injects zipkin trace into every request which has a zipkin traceId and isSampled of true in the header. Includes config transforms that automatically modifies the config for zipkin to work.
 
-### Further documentation and diagrams
-Further documentation about zipkin in general and .net implementation, please take a look at : https://sites.google.com/a/mdsol.com/knowledgebase/home/general/personal-pages-medidata-white-pages/tomoko-kwan/zomg-tomokos-blog
+For more information and implementations in other languages, please check [Openzipkin](https://github.com/openzipkin/).
 
 ### Enable/Disable zipkin tracing
 
@@ -95,9 +94,8 @@ The following will be added to add the httpModule to your project.  Please don't
   </system.webServer>
   ```
 
-### Contact
-sauce-forge@msdol.com
-	 
-
-	 
+## Contributors
+ZipkinTracer is (c) Medidata Solutions Worldwide and owned by its major contributors:
+* Tomoko Kwan
+* [Kenya Matsumoto](https://github.com/kenyamat)
 
