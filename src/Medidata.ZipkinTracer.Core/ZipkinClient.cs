@@ -7,6 +7,7 @@ namespace Medidata.ZipkinTracer.Core
 {
     public class ZipkinClient : ITracerClient
     {
+        const string medidataDomain = ".imedidata.net";
         internal bool isTraceOn;
         internal SpanCollector spanCollector;
         internal SpanTracer spanTracer;
@@ -49,15 +50,12 @@ namespace Medidata.ZipkinTracer.Core
             }
         }
 
-        public void StartClientTrace(string clientServiceName)
+        public void StartClientTrace(Uri clientService)
         {
             if (isTraceOn)
             {
-                if (string.IsNullOrWhiteSpace(clientServiceName))
-                {
-                    logger.Error("clientServiceName is null or whitespace");
-                    return;
-                }
+                var clientServiceName = GetClientServiceName(clientService);
+                if (string.IsNullOrWhiteSpace(clientServiceName)) { return; }
 
                 try
                 {
@@ -75,15 +73,12 @@ namespace Medidata.ZipkinTracer.Core
             }
         }
 
-        public void EndClientTrace(int duration, string clientServiceName)
+        public void EndClientTrace(int duration, Uri clientService)
         {
             if (isTraceOn)
             {
-                if (string.IsNullOrWhiteSpace(clientServiceName))
-                {
-                    logger.Error("clientServiceName is null or whitespace");
-                    return;
-                }
+                var clientServiceName = GetClientServiceName(clientService);
+                if (string.IsNullOrWhiteSpace(clientServiceName)) { return; }
 
                 try
                 {
@@ -97,6 +92,17 @@ namespace Medidata.ZipkinTracer.Core
                     logger.Error("Error Ending Client Trace", ex);
                 }
             }
+        }
+
+        private string GetClientServiceName(Uri uri)
+        {
+            if (uri == null)
+            {
+                logger.Error("clientService uri is null");
+                return null;
+            }
+
+            return uri.Host.Replace(medidataDomain, "");
         }
 
         public void StartServerTrace()

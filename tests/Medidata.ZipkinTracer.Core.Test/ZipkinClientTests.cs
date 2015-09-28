@@ -325,12 +325,31 @@ namespace Medidata.ZipkinTracer.Core.Test
             var zipkinClient = (ZipkinClient)tracerClient;
             spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
             zipkinClient.spanTracer = spanTracerStub;
-            var clientServiceName = fixture.Create<string>();
+            var clientServiceName = "ampridatvir-sandbox";
+            var clientServiceUri = new Uri("https://"+clientServiceName+".imedidata.net:8000/");
 
             var expectedSpan = new Span();
-            spanTracerStub.Expect(x => x.SendClientSpan(Arg<string>.Is.Equal(requestName), Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Return(expectedSpan);
+            spanTracerStub.Expect(x => x.SendClientSpan(Arg<string>.Is.Equal(requestName), Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Equal(clientServiceName))).Return(expectedSpan);
 
-            tracerClient.StartClientTrace(clientServiceName);
+            tracerClient.StartClientTrace(clientServiceUri);
+
+            Assert.AreEqual(expectedSpan, zipkinClient.clientSpan);
+        }
+
+        [TestMethod]
+        public void StartClientSpan_UsingIpAddress()
+        {
+            var tracerClient = SetupZipkinClient();
+            var zipkinClient = (ZipkinClient)tracerClient;
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
+            zipkinClient.spanTracer = spanTracerStub;
+            var clientServiceName = "192.168.178.178";
+            var clientServiceUri = new Uri("https://" + clientServiceName + ":8000/");
+
+            var expectedSpan = new Span();
+            spanTracerStub.Expect(x => x.SendClientSpan(Arg<string>.Is.Equal(requestName), Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Equal(clientServiceName))).Return(expectedSpan);
+
+            tracerClient.StartClientTrace(clientServiceUri);
 
             Assert.AreEqual(expectedSpan, zipkinClient.clientSpan);
         }
@@ -342,12 +361,12 @@ namespace Medidata.ZipkinTracer.Core.Test
             var zipkinClient = (ZipkinClient)tracerClient;
             spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
             zipkinClient.spanTracer = spanTracerStub;
-            var clientServiceName = fixture.Create<string>();
+            var clientServiceName = "ampridatvir-sandbox";
+            var clientServiceUri = new Uri("https://" + clientServiceName + ".imedidata.net:8000/");
 
-            var expectedSpan = new Span();
-            spanTracerStub.Expect(x => x.SendClientSpan(Arg<string>.Is.Equal(requestName), Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Throw(new Exception());
+            spanTracerStub.Expect(x => x.SendClientSpan(Arg<string>.Is.Equal(requestName), Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Equal(clientServiceName))).Throw(new Exception());
 
-            tracerClient.StartClientTrace(clientServiceName);
+            tracerClient.StartClientTrace(clientServiceUri);
 
             Assert.AreEqual(null, zipkinClient.clientSpan);
         }
@@ -359,12 +378,11 @@ namespace Medidata.ZipkinTracer.Core.Test
             var zipkinClient = (ZipkinClient)tracerClient;
             spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
             zipkinClient.spanTracer = spanTracerStub;
-            var clientServiceName = string.Empty;
 
             var expectedSpan = new Span();
             spanTracerStub.Expect(x => x.SendClientSpan(Arg<string>.Is.Equal(requestName), Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Return(expectedSpan);
 
-            tracerClient.StartClientTrace(clientServiceName);
+            tracerClient.StartClientTrace(null);
 
             Assert.AreEqual(null, zipkinClient.clientSpan);
         }
@@ -375,9 +393,10 @@ namespace Medidata.ZipkinTracer.Core.Test
             var tracerClient = SetupZipkinClient();
             var zipkinClient = (ZipkinClient)tracerClient;
             zipkinClient.isTraceOn = false;
-            var clientServiceName = fixture.Create<string>();
+            var clientServiceName = "ampridatvir-sandbox";
+            var clientServiceUri = new Uri("https://" + clientServiceName + ".imedidata.net:8000/");
 
-            tracerClient.StartClientTrace(clientServiceName);
+            tracerClient.StartClientTrace(clientServiceUri);
 
             Assert.AreEqual(null, zipkinClient.serverSpan);
         }
@@ -391,10 +410,29 @@ namespace Medidata.ZipkinTracer.Core.Test
             zipkinClient.spanTracer = spanTracerStub;
             zipkinClient.clientSpan = new Span();
 
-            var clientServiceName = fixture.Create<string>();
+            var clientServiceName = "ampridatvir-sandbox";
+            var clientServiceUri = new Uri("https://" + clientServiceName + ".imedidata.net:8000/");
             var expectedDuration = fixture.Create<int>();
 
-            tracerClient.EndClientTrace(expectedDuration, clientServiceName);
+            tracerClient.EndClientTrace(expectedDuration, clientServiceUri);
+
+            spanTracerStub.AssertWasCalled(x => x.ReceiveClientSpan(zipkinClient.clientSpan, expectedDuration, clientServiceName));
+        }
+
+        [TestMethod]
+        public void EndClientSpan_UsingIpAddress()
+        {
+            var tracerClient = SetupZipkinClient();
+            var zipkinClient = (ZipkinClient)tracerClient;
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
+            zipkinClient.spanTracer = spanTracerStub;
+            zipkinClient.clientSpan = new Span();
+
+            var clientServiceName = "192.168.178.178";
+            var clientServiceUri = new Uri("https://" + clientServiceName + ":8000/");
+            var expectedDuration = fixture.Create<int>();
+
+            tracerClient.EndClientTrace(expectedDuration, clientServiceUri);
 
             spanTracerStub.AssertWasCalled(x => x.ReceiveClientSpan(zipkinClient.clientSpan, expectedDuration, clientServiceName));
         }
@@ -408,31 +446,25 @@ namespace Medidata.ZipkinTracer.Core.Test
             zipkinClient.spanTracer = spanTracerStub;
             zipkinClient.clientSpan = new Span();
 
-            var clientServiceName = fixture.Create<string>();
+            var clientServiceName = "ampridatvir-sandbox";
+            var clientServiceUri = new Uri("https://" + clientServiceName + ".imedidata.net:8000/");
             var expectedDuration = fixture.Create<int>();
 
             spanTracerStub.Expect(x => x.ReceiveClientSpan(zipkinClient.clientSpan, expectedDuration, clientServiceName)).Throw(new Exception());
 
-            tracerClient.EndClientTrace(expectedDuration, clientServiceName);
+            tracerClient.EndClientTrace(expectedDuration, clientServiceUri);
         }
 
         [TestMethod]
         public void EndClientSpan_InvalidClientServiceName()
         {
             var tracerClient = SetupZipkinClient();
-            var zipkinClient = (ZipkinClient)tracerClient;
             spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
-            zipkinClient.spanTracer = spanTracerStub;
-            zipkinClient.clientSpan = new Span();
-
-            var clientServiceName = string.Empty;
             var expectedDuration = fixture.Create<int>();
 
-            spanTracerStub.Expect(x => x.ReceiveClientSpan(zipkinClient.clientSpan, expectedDuration, clientServiceName));
+            tracerClient.EndClientTrace(expectedDuration, null);
 
-            tracerClient.EndClientTrace(expectedDuration, clientServiceName);
-
-            spanTracerStub.AssertWasNotCalled(x => x.ReceiveClientSpan(zipkinClient.clientSpan, expectedDuration, clientServiceName));
+            spanTracerStub.AssertWasNotCalled(x => x.ReceiveClientSpan(Arg<Span>.Is.Anything, Arg<int>.Is.Anything, Arg<string>.Is.Anything));
         }
 
         [TestMethod]
@@ -441,9 +473,10 @@ namespace Medidata.ZipkinTracer.Core.Test
             var tracerClient = SetupZipkinClient();
             var zipkinClient = (ZipkinClient)tracerClient;
             zipkinClient.isTraceOn = false;
-            var clientServiceName = fixture.Create<string>();
+            var clientServiceName = "ampridatvir-sandbox";
+            var clientServiceUri = new Uri("https://" + clientServiceName + ".imedidata.net:8000/");
 
-            tracerClient.EndClientTrace(10, clientServiceName);
+            tracerClient.EndClientTrace(10, clientServiceUri);
         }
 
         private ITracerClient SetupZipkinClient()
