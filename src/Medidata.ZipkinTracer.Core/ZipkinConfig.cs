@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
+﻿using System.Configuration;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
 
 namespace Medidata.ZipkinTracer.Core
 {

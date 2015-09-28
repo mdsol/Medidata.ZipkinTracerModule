@@ -2,10 +2,6 @@
 using Medidata.ZipkinTracer.Core.Collector;
 using log4net;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Medidata.ZipkinTracer.Core
 {
@@ -53,19 +49,53 @@ namespace Medidata.ZipkinTracer.Core
             }
         }
 
-        public void StartClientTrace()
+        public void StartClientTrace(string clientServiceName)
         {
             if (isTraceOn)
             {
-                clientSpan = StartTrace(spanTracer.SendClientSpan);
+                if (string.IsNullOrWhiteSpace(clientServiceName))
+                {
+                    logger.Error("clientServiceName is null or whitespace");
+                    return;
+                }
+
+                try
+                {
+                    clientSpan = spanTracer.SendClientSpan(
+                        requestName,
+                        traceProvider.TraceId,
+                        traceProvider.ParentSpanId,
+                        traceProvider.SpanId,
+                        clientServiceName);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Error Starting Client Trace", ex);
+                }
             }
         }
 
-        public void EndClientTrace(int duration)
+        public void EndClientTrace(int duration, string clientServiceName)
         {
             if (isTraceOn)
             {
-                EndTrace(spanTracer.ReceiveClientSpan, clientSpan, duration);
+                if (string.IsNullOrWhiteSpace(clientServiceName))
+                {
+                    logger.Error("clientServiceName is null or whitespace");
+                    return;
+                }
+
+                try
+                {
+                    spanTracer.ReceiveClientSpan(
+                        clientSpan,
+                        duration,
+                        clientServiceName);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Error Ending Client Trace", ex);
+                }
             }
         }
 
@@ -73,7 +103,18 @@ namespace Medidata.ZipkinTracer.Core
         {
             if (isTraceOn)
             {
-                serverSpan = StartTrace(spanTracer.ReceiveServerSpan);
+                try
+                {
+                    serverSpan = spanTracer.ReceiveServerSpan(
+                        requestName,
+                        traceProvider.TraceId,
+                        traceProvider.ParentSpanId,
+                        traceProvider.SpanId);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Error Starting Server Trace", ex);
+                }
             }
         }
 
@@ -81,32 +122,16 @@ namespace Medidata.ZipkinTracer.Core
         {
             if (isTraceOn)
             {
-                EndTrace(spanTracer.SendServerSpan, serverSpan, duration);
-            }
-        }
-
-        private Span StartTrace(Func<string, string, string, string, Span> func)
-        {
-            try
-            {
-                return func(requestName, traceProvider.TraceId, traceProvider.ParentSpanId, traceProvider.SpanId);
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Error Starting Trace", ex);
-            }
-            return null;
-        }
-
-        private void EndTrace(Action<Span, int> action, Span span, int duration)
-        {
-            try
-            {
-                action(span, duration);
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Error Ending Trace", ex);
+                try
+                {
+                    spanTracer.SendServerSpan(
+                        serverSpan,
+                        duration);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Error Ending Server Trace", ex);
+                }
             }
         }
 

@@ -325,11 +325,12 @@ namespace Medidata.ZipkinTracer.Core.Test
             var zipkinClient = (ZipkinClient)tracerClient;
             spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
             zipkinClient.spanTracer = spanTracerStub;
+            var clientServiceName = fixture.Create<string>();
 
             var expectedSpan = new Span();
-            spanTracerStub.Expect(x => x.SendClientSpan(Arg<string>.Is.Equal(requestName), Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Return(expectedSpan);
+            spanTracerStub.Expect(x => x.SendClientSpan(Arg<string>.Is.Equal(requestName), Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Return(expectedSpan);
 
-            tracerClient.StartClientTrace();
+            tracerClient.StartClientTrace(clientServiceName);
 
             Assert.AreEqual(expectedSpan, zipkinClient.clientSpan);
         }
@@ -341,11 +342,29 @@ namespace Medidata.ZipkinTracer.Core.Test
             var zipkinClient = (ZipkinClient)tracerClient;
             spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
             zipkinClient.spanTracer = spanTracerStub;
+            var clientServiceName = fixture.Create<string>();
 
             var expectedSpan = new Span();
-            spanTracerStub.Expect(x => x.SendClientSpan(Arg<string>.Is.Equal(requestName), Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Throw(new Exception());
+            spanTracerStub.Expect(x => x.SendClientSpan(Arg<string>.Is.Equal(requestName), Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Throw(new Exception());
 
-            tracerClient.StartClientTrace();
+            tracerClient.StartClientTrace(clientServiceName);
+
+            Assert.AreEqual(null, zipkinClient.clientSpan);
+        }
+
+        [TestMethod]
+        public void StartClientSpan_InvalidClientServiceName()
+        {
+            var tracerClient = SetupZipkinClient();
+            var zipkinClient = (ZipkinClient)tracerClient;
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
+            zipkinClient.spanTracer = spanTracerStub;
+            var clientServiceName = string.Empty;
+
+            var expectedSpan = new Span();
+            spanTracerStub.Expect(x => x.SendClientSpan(Arg<string>.Is.Equal(requestName), Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Return(expectedSpan);
+
+            tracerClient.StartClientTrace(clientServiceName);
 
             Assert.AreEqual(null, zipkinClient.clientSpan);
         }
@@ -356,8 +375,9 @@ namespace Medidata.ZipkinTracer.Core.Test
             var tracerClient = SetupZipkinClient();
             var zipkinClient = (ZipkinClient)tracerClient;
             zipkinClient.isTraceOn = false;
+            var clientServiceName = fixture.Create<string>();
 
-            tracerClient.StartClientTrace();
+            tracerClient.StartClientTrace(clientServiceName);
 
             Assert.AreEqual(null, zipkinClient.serverSpan);
         }
@@ -371,11 +391,12 @@ namespace Medidata.ZipkinTracer.Core.Test
             zipkinClient.spanTracer = spanTracerStub;
             zipkinClient.clientSpan = new Span();
 
+            var clientServiceName = fixture.Create<string>();
             var expectedDuration = fixture.Create<int>();
 
-            tracerClient.EndClientTrace(expectedDuration);
+            tracerClient.EndClientTrace(expectedDuration, clientServiceName);
 
-            spanTracerStub.AssertWasCalled(x => x.ReceiveClientSpan(zipkinClient.clientSpan, expectedDuration));
+            spanTracerStub.AssertWasCalled(x => x.ReceiveClientSpan(zipkinClient.clientSpan, expectedDuration, clientServiceName));
         }
 
         [TestMethod]
@@ -387,11 +408,31 @@ namespace Medidata.ZipkinTracer.Core.Test
             zipkinClient.spanTracer = spanTracerStub;
             zipkinClient.clientSpan = new Span();
 
+            var clientServiceName = fixture.Create<string>();
             var expectedDuration = fixture.Create<int>();
 
-            spanTracerStub.Expect(x => x.ReceiveClientSpan(zipkinClient.clientSpan, expectedDuration)).Throw(new Exception());
+            spanTracerStub.Expect(x => x.ReceiveClientSpan(zipkinClient.clientSpan, expectedDuration, clientServiceName)).Throw(new Exception());
 
-            tracerClient.EndClientTrace(expectedDuration);
+            tracerClient.EndClientTrace(expectedDuration, clientServiceName);
+        }
+
+        [TestMethod]
+        public void EndClientSpan_InvalidClientServiceName()
+        {
+            var tracerClient = SetupZipkinClient();
+            var zipkinClient = (ZipkinClient)tracerClient;
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
+            zipkinClient.spanTracer = spanTracerStub;
+            zipkinClient.clientSpan = new Span();
+
+            var clientServiceName = string.Empty;
+            var expectedDuration = fixture.Create<int>();
+
+            spanTracerStub.Expect(x => x.ReceiveClientSpan(zipkinClient.clientSpan, expectedDuration, clientServiceName));
+
+            tracerClient.EndClientTrace(expectedDuration, clientServiceName);
+
+            spanTracerStub.AssertWasNotCalled(x => x.ReceiveClientSpan(zipkinClient.clientSpan, expectedDuration, clientServiceName));
         }
 
         [TestMethod]
@@ -400,8 +441,9 @@ namespace Medidata.ZipkinTracer.Core.Test
             var tracerClient = SetupZipkinClient();
             var zipkinClient = (ZipkinClient)tracerClient;
             zipkinClient.isTraceOn = false;
+            var clientServiceName = fixture.Create<string>();
 
-            tracerClient.EndClientTrace(10);
+            tracerClient.EndClientTrace(10, clientServiceName);
         }
 
         private ITracerClient SetupZipkinClient()
