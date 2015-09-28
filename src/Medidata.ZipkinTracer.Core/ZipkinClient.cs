@@ -2,12 +2,12 @@
 using Medidata.ZipkinTracer.Core.Collector;
 using log4net;
 using System;
+using System.Collections.Generic;
 
 namespace Medidata.ZipkinTracer.Core
 {
     public class ZipkinClient : ITracerClient
     {
-        const string medidataDomain = ".imedidata.net";
         internal bool isTraceOn;
         internal SpanCollector spanCollector;
         internal SpanTracer spanTracer;
@@ -17,11 +17,14 @@ namespace Medidata.ZipkinTracer.Core
         private string requestName;
         private ITraceProvider traceProvider;
         private ILog logger;
+        private List<string> internalDomainList;
 
         public ZipkinClient(ITraceProvider tracerProvider, string requestName, ILog logger) : this(tracerProvider, requestName, logger, new ZipkinConfig(), new SpanCollectorBuilder()) { }
 
         public ZipkinClient(ITraceProvider traceProvider, string requestName, ILog logger, IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder)
         {
+            internalDomainList = zipkinConfig.GetInternalDomainList();
+
             this.logger = logger;
             isTraceOn = true;
 
@@ -102,7 +105,12 @@ namespace Medidata.ZipkinTracer.Core
                 return null;
             }
 
-            return uri.Host.Replace(medidataDomain, "");
+            var host = uri.Host;
+            foreach (var domain in internalDomainList)
+            {
+                host = host.Replace(domain, "");
+            }
+            return host;
         }
 
         public void StartServerTrace()
