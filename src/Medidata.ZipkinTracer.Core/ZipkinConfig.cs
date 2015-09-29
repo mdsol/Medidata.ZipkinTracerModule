@@ -39,15 +39,15 @@ namespace Medidata.ZipkinTracer.Core
 
         public List<string> GetNotToBeDisplayedDomainList()
         {
-            var internalDomainList = new List<string>();
+            var zipkinNotToBeDisplayedDomainList = new List<string>();
 
-            var rawInternalDomainList = ConfigurationManager.AppSettings["notToBeDisplayedDomainList"];
+            var rawInternalDomainList = ConfigurationManager.AppSettings["zipkinNotToBeDisplayedDomainList"];
             if (!string.IsNullOrWhiteSpace(rawInternalDomainList))
             {
-                internalDomainList.AddRange(rawInternalDomainList.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries).Select(w => w.Trim()).ToList());
+                zipkinNotToBeDisplayedDomainList.AddRange(rawInternalDomainList.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries).Select(w => w.Trim()).ToList());
             }
 
-            return internalDomainList;
+            return zipkinNotToBeDisplayedDomainList;
         }
     }
 }

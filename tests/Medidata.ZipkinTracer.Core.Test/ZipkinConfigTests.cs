@@ -6,13 +6,13 @@ namespace Medidata.ZipkinTracer.Core.Test
     [TestClass]
     public class ZipkinConfigTests
     {
-        #region Get Internal Domain List
+        #region Get Not To Be Displayed Domain List
         [TestMethod]
-        public void GetInternalDomainList()
+        public void GetNotToBeDisplayedDomainList()
         {
             // Arrange
             ZipkinConfig config = new ZipkinConfig();
-            ConfigurationManager.AppSettings["notToBeDisplayedDomainList"] = ".xyz.net,.abc.com";
+            ConfigurationManager.AppSettings["zipkinNotToBeDisplayedDomainList"] = ".xyz.net,.abc.com";
 
             // Act
             var result = config.GetNotToBeDisplayedDomainList();
@@ -25,11 +25,11 @@ namespace Medidata.ZipkinTracer.Core.Test
         }
 
         [TestMethod]
-        public void GetInternalDomainListWithEmptyConfig()
+        public void GetNotToBeDisplayedDomainListWithEmptyConfig()
         {
             // Arrange
             ZipkinConfig config = new ZipkinConfig();
-            ConfigurationManager.AppSettings["notToBeDisplayedDomainList"] = "";
+            ConfigurationManager.AppSettings["zipkinNotToBeDisplayedDomainList"] = "";
 
             // Act
             var result = config.GetNotToBeDisplayedDomainList();
@@ -40,11 +40,11 @@ namespace Medidata.ZipkinTracer.Core.Test
         }
 
         [TestMethod]
-        public void GetInternalDomainListWithOnlyCommaLocalesConfigValues()
+        public void GetNotToBeDisplayedDomainListWithOnlyCommaLocalesConfigValues()
         {
             // Arrange
             ZipkinConfig config = new ZipkinConfig();
-            ConfigurationManager.AppSettings["notToBeDisplayedDomainList"] = ",";
+            ConfigurationManager.AppSettings["zipkinNotToBeDisplayedDomainList"] = ",";
 
             // Act
             var result = config.GetNotToBeDisplayedDomainList();

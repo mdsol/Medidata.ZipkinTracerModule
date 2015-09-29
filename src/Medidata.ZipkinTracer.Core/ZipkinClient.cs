@@ -17,13 +17,13 @@ namespace Medidata.ZipkinTracer.Core
         private string requestName;
         private ITraceProvider traceProvider;
         private ILog logger;
-        private List<string> internalDomainList;
+        private List<string> zipkinNotToBeDisplayedDomainList;
 
         public ZipkinClient(ITraceProvider tracerProvider, string requestName, ILog logger) : this(tracerProvider, requestName, logger, new ZipkinConfig(), new SpanCollectorBuilder()) { }
 
         public ZipkinClient(ITraceProvider traceProvider, string requestName, ILog logger, IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder)
         {
-            internalDomainList = zipkinConfig.GetNotToBeDisplayedDomainList();
+            zipkinNotToBeDisplayedDomainList = zipkinConfig.GetNotToBeDisplayedDomainList();
 
             this.logger = logger;
             isTraceOn = true;
@@ -106,7 +106,7 @@ namespace Medidata.ZipkinTracer.Core
             }
 
             var host = uri.Host;
-            foreach (var domain in internalDomainList)
+            foreach (var domain in zipkinNotToBeDisplayedDomainList)
             {
                 host = host.Replace(domain, "");
             }
