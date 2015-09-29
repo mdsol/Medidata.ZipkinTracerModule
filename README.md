@@ -110,4 +110,4 @@ The following will be added to add the httpModule to your project.  Please don't
 ZipkinTracer is (c) Medidata Solutions Worldwide and owned by its major contributors:
 * Tomoko Kwan
 * [Kenya Matsumoto](https://github.com/kenyamat)
-
+* [Brent Villanueva](https://github.com/bvillanueva-mdsol)
