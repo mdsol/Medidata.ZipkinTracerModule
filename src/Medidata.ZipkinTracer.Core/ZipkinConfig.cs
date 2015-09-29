@@ -9,7 +9,7 @@ namespace Medidata.ZipkinTracer.Core
     {
         public string ServiceName
         {
-            get {  return ConfigurationManager.AppSettings["ServiceName"];}
+            get { return ConfigurationManager.AppSettings["zipkinServiceName"]; }
         }
 
         public string ZipkinServerName
@@ -24,12 +24,12 @@ namespace Medidata.ZipkinTracer.Core
 
         public string SpanProcessorBatchSize
         {
-            get {  return ConfigurationManager.AppSettings["spanProcessorBatchSize"];}
+            get { return ConfigurationManager.AppSettings["zipkinSpanProcessorBatchSize"]; }
         }
 
         public string DontSampleListCsv
         {
-            get {  return ConfigurationManager.AppSettings["uriBlacklist"];} // TODO: refactor this later if it is being used
+            get { return ConfigurationManager.AppSettings["zipkinUriBlacklist"]; } // TODO: refactor this later if it is being used
         }
 
         public string ZipkinSampleRate

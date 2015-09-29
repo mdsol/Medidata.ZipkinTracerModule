@@ -1,8 +1,8 @@
 ﻿<appSettings>
   <add key="zipkinScribeServerName" value="zipkinvm.cloudapp.net" />
   <add key="zipkinScribeServerPort" value="9410" />
-  <add key="ServiceName" value="***Service Name Here***" />
-  <add key="spanProcessorBatchSize" value="10" />
+  <add key="zipkinServiceName" value="***Service Name Here***" />
+  <add key="zipkinSpanProcessorBatchSize" value="10" />
   <add key="zipkinSampleRate" value="0.5" />
   <add key="zipkinNotToBeDisplayedDomainList" value=".xyz.com,.softwaresite.net" />
 </appSettings>

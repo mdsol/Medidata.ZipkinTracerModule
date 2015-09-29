@@ -37,8 +37,8 @@ Add the below additional configurations. Please verify these values and modify t
 <appSettings>
   <add key="zipkinScribeServerName" value="zipkinvm.cloudapp.net" />
   <add key="zipkinScribeServerPort" value="9410" />
-  <add key="ServiceName" value="Name of your Service i.e.Gambit" />
-  <add key="spanProcessorBatchSize" value="10" />
+  <add key="zipkinServiceName" value="Name of your Service i.e.Gambit" />
+  <add key="zipkinSpanProcessorBatchSize" value="10" />
   <add key="zipkinSampleRate" value="0.5" />
   <add key="zipkinNotToBeDisplayedDomainList" value=".xyz.com,.softwaresite.net" />
 </appSettings>
@@ -48,9 +48,9 @@ Add the below additional configurations. Please verify these values and modify t
 
 	zipkinScribeServerPort - the zipkin scribe/collector server port to connect to send the Spans
 
-	ServiceName- name of your Service that zipkin will use to label the trace
+	zipkinServiceName- name of your Service that zipkin will use to label the trace
 
-	spanProcessorBatchSize - how many Spans should be sent to the zipkin scribe/collector in one go.
+	zipkinSpanProcessorBatchSize - how many Spans should be sent to the zipkin scribe/collector in one go.
 	
 	zipkinSampleRate - 1 decimal point float value between 0 and 1.  this value will determine randomly if the current request will be traced or not.
 
@@ -71,11 +71,11 @@ The values are the same as appsettings.template.config
   <parameter name="Zipkin Scribe Server Port" description="Zipkin scribe server port" defaultValue="9410">
     <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinScribeServerPort']/@value" />
   </parameter>
-  <parameter name="Service Name" description="Service name to be traced in Zipkin" defaultValue="Gambit">
-    <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='ServiceName']/@value" />
+  <parameter name="Zipkin Service Name" description="Service name to be traced in Zipkin" defaultValue="Gambit">
+    <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinServiceName']/@value" />
   </parameter>
-  <parameter name="Span Processor Batch Size" description="Number of spans to send to zipkin collector in one go" defaultValue="10">
-    <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='spanProcessorBatchSize']/@value" />
+  <parameter name="Zipkin Span Processor Batch Size" description="Number of spans to send to zipkin collector in one go" defaultValue="10">
+    <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinSpanProcessorBatchSize']/@value" />
   </parameter>
   <parameter name="Zipkin Sample Rate" description="float between 0 and 1 to determine whether to send a zipkin trace" defaultValue="0.5">
     <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinSampleRate']/@value" />
