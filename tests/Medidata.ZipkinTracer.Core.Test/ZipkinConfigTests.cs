@@ -12,10 +12,10 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             // Arrange
             ZipkinConfig config = new ZipkinConfig();
-            ConfigurationManager.AppSettings["internalDomainList"] = ".xyz.net,.abc.com";
+            ConfigurationManager.AppSettings["notToBeDisplayedDomainList"] = ".xyz.net,.abc.com";
 
             // Act
-            var result = config.GetInternalDomainList();
+            var result = config.GetNotToBeDisplayedDomainList();
 
             // Assert
             Assert.IsNotNull(result);
@@ -29,10 +29,10 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             // Arrange
             ZipkinConfig config = new ZipkinConfig();
-            ConfigurationManager.AppSettings["internalDomainList"] = "";
+            ConfigurationManager.AppSettings["notToBeDisplayedDomainList"] = "";
 
             // Act
-            var result = config.GetInternalDomainList();
+            var result = config.GetNotToBeDisplayedDomainList();
 
             // Assert
             Assert.IsNotNull(result);
@@ -44,10 +44,10 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             // Arrange
             ZipkinConfig config = new ZipkinConfig();
-            ConfigurationManager.AppSettings["internalDomainList"] = ",";
+            ConfigurationManager.AppSettings["notToBeDisplayedDomainList"] = ",";
 
             // Act
-            var result = config.GetInternalDomainList();
+            var result = config.GetNotToBeDisplayedDomainList();
 
             // Assert
             Assert.IsNotNull(result);

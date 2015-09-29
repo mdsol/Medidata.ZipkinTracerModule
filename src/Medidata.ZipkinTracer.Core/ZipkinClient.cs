@@ -23,7 +23,7 @@ namespace Medidata.ZipkinTracer.Core
 
         public ZipkinClient(ITraceProvider traceProvider, string requestName, ILog logger, IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder)
         {
-            internalDomainList = zipkinConfig.GetInternalDomainList();
+            internalDomainList = zipkinConfig.GetNotToBeDisplayedDomainList();
 
             this.logger = logger;
             isTraceOn = true;

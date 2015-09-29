@@ -359,7 +359,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         public void StartClientSpan_MultipleDomainList()
         {
             var zipkinConfig = CreateZipkinConfigWithDefaultValues();
-            zipkinConfig.Expect(x => x.GetInternalDomainList()).Return(new List<string>() { ".abc.net", ".xyz.net" });
+            zipkinConfig.Expect(x => x.GetNotToBeDisplayedDomainList()).Return(new List<string>() { ".abc.net", ".xyz.net" });
             var tracerClient = SetupZipkinClient(zipkinConfig);
             var zipkinClient = (ZipkinClient)tracerClient;
             spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
@@ -462,7 +462,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         public void EndClientSpan_MultipleDomainList()
         {
             var zipkinConfig = CreateZipkinConfigWithDefaultValues();
-            zipkinConfig.Expect(x => x.GetInternalDomainList()).Return(new List<string>() { ".abc.net", ".xyz.net" });
+            zipkinConfig.Expect(x => x.GetNotToBeDisplayedDomainList()).Return(new List<string>() { ".abc.net", ".xyz.net" });
             var tracerClient = SetupZipkinClient(zipkinConfig);
             var zipkinClient = (ZipkinClient)tracerClient;
             spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
@@ -546,7 +546,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             zipkinConfigStub.Expect(x => x.ServiceName).Return(fixture.Create<string>());
             zipkinConfigStub.Expect(x => x.DontSampleListCsv).Return("foo,bar,baz");
             zipkinConfigStub.Expect(x => x.ZipkinSampleRate).Return("0.5");
-            zipkinConfigStub.Expect(x => x.GetInternalDomainList()).Return(new List<string>() { ".xyz.net" });
+            zipkinConfigStub.Expect(x => x.GetNotToBeDisplayedDomainList()).Return(new List<string>() { ".xyz.net" });
             return zipkinConfigStub;
         }
 
@@ -559,7 +559,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             zipkinConfigStub.Expect(x => x.ServiceName).Return(serviceName);
             zipkinConfigStub.Expect(x => x.DontSampleListCsv).Return(filterListCsv);
             zipkinConfigStub.Expect(x => x.ZipkinSampleRate).Return(zipkinSampleRate);
-            zipkinConfigStub.Expect(x => x.GetInternalDomainList()).Return(domainList);
+            zipkinConfigStub.Expect(x => x.GetNotToBeDisplayedDomainList()).Return(domainList);
             return zipkinConfigStub;
         }
     }

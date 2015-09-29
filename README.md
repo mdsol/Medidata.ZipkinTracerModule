@@ -40,6 +40,7 @@ Add the below additional configurations. Please verify these values and modify t
   <add key="ServiceName" value="Name of your Service i.e.Gambit" />
   <add key="spanProcessorBatchSize" value="10" />
   <add key="zipkinSampleRate" value="0.5" />
+  <add key="notToBeDisplayedDomainList" value=".xyz.com,.softwaresite.net" />
 </appSettings>
 ```
 
@@ -53,7 +54,9 @@ Add the below additional configurations. Please verify these values and modify t
 	
 	zipkinSampleRate - 1 decimal point float value between 0 and 1.  this value will determine randomly if the current request will be traced or not.
 
-	
+	notToBeDisplayedDomainList - comma separate domain list, it will be used when logging hostname by excluding these strings in service name attribute
+                                 e.g. domain: ".xyz.com", host: "abc.xyz.com" will be logged as "abc" only    
+
 2) parameters.xml
 
 This is used in opscode's xml when deploying service (i.e. Gambit) to customize the values to be used in appsettings.
@@ -76,6 +79,9 @@ The values are the same as appsettings.template.config
   </parameter>
   <parameter name="Zipkin Sample Rate" description="float between 0 and 1 to determine whether to send a zipkin trace" defaultValue="0.5">
     <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinSampleRate']/@value" />
+  </parameter>
+  <parameter name="Not To Be Displayed Domain List" description="comma separate domain list, it will be used in excluding these strings when logging hostname as service name" defaultValue="0.5">
+    <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='notToBeDisplayedDomainList']/@value" />
   </parameter>
 </parameters>
 ```

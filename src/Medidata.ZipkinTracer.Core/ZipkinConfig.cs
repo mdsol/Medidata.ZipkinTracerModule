@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Medidata.ZipkinTracer.Core
@@ -38,11 +37,11 @@ namespace Medidata.ZipkinTracer.Core
             get {  return ConfigurationManager.AppSettings["zipkinSampleRate"];}
         }
 
-        public List<string> GetInternalDomainList()
+        public List<string> GetNotToBeDisplayedDomainList()
         {
             var internalDomainList = new List<string>();
 
-            var rawInternalDomainList = ConfigurationManager.AppSettings["internalDomainList"];
+            var rawInternalDomainList = ConfigurationManager.AppSettings["notToBeDisplayedDomainList"];
             if (!string.IsNullOrWhiteSpace(rawInternalDomainList))
             {
                 internalDomainList.AddRange(rawInternalDomainList.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries).Select(w => w.Trim()).ToList());

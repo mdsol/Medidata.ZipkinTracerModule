@@ -14,4 +14,7 @@
   <parameter name="Zipkin Sample Rate" description="float between 0 and 1 to determine whether to send a zipkin trace" defaultValue="0.5">
     <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinSampleRate']/@value" />
   </parameter>
+  <parameter name="Not To Be Displayed Domain List" description="comma separate domain list, it will be used when logging hostname by excluding these strings in service name attribute" defaultValue="0.5">
+    <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='notToBeDisplayedDomainList']/@value" />
+  </parameter>
 </parameters>

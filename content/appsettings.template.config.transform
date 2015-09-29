@@ -4,4 +4,5 @@
   <add key="ServiceName" value="***Service Name Here***" />
   <add key="spanProcessorBatchSize" value="10" />
   <add key="zipkinSampleRate" value="0.5" />
+  <add key="notToBeDisplayedDomainList" value=".xyz.com,.softwaresite.net" />
 </appSettings>
