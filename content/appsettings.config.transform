@@ -4,5 +4,6 @@
   <add key="zipkinServiceName" value="***Service Name Here***" />
   <add key="zipkinSpanProcessorBatchSize" value="10" />
   <add key="zipkinSampleRate" value="0.5" />
-  <add key="zipkinNotToBeDisplayedDomainList" value=".xyz.com,.softwaresite.net" />
+  <add key="zipkinNotToBeDisplayedDomainList" value="***Domains Here***" />
+  <add key="zipkinExcludedUriList" value="***Excluded Uris Here***" />
 </appSettings>

@@ -29,7 +29,7 @@ namespace Medidata.ZipkinTracer.Core
 
         public string DontSampleListCsv
         {
-            get { return ConfigurationManager.AppSettings["zipkinUriBlacklist"]; } // TODO: refactor this later if it is being used
+            get { return ConfigurationManager.AppSettings["zipkinExcludedUriList"]; }
         }
 
         public string ZipkinSampleRate

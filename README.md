@@ -37,10 +37,11 @@ Add the below additional configurations. Please verify these values and modify t
 <appSettings>
   <add key="zipkinScribeServerName" value="zipkinvm.cloudapp.net" />
   <add key="zipkinScribeServerPort" value="9410" />
-  <add key="zipkinServiceName" value="Name of your Service i.e.Gambit" />
+  <add key="zipkinServiceName" value="Name of your Service i.e. MyApplication" />
   <add key="zipkinSpanProcessorBatchSize" value="10" />
   <add key="zipkinSampleRate" value="0.5" />
-  <add key="zipkinNotToBeDisplayedDomainList" value=".xyz.com,.softwaresite.net" />
+  <add key="zipkinNotToBeDisplayedDomainList" value=".xyz.com,.myApplication.net" />
+  <add key="zipkinExcludedUriList" value="/check_uri,/status" />
 </appSettings>
 ```
 
@@ -57,9 +58,11 @@ Add the below additional configurations. Please verify these values and modify t
 	zipkinNotToBeDisplayedDomainList - comma separate domain list, it will be used when logging hostname by excluding these strings in service name attribute
                                  e.g. domain: ".xyz.com", host: "abc.xyz.com" will be logged as "abc" only    
 
+    zipkinExcludedUriList - uri list that is not needed for tracing
+
 2) parameters.xml
 
-This is used in opscode's xml when deploying service (i.e. Gambit) to customize the values to be used in appsettings.
+This is used in opscode's xml when deploying service (i.e. MyApplication) to customize the values to be used in appsettings.
 
 The values are the same as appsettings.template.config
 
@@ -71,7 +74,7 @@ The values are the same as appsettings.template.config
   <parameter name="Zipkin Scribe Server Port" description="Zipkin scribe server port" defaultValue="9410">
     <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinScribeServerPort']/@value" />
   </parameter>
-  <parameter name="Zipkin Service Name" description="Service name to be traced in Zipkin" defaultValue="Gambit">
+  <parameter name="Zipkin Service Name" description="Service name to be traced in Zipkin" defaultValue="MyApplication">
     <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinServiceName']/@value" />
   </parameter>
   <parameter name="Zipkin Span Processor Batch Size" description="Number of spans to send to zipkin collector in one go" defaultValue="10">
@@ -80,8 +83,11 @@ The values are the same as appsettings.template.config
   <parameter name="Zipkin Sample Rate" description="float between 0 and 1 to determine whether to send a zipkin trace" defaultValue="0.5">
     <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinSampleRate']/@value" />
   </parameter>
-  <parameter name="Zipkin Not To Be Displayed Domain List" description="comma separate domain list, it will be used when logging hostname by excluding these strings in service name attribute" defaultValue="0.5">
+  <parameter name="Zipkin Not To Be Displayed Domain List" description="comma separate domain list, it will be used when logging hostname by excluding these strings in service name attribute" defaultValue=".myApplication.net">
     <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinNotToBeDisplayedDomainList']/@value" />
+  </parameter>
+  <parameter name="Zipkin Excluded Uri List" description="uri list that is not needed for tracing" defaultValue="/check_uri,/status">
+    <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinExcludedUriList']/@value" />
   </parameter>
 </parameters>
 ```
