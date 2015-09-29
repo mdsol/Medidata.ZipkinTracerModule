@@ -102,6 +102,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         public void SendClientSpan()
         {
             var serviceName = fixture.Create<string>();
+            var clientServiceName = fixture.Create<string>();
             var requestName = fixture.Create<string>();
             var traceId = fixture.Create<long>().ToString();
             var parentSpanId = fixture.Create<long>().ToString();
@@ -109,9 +110,9 @@ namespace Medidata.ZipkinTracer.Core.Test
 
             var spanTracer = new SpanTracer(spanCollectorStub, serviceName, zipkinEndpointStub);
 
-            zipkinEndpointStub.Expect(x => x.GetEndpoint(serviceName)).Return(new Endpoint() { Service_name = serviceName });
+            zipkinEndpointStub.Expect(x => x.GetEndpoint(clientServiceName)).Return(new Endpoint() { Service_name = clientServiceName });
 
-            var resultSpan = spanTracer.SendClientSpan(requestName, traceId, parentSpanId, spanId);
+            var resultSpan = spanTracer.SendClientSpan(requestName, traceId, parentSpanId, spanId, clientServiceName);
             Assert.AreEqual(requestName, resultSpan.Name);
             Assert.AreEqual(Int64.Parse(traceId, System.Globalization.NumberStyles.HexNumber), resultSpan.Trace_id);
             Assert.AreEqual(Int64.Parse(parentSpanId, System.Globalization.NumberStyles.HexNumber), resultSpan.Parent_id);
@@ -124,29 +125,29 @@ namespace Medidata.ZipkinTracer.Core.Test
             Assert.AreEqual(zipkinCoreConstants.CLIENT_SEND, annotation.Value);
             Assert.IsNotNull(annotation.Timestamp);
             Assert.IsNotNull(annotation.Host);
+            Assert.AreEqual(0, resultSpan.Binary_annotations.Count);
 
             var endpoint = annotation.Host as Endpoint;
             Assert.IsNotNull(endpoint);
-            Assert.AreEqual(serviceName, endpoint.Service_name);
-
-            AssertBinaryAnnotations(resultSpan.Binary_annotations, traceId, spanId, parentSpanId);
+            Assert.AreEqual(clientServiceName, endpoint.Service_name);
         }
 
         [TestMethod]
         public void ReceiveClientSpan()
         {
             var serviceName = fixture.Create<string>();
+            var clientServiceName = fixture.Create<string>();
             var spanTracer = new SpanTracer(spanCollectorStub, serviceName, zipkinEndpointStub);
 
             var expectedSpan = new Span() { Annotations = new System.Collections.Generic.List<Annotation>() };
             var expectedDuration = fixture.Create<int>();
 
-            zipkinEndpointStub.Expect(x => x.GetEndpoint(serviceName)).Return(new Endpoint() { Service_name = serviceName });
+            zipkinEndpointStub.Expect(x => x.GetEndpoint(clientServiceName)).Return(new Endpoint() { Service_name = clientServiceName });
 
-            spanTracer.ReceiveClientSpan(expectedSpan, expectedDuration);
+            spanTracer.ReceiveClientSpan(expectedSpan, expectedDuration, clientServiceName);
 
             spanCollectorStub.AssertWasCalled(x => x.Collect(Arg<Span>.Matches(y =>
-                    ValidateReceiveClientSpan(y, serviceName, expectedDuration)
+                    ValidateReceiveClientSpan(y, clientServiceName, expectedDuration)
                     ))
                 );
         }

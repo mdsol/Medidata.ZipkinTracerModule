@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Medidata.ZipkinTracer.Core
@@ -67,31 +66,27 @@ namespace Medidata.ZipkinTracer.Core
             spanCollector.Collect(span);
         }
 
-        public virtual Span SendClientSpan(string requestName, string traceId, string parentSpanId, string spanId)
+        public virtual Span SendClientSpan(string requestName, string traceId, string parentSpanId, string spanId, string clientServiceName)
         {
             var newSpan = CreateNewSpan(requestName, traceId, parentSpanId, spanId);
 
             var annotation = new Annotation()
             {
-                Host = zipkinEndpoint.GetEndpoint(serviceName),
+                Host = zipkinEndpoint.GetEndpoint(clientServiceName),
                 Timestamp = GetTimeStamp(),
                 Value = zipkinCoreConstants.CLIENT_SEND
             };
 
             newSpan.Annotations.Add(annotation);
 
-            AddBinaryAnnotation("trace_id", traceId, newSpan);
-            AddBinaryAnnotation("span_id", spanId, newSpan);
-            AddBinaryAnnotation("parent_id", parentSpanId, newSpan);
-
             return newSpan;
         }
 
-        public virtual void ReceiveClientSpan(Span span, int duration)
+        public virtual void ReceiveClientSpan(Span span, int duration, string clientServiceName)
         {
             var annotation = new Annotation()
             {
-                Host = zipkinEndpoint.GetEndpoint(serviceName),
+                Host = zipkinEndpoint.GetEndpoint(clientServiceName),
                 Duration = duration,  //duration is currently not supported by zipkin UI
                 Timestamp = GetTimeStamp(),
                 Value = zipkinCoreConstants.CLIENT_RECV

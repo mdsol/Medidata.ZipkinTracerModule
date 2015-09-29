@@ -3,9 +3,6 @@ using Medidata.ZipkinTracer.Core.Collector;
 using log4net;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Medidata.ZipkinTracer.Core
 {
@@ -20,11 +17,14 @@ namespace Medidata.ZipkinTracer.Core
         private string requestName;
         private ITraceProvider traceProvider;
         private ILog logger;
+        private List<string> zipkinNotToBeDisplayedDomainList;
 
         public ZipkinClient(ITraceProvider tracerProvider, string requestName, ILog logger) : this(tracerProvider, requestName, logger, new ZipkinConfig(), new SpanCollectorBuilder()) { }
 
         public ZipkinClient(ITraceProvider traceProvider, string requestName, ILog logger, IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder)
         {
+            zipkinNotToBeDisplayedDomainList = zipkinConfig.GetNotToBeDisplayedDomainList();
+
             this.logger = logger;
             isTraceOn = true;
 
@@ -53,27 +53,82 @@ namespace Medidata.ZipkinTracer.Core
             }
         }
 
-        public void StartClientTrace()
+        public void StartClientTrace(Uri clientService)
         {
             if (isTraceOn)
             {
-                clientSpan = StartTrace(spanTracer.SendClientSpan);
+                var clientServiceName = GetClientServiceName(clientService);
+                if (string.IsNullOrWhiteSpace(clientServiceName)) { return; }
+
+                try
+                {
+                    clientSpan = spanTracer.SendClientSpan(
+                        requestName,
+                        traceProvider.TraceId,
+                        traceProvider.ParentSpanId,
+                        traceProvider.SpanId,
+                        clientServiceName);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Error Starting Client Trace", ex);
+                }
             }
         }
 
-        public void EndClientTrace(int duration)
+        public void EndClientTrace(int duration, Uri clientService)
         {
             if (isTraceOn)
             {
-                EndTrace(spanTracer.ReceiveClientSpan, clientSpan, duration);
+                var clientServiceName = GetClientServiceName(clientService);
+                if (string.IsNullOrWhiteSpace(clientServiceName)) { return; }
+
+                try
+                {
+                    spanTracer.ReceiveClientSpan(
+                        clientSpan,
+                        duration,
+                        clientServiceName);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Error Ending Client Trace", ex);
+                }
             }
+        }
+
+        private string GetClientServiceName(Uri uri)
+        {
+            if (uri == null)
+            {
+                logger.Error("clientService uri is null");
+                return null;
+            }
+
+            var host = uri.Host;
+            foreach (var domain in zipkinNotToBeDisplayedDomainList)
+            {
+                host = host.Replace(domain, "");
+            }
+            return host;
         }
 
         public void StartServerTrace()
         {
             if (isTraceOn)
             {
-                serverSpan = StartTrace(spanTracer.ReceiveServerSpan);
+                try
+                {
+                    serverSpan = spanTracer.ReceiveServerSpan(
+                        requestName,
+                        traceProvider.TraceId,
+                        traceProvider.ParentSpanId,
+                        traceProvider.SpanId);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Error Starting Server Trace", ex);
+                }
             }
         }
 
@@ -81,32 +136,16 @@ namespace Medidata.ZipkinTracer.Core
         {
             if (isTraceOn)
             {
-                EndTrace(spanTracer.SendServerSpan, serverSpan, duration);
-            }
-        }
-
-        private Span StartTrace(Func<string, string, string, string, Span> func)
-        {
-            try
-            {
-                return func(requestName, traceProvider.TraceId, traceProvider.ParentSpanId, traceProvider.SpanId);
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Error Starting Trace", ex);
-            }
-            return null;
-        }
-
-        private void EndTrace(Action<Span, int> action, Span span, int duration)
-        {
-            try
-            {
-                action(span, duration);
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Error Ending Trace", ex);
+                try
+                {
+                    spanTracer.SendServerSpan(
+                        serverSpan,
+                        duration);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Error Ending Server Trace", ex);
+                }
             }
         }
 
