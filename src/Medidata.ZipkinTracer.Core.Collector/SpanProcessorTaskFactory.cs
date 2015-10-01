@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using log4net;
+using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,6 +10,12 @@ namespace Medidata.ZipkinTracer.Core.Collector
     {
         internal Task spanProcessorTaskInstance = null;
         internal CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        private ILog logger;
+
+        public SpanProcessorTaskFactory(ILog logger)
+        {
+            this.logger = logger;
+        }
 
         [ExcludeFromCodeCoverage]  //excluded from code coverage since this class is a 1 liner that starts up a background thread
         public virtual void CreateAndStart(Action action)
@@ -31,11 +35,18 @@ namespace Medidata.ZipkinTracer.Core.Collector
 
         internal async void ActionWrapper(Action action)
         {
-            while(!IsTaskCancelled())
+            try
             {
-                action();
-                await Task.Delay(500, cancellationTokenSource.Token);
-            } 
+                while (!IsTaskCancelled())
+                {
+                    action();
+                    await Task.Delay(500, cancellationTokenSource.Token);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error in SpanProcessorTask", ex);
+            }
         }
 
         public virtual bool IsTaskCancelled()

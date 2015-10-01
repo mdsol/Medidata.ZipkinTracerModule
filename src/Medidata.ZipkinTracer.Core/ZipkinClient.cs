@@ -37,7 +37,11 @@ namespace Medidata.ZipkinTracer.Core
             {
                 try
                 {
-                    spanCollector = spanCollectorBuilder.Build(zipkinConfig.ZipkinServerName, int.Parse(zipkinConfig.ZipkinServerPort), int.Parse(zipkinConfig.SpanProcessorBatchSize));
+                    spanCollector = spanCollectorBuilder.Build(
+                        zipkinConfig.ZipkinServerName,
+                        int.Parse(zipkinConfig.ZipkinServerPort),
+                        int.Parse(zipkinConfig.SpanProcessorBatchSize),
+                        logger);
                     spanCollector.Start();
 
                     spanTracer = new SpanTracer(spanCollector, zipkinConfig.ServiceName, new ServiceEndpoint());

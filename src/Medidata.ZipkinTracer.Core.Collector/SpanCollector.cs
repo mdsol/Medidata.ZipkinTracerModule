@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using log4net;
 
 namespace Medidata.ZipkinTracer.Core.Collector
 {
@@ -10,7 +11,7 @@ namespace Medidata.ZipkinTracer.Core.Collector
         internal SpanProcessor spanProcessor;
         internal IClientProvider clientProvider;
 
-        public SpanCollector(IClientProvider clientProvider, int maxProcessorBatchSize)
+        public SpanCollector(IClientProvider clientProvider, int maxProcessorBatchSize, ILog logger)
         {
             if ( spanQueue == null)
             {
@@ -18,8 +19,8 @@ namespace Medidata.ZipkinTracer.Core.Collector
             }
 
             this.clientProvider = clientProvider;
-            
-            spanProcessor = new SpanProcessor(spanQueue, clientProvider, maxProcessorBatchSize);
+
+            spanProcessor = new SpanProcessor(spanQueue, clientProvider, maxProcessorBatchSize, logger);
         }
 
         public virtual void Collect(Span span)

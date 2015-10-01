@@ -3,9 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using log4net;
 using Thrift;
 using Thrift.Protocol;
 using Thrift.Transport;
@@ -27,7 +25,7 @@ namespace Medidata.ZipkinTracer.Core.Collector
         internal int retries;
         internal int maxBatchSize;
 
-        public SpanProcessor(BlockingCollection<Span> spanQueue, IClientProvider clientProvider, int maxBatchSize)
+        public SpanProcessor(BlockingCollection<Span> spanQueue, IClientProvider clientProvider, int maxBatchSize, ILog logger)
         {
             if ( spanQueue == null) 
             {
@@ -44,7 +42,7 @@ namespace Medidata.ZipkinTracer.Core.Collector
             this.maxBatchSize = maxBatchSize;
             logEntries = new List<LogEntry>();
             protocolFactory = new TBinaryProtocol.Factory();
-            spanProcessorTaskFactory = new SpanProcessorTaskFactory();
+            spanProcessorTaskFactory = new SpanProcessorTaskFactory(logger);
         }
 
         public virtual void Stop()
@@ -90,7 +88,7 @@ namespace Medidata.ZipkinTracer.Core.Collector
                 clientProvider.Log(logEntries);
                 retries = 0;
             }
-            catch (TException tEx)
+            catch (TException)
             {
                 if ( retries < 3 )
                 {

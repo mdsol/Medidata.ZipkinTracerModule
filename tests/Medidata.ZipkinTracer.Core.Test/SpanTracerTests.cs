@@ -5,6 +5,7 @@ using Medidata.ZipkinTracer.Core.Collector;
 using Rhino.Mocks;
 using System.Linq;
 using System.Text;
+using log4net;
 
 namespace Medidata.ZipkinTracer.Core.Test
 {
@@ -14,12 +15,14 @@ namespace Medidata.ZipkinTracer.Core.Test
         private IFixture fixture;
         private SpanCollector spanCollectorStub;
         private ServiceEndpoint zipkinEndpointStub;
+        private ILog logger;
 
         [TestInitialize]
         public void Init()
         {
             fixture = new Fixture();
-            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(MockRepository.GenerateStub<IClientProvider>(), 0);
+            logger = MockRepository.GenerateStub<ILog>();
+            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(MockRepository.GenerateStub<IClientProvider>(), 0, logger);
             zipkinEndpointStub = MockRepository.GenerateStub<ServiceEndpoint>();
         }
 
