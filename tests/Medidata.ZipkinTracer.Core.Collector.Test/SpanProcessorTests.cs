@@ -90,16 +90,24 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         }
 
         [TestMethod]
-        public void LogSubmittedSpans_IncrementSubsequentEmptyQueueCountIfSpanQueueEmpty()
+        public void LogSubmittedSpans_DoNotIncrementSubsequentPollCountIfSpanQueueIsEmpty()
         {
             spanProcessor.LogSubmittedSpans();
-            Assert.AreEqual(1, spanProcessor.subsequentEmptyQueueCount);
+            Assert.AreEqual(0, spanProcessor.subsequentPollCount);
         }
 
         [TestMethod]
-        public void LogSubmittedSpans_WhenQueueIsSubsequentlyEmptyForMaxTimes()
+        public void LogSubmittedSpans_IncrementSubsequentPollCountIfSpanQueueHasAnItemLessThanMax()
         {
-            spanProcessor.subsequentEmptyQueueCount = SpanProcessor.MAX_SUBSEQUENT_EMPTY_QUEUE + 1;
+            spanProcessor.logEntries.Add(new LogEntry());
+            spanProcessor.LogSubmittedSpans();
+            Assert.AreEqual(1, spanProcessor.subsequentPollCount);
+        }
+
+        [TestMethod]
+        public void LogSubmittedSpans_WhenQueueIsSubsequentlyLessThanTheMaxBatchCountMaxTimes()
+        {
+            spanProcessor.subsequentPollCount = SpanProcessor.MAX_NUMBER_OF_POLLS + 1;
             spanProcessor.logEntries.Add(new LogEntry());
             spanProcessor.LogSubmittedSpans();
 

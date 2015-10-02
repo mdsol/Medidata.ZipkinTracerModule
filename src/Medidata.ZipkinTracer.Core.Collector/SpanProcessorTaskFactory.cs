@@ -46,6 +46,7 @@ namespace Medidata.ZipkinTracer.Core.Collector
         {
             while (!IsTaskCancelled())
             {
+                int delayTime = 500;
                 try
                 {
                     action();
@@ -53,8 +54,9 @@ namespace Medidata.ZipkinTracer.Core.Collector
                 catch (Exception ex)
                 {
                     logger.Error("Error in SpanProcessorTask", ex);
+                    delayTime = 30000;
                 }
-                await Task.Delay(500, cancellationTokenSource.Token);
+                await Task.Delay(delayTime, cancellationTokenSource.Token);
             }
         }
 
