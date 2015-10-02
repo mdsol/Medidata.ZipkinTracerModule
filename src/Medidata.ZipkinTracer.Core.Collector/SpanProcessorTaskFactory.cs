@@ -8,13 +8,25 @@ namespace Medidata.ZipkinTracer.Core.Collector
 {
     public class SpanProcessorTaskFactory
     {
-        internal Task spanProcessorTaskInstance = null;
-        internal CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        private Task spanProcessorTaskInstance;
+        private CancellationTokenSource cancellationTokenSource;
         private ILog logger;
 
         public SpanProcessorTaskFactory(ILog logger)
         {
             this.logger = logger;
+            cancellationTokenSource = new CancellationTokenSource();
+        }
+
+        /// <summary>
+        /// For unit test
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="cancellationTokenSource"></param>
+        public SpanProcessorTaskFactory(ILog logger, CancellationTokenSource cancellationTokenSource)
+        {
+            this.logger = logger;
+            this.cancellationTokenSource = cancellationTokenSource;
         }
 
         [ExcludeFromCodeCoverage]  //excluded from code coverage since this class is a 1 liner that starts up a background thread
@@ -35,17 +47,17 @@ namespace Medidata.ZipkinTracer.Core.Collector
 
         internal async void ActionWrapper(Action action)
         {
-            try
+            while (!IsTaskCancelled())
             {
-                while (!IsTaskCancelled())
+                try
                 {
                     action();
-                    await Task.Delay(500, cancellationTokenSource.Token);
                 }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("Error in SpanProcessorTask", ex);
+                catch (Exception ex)
+                {
+                    logger.Error("Error in SpanProcessorTask", ex);
+                }
+                await Task.Delay(500, cancellationTokenSource.Token);
             }
         }
 

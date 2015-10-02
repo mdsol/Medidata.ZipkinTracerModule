@@ -18,9 +18,8 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         public void Init()
         {
             logger = MockRepository.GenerateStub<ILog>();
-            spanProcessorTaskFactory = new SpanProcessorTaskFactory(logger);
             cancellationTokenSource = new CancellationTokenSource();
-            spanProcessorTaskFactory.cancellationTokenSource = cancellationTokenSource;
+            spanProcessorTaskFactory = new SpanProcessorTaskFactory(logger, cancellationTokenSource);
             actionCalled = false;
         }
 

@@ -22,31 +22,27 @@ namespace Medidata.ZipkinTracer.HttpModule
                     var logger = LogManager.GetLogger(this.GetType());
 
                     ITracerClient zipkinClient = new ZipkinClient(traceProvider, url, logger);
-
                     zipkinClient.StartServerTrace();
 
                     HttpContext.Current.Items["zipkinClient"] = zipkinClient;
-
-                    var stopwatch = new Stopwatch();
-                    HttpContext.Current.Items["zipkinStopwatch"] = stopwatch;
-                    stopwatch.Start();
                 };
 
             context.EndRequest += (sender, args) =>
                 {
-                    var stopwatch = (Stopwatch)HttpContext.Current.Items["zipkinStopwatch"];
-                    stopwatch.Stop();
-
                     var zipkinClient = (ITracerClient)HttpContext.Current.Items["zipkinClient"];
+                    zipkinClient.EndServerTrace();
+                };
 
-                    zipkinClient.EndServerTrace(stopwatch.Elapsed.Milliseconds * 1000);
+            context.Error += (sender, args) =>
+                {
+                    var zipkinClient = (ITracerClient)HttpContext.Current.Items["zipkinClient"];
+                    zipkinClient.EndServerTrace();
                 };
         }
 
         public void Dispose()
         {
             if (HttpContext.Current == null) return;
-            HttpContext.Current.Items["zipkinStopwatch"] = null;
             HttpContext.Current.Items["zipkinClient"] = null;
         }
     }

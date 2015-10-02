@@ -42,7 +42,6 @@ namespace Medidata.ZipkinTracer.Core
                         int.Parse(zipkinConfig.ZipkinServerPort),
                         int.Parse(zipkinConfig.SpanProcessorBatchSize),
                         logger);
-                    spanCollector.Start();
 
                     spanTracer = new SpanTracer(spanCollector, zipkinConfig.ServiceName, new ServiceEndpoint());
 
@@ -80,7 +79,7 @@ namespace Medidata.ZipkinTracer.Core
             }
         }
 
-        public void EndClientTrace(int duration, Uri clientService)
+        public void EndClientTrace(Uri clientService)
         {
             if (isTraceOn)
             {
@@ -91,7 +90,6 @@ namespace Medidata.ZipkinTracer.Core
                 {
                     spanTracer.ReceiveClientSpan(
                         clientSpan,
-                        duration,
                         clientServiceName);
                 }
                 catch (Exception ex)
@@ -136,15 +134,13 @@ namespace Medidata.ZipkinTracer.Core
             }
         }
 
-        public void EndServerTrace(int duration)
+        public void EndServerTrace()
         {
             if (isTraceOn)
             {
                 try
                 {
-                    spanTracer.SendServerSpan(
-                        serverSpan,
-                        duration);
+                    spanTracer.SendServerSpan(serverSpan);
                 }
                 catch (Exception ex)
                 {
@@ -220,7 +216,8 @@ namespace Medidata.ZipkinTracer.Core
                 logger.Error("traceProvider value is null");
                 return false;
             }
-            else if (string.IsNullOrEmpty(traceProvider.TraceId) || !traceProvider.IsSampled)
+
+            if (string.IsNullOrEmpty(traceProvider.TraceId) || !traceProvider.IsSampled)
             {
                 return false;
             }

@@ -23,6 +23,17 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         }
 
         [TestMethod]
+        public void GetInstance()
+        {
+            SpanCollector.spanQueue = null;
+
+            clientProviderStub = MockRepository.GenerateStub<IClientProvider>();
+            spanCollector = SpanCollector.GetInstance(clientProviderStub, 0, logger);
+
+            Assert.IsNotNull(SpanCollector.spanQueue);
+        }
+
+        [TestMethod]
         public void CTOR_initializesSpanCollector()
         {
             SpanCollector.spanQueue = null;

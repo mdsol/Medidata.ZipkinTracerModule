@@ -9,7 +9,19 @@ namespace Medidata.ZipkinTracer.Core.Collector
         internal static BlockingCollection<Span> spanQueue;
 
         internal SpanProcessor spanProcessor;
-        internal IClientProvider clientProvider;
+        private IClientProvider clientProvider;
+
+        private static SpanCollector instance;
+
+        public static SpanCollector GetInstance(IClientProvider clientProvider, int maxProcessorBatchSize, ILog logger)
+        {
+            if (instance == null)
+            {
+                instance = new SpanCollector(clientProvider, maxProcessorBatchSize, logger);
+                instance.Start();
+            }
+            return instance;
+        }
 
         public SpanCollector(IClientProvider clientProvider, int maxProcessorBatchSize, ILog logger)
         {

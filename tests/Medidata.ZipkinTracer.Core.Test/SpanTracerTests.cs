@@ -30,21 +30,21 @@ namespace Medidata.ZipkinTracer.Core.Test
         [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullSpanCollector()
         {
-            var spanTracer = new SpanTracer(null, fixture.Create<string>(), zipkinEndpointStub);
+            new SpanTracer(null, fixture.Create<string>(), zipkinEndpointStub);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullOrEmptyString()
         {
-            var spanTracer = new SpanTracer(spanCollectorStub, null, zipkinEndpointStub);
+            new SpanTracer(spanCollectorStub, null, zipkinEndpointStub);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullZipkinEndpoint()
         {
-            var spanTracer = new SpanTracer(spanCollectorStub, fixture.Create<string>(), null);
+            new SpanTracer(spanCollectorStub, fixture.Create<string>(), null);
         }
 
         [TestMethod]
@@ -89,14 +89,13 @@ namespace Medidata.ZipkinTracer.Core.Test
             var spanTracer = new SpanTracer(spanCollectorStub, serviceName, zipkinEndpointStub);
 
             var expectedSpan = new Span() { Annotations = new System.Collections.Generic.List<Annotation>() };
-            var expectedDuration = fixture.Create<int>();
 
             zipkinEndpointStub.Expect(x => x.GetEndpoint(serviceName)).Return(new Endpoint() { Service_name = serviceName });
 
-            spanTracer.SendServerSpan(expectedSpan, expectedDuration);
+            spanTracer.SendServerSpan(expectedSpan);
 
             spanCollectorStub.AssertWasCalled(x => x.Collect(Arg<Span>.Matches(y =>
-                    ValidateSendServerSpan(y, serviceName, expectedDuration)
+                    ValidateSendServerSpan(y, serviceName)
                     ))
                 );
         }
@@ -143,38 +142,35 @@ namespace Medidata.ZipkinTracer.Core.Test
             var spanTracer = new SpanTracer(spanCollectorStub, serviceName, zipkinEndpointStub);
 
             var expectedSpan = new Span() { Annotations = new System.Collections.Generic.List<Annotation>() };
-            var expectedDuration = fixture.Create<int>();
 
             zipkinEndpointStub.Expect(x => x.GetEndpoint(clientServiceName)).Return(new Endpoint() { Service_name = clientServiceName });
 
-            spanTracer.ReceiveClientSpan(expectedSpan, expectedDuration, clientServiceName);
+            spanTracer.ReceiveClientSpan(expectedSpan, clientServiceName);
 
             spanCollectorStub.AssertWasCalled(x => x.Collect(Arg<Span>.Matches(y =>
-                    ValidateReceiveClientSpan(y, clientServiceName, expectedDuration)
+                    ValidateReceiveClientSpan(y, clientServiceName)
                     ))
                 );
         }
 
-        private bool ValidateReceiveClientSpan(Span y, string serviceName, int duration)
+        private bool ValidateReceiveClientSpan(Span y, string serviceName)
         {
             var annotation = (Annotation)y.Annotations[0];
             var endpoint = (Endpoint)annotation.Host;
 
             Assert.AreEqual(serviceName, endpoint.Service_name);
-            Assert.AreEqual(duration, annotation.Duration);
             Assert.AreEqual(zipkinCoreConstants.CLIENT_RECV, annotation.Value);
             Assert.IsNotNull(annotation.Timestamp);
 
             return true;
         }
 
-        private bool ValidateSendServerSpan(Span y, string serviceName, int duration)
+        private bool ValidateSendServerSpan(Span y, string serviceName)
         {
             var annotation = (Annotation)y.Annotations[0];
             var endpoint = (Endpoint)annotation.Host;
 
             Assert.AreEqual(serviceName, endpoint.Service_name);
-            Assert.AreEqual(duration, annotation.Duration);
             Assert.AreEqual(zipkinCoreConstants.SERVER_SEND, annotation.Value);
             Assert.IsNotNull(annotation.Timestamp);
 
