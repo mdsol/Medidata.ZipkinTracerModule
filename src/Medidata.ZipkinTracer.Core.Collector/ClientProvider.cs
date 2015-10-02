@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Thrift;
+﻿using System.Collections.Generic;
 using Thrift.Protocol;
 using Thrift.Transport;
 
@@ -14,9 +9,8 @@ namespace Medidata.ZipkinTracer.Core.Collector
         private readonly string host;
         private readonly int port;
         private TTransport transport;
-        internal ZipkinCollector.Client Client;
-
-        internal static ClientProvider instance = null;
+        private ZipkinCollector.Client client;
+        private static ClientProvider instance;
 
         private ClientProvider(string host, int port) 
         {
@@ -29,16 +23,6 @@ namespace Medidata.ZipkinTracer.Core.Collector
             if (instance == null)
             {
                 instance = new ClientProvider(host, port);
-                try
-                {
-                    instance.Setup();
-                }
-                catch (Exception ex)
-                {
-                    instance.Close();
-                    instance = null;
-                    throw ex;
-                }
             }
             return instance;
         }
@@ -48,7 +32,7 @@ namespace Medidata.ZipkinTracer.Core.Collector
             var socket = new TSocket(host, port);
             transport = new TFramedTransport(socket);
             var protocol = new TBinaryProtocol(transport);
-            Client = new ZipkinCollector.Client(protocol);
+            client = new ZipkinCollector.Client(protocol);
             transport.Open();
         }
 
@@ -63,7 +47,15 @@ namespace Medidata.ZipkinTracer.Core.Collector
 
         public void Log(List<LogEntry> logEntries)
         {
-            Client.Log(logEntries);
+            try
+            {
+                Setup();
+                client.Log(logEntries);
+            }
+            finally
+            {
+                Close();
+            }
         }
     }
 }

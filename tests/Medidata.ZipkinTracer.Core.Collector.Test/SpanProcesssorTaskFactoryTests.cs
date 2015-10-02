@@ -1,25 +1,25 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Ploeh.AutoFixture;
+using Rhino.Mocks;
 using System.Threading;
+using log4net;
 
 namespace Medidata.ZipkinTracer.Core.Collector.Test
 {
     [TestClass]
     public class SpanProcesssorTaskFactoryTests
     {
-        private Fixture fixture;
         private SpanProcessorTaskFactory spanProcessorTaskFactory;
         private CancellationTokenSource cancellationTokenSource;
         private bool actionCalled;
+        private ILog logger;
 
         [TestInitialize]
         public void Init()
         {
-            fixture = new Fixture();
-            spanProcessorTaskFactory = new SpanProcessorTaskFactory();
+            logger = MockRepository.GenerateStub<ILog>();
             cancellationTokenSource = new CancellationTokenSource();
-            spanProcessorTaskFactory.cancellationTokenSource = cancellationTokenSource;
+            spanProcessorTaskFactory = new SpanProcessorTaskFactory(logger, cancellationTokenSource);
             actionCalled = false;
         }
 
@@ -52,6 +52,23 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
 
             spanProcessorTaskFactory.ActionWrapper(myAction);
             Assert.IsTrue(actionCalled);
+
+            cancellationTokenSource.Cancel();
+        }
+
+        [TestMethod]
+        public void ActionWrapper_Exception()
+        {
+            Exception ex = new Exception("Exception!");
+            bool logErrorCalled = false;
+            logger.Stub(x => x.Error(Arg<string>.Is.Equal("Error in SpanProcessorTask"), Arg<Exception>.Is.Equal(ex)))
+                .WhenCalled(x => { logErrorCalled = true; });
+            var myAction = new Action(() => { actionCalled = true; throw ex; });
+            Assert.IsFalse(actionCalled);
+
+            spanProcessorTaskFactory.ActionWrapper(myAction);
+            Assert.IsTrue(actionCalled);
+            Assert.IsTrue(logErrorCalled);
 
             cancellationTokenSource.Cancel();
         }

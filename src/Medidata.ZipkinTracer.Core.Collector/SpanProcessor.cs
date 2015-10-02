@@ -3,9 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using log4net;
 using Thrift;
 using Thrift.Protocol;
 using Thrift.Transport;
@@ -14,8 +12,8 @@ namespace Medidata.ZipkinTracer.Core.Collector
 {
     public class SpanProcessor
     {
-        //send contents of queue if it has been empty for number of polls
-        internal const int MAX_SUBSEQUENT_EMPTY_QUEUE = 5;
+        //send contents of queue if it has pending items but less than max batch size after doing max number of polls
+        internal const int MAX_NUMBER_OF_POLLS = 5;
 
         private TBinaryProtocol.Factory protocolFactory;
         internal BlockingCollection<Span> spanQueue;
@@ -23,11 +21,11 @@ namespace Medidata.ZipkinTracer.Core.Collector
 
         internal List<LogEntry> logEntries;
         internal SpanProcessorTaskFactory spanProcessorTaskFactory;
-        internal int subsequentEmptyQueueCount;
+        internal int subsequentPollCount;
         internal int retries;
         internal int maxBatchSize;
 
-        public SpanProcessor(BlockingCollection<Span> spanQueue, IClientProvider clientProvider, int maxBatchSize)
+        public SpanProcessor(BlockingCollection<Span> spanQueue, IClientProvider clientProvider, int maxBatchSize, ILog logger)
         {
             if ( spanQueue == null) 
             {
@@ -44,7 +42,7 @@ namespace Medidata.ZipkinTracer.Core.Collector
             this.maxBatchSize = maxBatchSize;
             logEntries = new List<LogEntry>();
             protocolFactory = new TBinaryProtocol.Factory();
-            spanProcessorTaskFactory = new SpanProcessorTaskFactory();
+            spanProcessorTaskFactory = new SpanProcessorTaskFactory(logger);
         }
 
         public virtual void Stop()
@@ -65,20 +63,20 @@ namespace Medidata.ZipkinTracer.Core.Collector
             if (span != null)
             {
                 logEntries.Add(Create(span));
-                subsequentEmptyQueueCount = 0;
+                subsequentPollCount = 0;
             }
-            else
+            else if (logEntries.Any())
             {
-                subsequentEmptyQueueCount++;
+                subsequentPollCount++;
             }
 
-            if (logEntries.Count() >= maxBatchSize
-                || logEntries.Any() && spanProcessorTaskFactory.IsTaskCancelled()
-                || logEntries.Any() && subsequentEmptyQueueCount > MAX_SUBSEQUENT_EMPTY_QUEUE)
+            if ((logEntries.Count() >= maxBatchSize)
+                || (logEntries.Any() && spanProcessorTaskFactory.IsTaskCancelled())
+                || (subsequentPollCount > MAX_NUMBER_OF_POLLS))
             {
                 var entries = logEntries;
                 logEntries = new List<LogEntry>();
-                subsequentEmptyQueueCount = 0;
+                subsequentPollCount = 0;
                 Log(clientProvider, entries);
             }
         }
@@ -90,7 +88,7 @@ namespace Medidata.ZipkinTracer.Core.Collector
                 clientProvider.Log(logEntries);
                 retries = 0;
             }
-            catch (TException tEx)
+            catch (TException)
             {
                 if ( retries < 3 )
                 {

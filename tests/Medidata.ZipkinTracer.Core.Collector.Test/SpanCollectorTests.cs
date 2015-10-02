@@ -1,9 +1,8 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
 using System.Collections.Concurrent;
-using Thrift;
+using log4net;
 
 namespace Medidata.ZipkinTracer.Core.Collector.Test
 {
@@ -14,11 +13,24 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         private IClientProvider clientProviderStub;
         private SpanCollector spanCollector;
         private SpanProcessor spanProcessorStub;
+        private ILog logger;
 
         [TestInitialize]
         public void Init()
         {
             fixture = new Fixture();
+            logger = MockRepository.GenerateStub<ILog>();
+        }
+
+        [TestMethod]
+        public void GetInstance()
+        {
+            SpanCollector.spanQueue = null;
+
+            clientProviderStub = MockRepository.GenerateStub<IClientProvider>();
+            spanCollector = SpanCollector.GetInstance(clientProviderStub, 0, logger);
+
+            Assert.IsNotNull(SpanCollector.spanQueue);
         }
 
         [TestMethod]
@@ -27,7 +39,7 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
             SpanCollector.spanQueue = null;
 
             clientProviderStub = MockRepository.GenerateStub<IClientProvider>();
-            spanCollector = new SpanCollector(clientProviderStub, 0);
+            spanCollector = new SpanCollector(clientProviderStub, 0, logger);
 
             Assert.IsNotNull(SpanCollector.spanQueue);
         }
@@ -39,7 +51,7 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
             SpanCollector.spanQueue = spanQueue;
 
             clientProviderStub = MockRepository.GenerateStub<IClientProvider>();
-            spanCollector = new SpanCollector(clientProviderStub, 0);
+            spanCollector = new SpanCollector(clientProviderStub, 0, logger);
 
             Assert.IsTrue(System.Object.ReferenceEquals(SpanCollector.spanQueue, spanQueue));
         }
@@ -92,10 +104,10 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         private void SetupSpanCollector()
         {
             clientProviderStub = MockRepository.GenerateStub<IClientProvider>();
-            spanCollector = new SpanCollector(clientProviderStub, 0);
+            spanCollector = new SpanCollector(clientProviderStub, 0, logger);
 
             SpanCollector.spanQueue = fixture.Create<BlockingCollection<Span>>();
-            spanProcessorStub = MockRepository.GenerateStub<SpanProcessor>(SpanCollector.spanQueue, clientProviderStub, 0);
+            spanProcessorStub = MockRepository.GenerateStub<SpanProcessor>(SpanCollector.spanQueue, clientProviderStub, 0, logger);
             spanCollector.spanProcessor = spanProcessorStub;
         }
     }

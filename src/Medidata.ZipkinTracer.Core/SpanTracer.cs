@@ -51,12 +51,11 @@ namespace Medidata.ZipkinTracer.Core
             return newSpan;
         }
 
-        public virtual void SendServerSpan(Span span, int duration)
+        public virtual void SendServerSpan(Span span)
         {
             var annotation = new Annotation()
             {
                 Host = zipkinEndpoint.GetEndpoint(serviceName),
-                Duration = duration,  //duration is currently not supported by zipkin UI
                 Timestamp = GetTimeStamp(),
                 Value = zipkinCoreConstants.SERVER_SEND
             };
@@ -82,12 +81,11 @@ namespace Medidata.ZipkinTracer.Core
             return newSpan;
         }
 
-        public virtual void ReceiveClientSpan(Span span, int duration, string clientServiceName)
+        public virtual void ReceiveClientSpan(Span span, string clientServiceName)
         {
             var annotation = new Annotation()
             {
                 Host = zipkinEndpoint.GetEndpoint(clientServiceName),
-                Duration = duration,  //duration is currently not supported by zipkin UI
                 Timestamp = GetTimeStamp(),
                 Value = zipkinCoreConstants.CLIENT_RECV
             };

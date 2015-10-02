@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using log4net;
+using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -10,8 +8,23 @@ namespace Medidata.ZipkinTracer.Core.Collector
 {
     public class SpanProcessorTaskFactory
     {
-        internal Task spanProcessorTaskInstance = null;
-        internal CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        private Task spanProcessorTaskInstance;
+        private CancellationTokenSource cancellationTokenSource;
+        private ILog logger;
+
+        public SpanProcessorTaskFactory(ILog logger, CancellationTokenSource cancellationTokenSource = null)
+        {
+            this.logger = logger;
+
+            if (cancellationTokenSource == null)
+            {
+                this.cancellationTokenSource = new CancellationTokenSource();
+            }
+            else
+            {
+                this.cancellationTokenSource = cancellationTokenSource;
+            }
+        }
 
         [ExcludeFromCodeCoverage]  //excluded from code coverage since this class is a 1 liner that starts up a background thread
         public virtual void CreateAndStart(Action action)
@@ -31,11 +44,20 @@ namespace Medidata.ZipkinTracer.Core.Collector
 
         internal async void ActionWrapper(Action action)
         {
-            while(!IsTaskCancelled())
+            while (!IsTaskCancelled())
             {
-                action();
-                await Task.Delay(500, cancellationTokenSource.Token);
-            } 
+                int delayTime = 500;
+                try
+                {
+                    action();
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("Error in SpanProcessorTask", ex);
+                    delayTime = 30000;
+                }
+                await Task.Delay(delayTime, cancellationTokenSource.Token);
+            }
         }
 
         public virtual bool IsTaskCancelled()

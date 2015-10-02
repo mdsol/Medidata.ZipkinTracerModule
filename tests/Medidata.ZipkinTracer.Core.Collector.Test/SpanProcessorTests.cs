@@ -3,10 +3,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
 using System.Collections.Concurrent;
 using Rhino.Mocks;
-using System.Threading;
-using System.Threading.Tasks;
 using Thrift;
 using System.Collections.Generic;
+using log4net;
 
 namespace Medidata.ZipkinTracer.Core.Collector.Test
 {
@@ -19,17 +18,18 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         private IClientProvider clientProvider;
         private BlockingCollection<Span> queue;
         private int testMaxBatchSize;
+        private ILog logger;
 
         [TestInitialize]
         public void Init()
         {
             fixture = new Fixture();
-
+            logger = MockRepository.GenerateStub<ILog>();
             queue = new BlockingCollection<Span>();
             clientProvider = MockRepository.GenerateStub<IClientProvider>();
             testMaxBatchSize = 10;
-            spanProcessor = new SpanProcessor(queue, clientProvider, testMaxBatchSize);
-            taskFactory = MockRepository.GenerateStub<SpanProcessorTaskFactory>();
+            spanProcessor = new SpanProcessor(queue, clientProvider, testMaxBatchSize, logger);
+            taskFactory = MockRepository.GenerateStub<SpanProcessorTaskFactory>(logger, null);
             spanProcessor.spanProcessorTaskFactory = taskFactory;
         }
 
@@ -37,14 +37,14 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullSpanQueue()
         {
-            var spanProcessor = new SpanProcessor(null, MockRepository.GenerateStub<IClientProvider>(), fixture.Create<int>());
+            new SpanProcessor(null, clientProvider, fixture.Create<int>(), logger);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullClientProvider()
         {
-            var spanProcessor = new SpanProcessor(new BlockingCollection<Span>(), null, fixture.Create<int>());
+            new SpanProcessor(new BlockingCollection<Span>(), null, fixture.Create<int>(), logger);
         }
 
         [TestMethod]
@@ -90,16 +90,24 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         }
 
         [TestMethod]
-        public void LogSubmittedSpans_IncrementSubsequentEmptyQueueCountIfSpanQueueEmpty()
+        public void LogSubmittedSpans_DoNotIncrementSubsequentPollCountIfSpanQueueIsEmpty()
         {
             spanProcessor.LogSubmittedSpans();
-            Assert.AreEqual(1, spanProcessor.subsequentEmptyQueueCount);
+            Assert.AreEqual(0, spanProcessor.subsequentPollCount);
         }
 
         [TestMethod]
-        public void LogSubmittedSpans_WhenQueueIsSubsequentlyEmptyForMaxTimes()
+        public void LogSubmittedSpans_IncrementSubsequentPollCountIfSpanQueueHasAnItemLessThanMax()
         {
-            spanProcessor.subsequentEmptyQueueCount = SpanProcessor.MAX_SUBSEQUENT_EMPTY_QUEUE + 1;
+            spanProcessor.logEntries.Add(new LogEntry());
+            spanProcessor.LogSubmittedSpans();
+            Assert.AreEqual(1, spanProcessor.subsequentPollCount);
+        }
+
+        [TestMethod]
+        public void LogSubmittedSpans_WhenQueueIsSubsequentlyLessThanTheMaxBatchCountMaxTimes()
+        {
+            spanProcessor.subsequentPollCount = SpanProcessor.MAX_NUMBER_OF_POLLS + 1;
             spanProcessor.logEntries.Add(new LogEntry());
             spanProcessor.LogSubmittedSpans();
 

@@ -6,7 +6,7 @@ namespace Medidata.ZipkinTracer.Core
     {
         void StartServerTrace();
         void StartClientTrace(Uri clientService);
-        void EndServerTrace(int duration);
-        void EndClientTrace(int duration, Uri clientService);
+        void EndServerTrace();
+        void EndClientTrace(Uri clientService);
     }
 }
