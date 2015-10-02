@@ -12,21 +12,18 @@ namespace Medidata.ZipkinTracer.Core.Collector
         private CancellationTokenSource cancellationTokenSource;
         private ILog logger;
 
-        public SpanProcessorTaskFactory(ILog logger)
+        public SpanProcessorTaskFactory(ILog logger, CancellationTokenSource cancellationTokenSource = null)
         {
             this.logger = logger;
-            cancellationTokenSource = new CancellationTokenSource();
-        }
 
-        /// <summary>
-        /// For unit test
-        /// </summary>
-        /// <param name="logger"></param>
-        /// <param name="cancellationTokenSource"></param>
-        public SpanProcessorTaskFactory(ILog logger, CancellationTokenSource cancellationTokenSource)
-        {
-            this.logger = logger;
-            this.cancellationTokenSource = cancellationTokenSource;
+            if (cancellationTokenSource == null)
+            {
+                this.cancellationTokenSource = new CancellationTokenSource();
+            }
+            else
+            {
+                this.cancellationTokenSource = cancellationTokenSource;
+            }
         }
 
         [ExcludeFromCodeCoverage]  //excluded from code coverage since this class is a 1 liner that starts up a background thread

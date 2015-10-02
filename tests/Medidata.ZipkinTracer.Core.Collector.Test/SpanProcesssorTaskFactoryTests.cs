@@ -69,6 +69,8 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
             spanProcessorTaskFactory.ActionWrapper(myAction);
             Assert.IsTrue(actionCalled);
             Assert.IsTrue(logErrorCalled);
+
+            cancellationTokenSource.Cancel();
         }
 
         [TestMethod]

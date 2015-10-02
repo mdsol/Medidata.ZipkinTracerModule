@@ -29,7 +29,7 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
             clientProvider = MockRepository.GenerateStub<IClientProvider>();
             testMaxBatchSize = 10;
             spanProcessor = new SpanProcessor(queue, clientProvider, testMaxBatchSize, logger);
-            taskFactory = MockRepository.GenerateStub<SpanProcessorTaskFactory>(logger );
+            taskFactory = MockRepository.GenerateStub<SpanProcessorTaskFactory>(logger, null);
             spanProcessor.spanProcessorTaskFactory = taskFactory;
         }
 
@@ -37,14 +37,14 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullSpanQueue()
         {
-            var spanProcessor = new SpanProcessor(null, clientProvider, fixture.Create<int>(), logger);
+            new SpanProcessor(null, clientProvider, fixture.Create<int>(), logger);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullClientProvider()
         {
-            var spanProcessor = new SpanProcessor(new BlockingCollection<Span>(), null, fixture.Create<int>(), logger);
+            new SpanProcessor(new BlockingCollection<Span>(), null, fixture.Create<int>(), logger);
         }
 
         [TestMethod]
