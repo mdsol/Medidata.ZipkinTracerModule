@@ -140,12 +140,16 @@ namespace Medidata.ZipkinTracer.Core.Test
             var serviceName = fixture.Create<string>();
             var clientServiceName = fixture.Create<string>();
             var spanTracer = new SpanTracer(spanCollectorStub, serviceName, zipkinEndpointStub);
+            var endpoint = new Endpoint() { Service_name = clientServiceName };
+            var expectedSpan = new Span()
+            {
+                Annotations = new System.Collections.Generic.List<Annotation>()
+            };
+            expectedSpan.Annotations.Add(new Annotation() { Host = endpoint, Value = zipkinCoreConstants.CLIENT_RECV, Timestamp = 1 });
 
-            var expectedSpan = new Span() { Annotations = new System.Collections.Generic.List<Annotation>() };
+            zipkinEndpointStub.Expect(x => x.GetEndpoint(clientServiceName)).Return(endpoint);
 
-            zipkinEndpointStub.Expect(x => x.GetEndpoint(clientServiceName)).Return(new Endpoint() { Service_name = clientServiceName });
-
-            spanTracer.ReceiveClientSpan(expectedSpan, clientServiceName);
+            spanTracer.ReceiveClientSpan(expectedSpan);
 
             spanCollectorStub.AssertWasCalled(x => x.Collect(Arg<Span>.Matches(y =>
                     ValidateReceiveClientSpan(y, clientServiceName)

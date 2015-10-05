@@ -11,17 +11,15 @@ namespace Medidata.ZipkinTracer.Core
         internal bool isTraceOn;
         internal SpanCollector spanCollector;
         internal SpanTracer spanTracer;
-        internal Span clientSpan;
-        internal Span serverSpan;
 
         private string requestName;
         private ITraceProvider traceProvider;
         private ILog logger;
         private List<string> zipkinNotToBeDisplayedDomainList;
 
-        public ZipkinClient(ITraceProvider tracerProvider, string requestName, ILog logger) : this(tracerProvider, requestName, logger, new ZipkinConfig(), new SpanCollectorBuilder()) { }
+        public ZipkinClient(ITraceProvider tracerProvider, ILog logger) : this(tracerProvider, logger, new ZipkinConfig(), new SpanCollectorBuilder()) { }
 
-        public ZipkinClient(ITraceProvider traceProvider, string requestName, ILog logger, IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder)
+        public ZipkinClient(ITraceProvider traceProvider, ILog logger, IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder)
         {
             zipkinNotToBeDisplayedDomainList = zipkinConfig.GetNotToBeDisplayedDomainList();
 
@@ -45,7 +43,6 @@ namespace Medidata.ZipkinTracer.Core
 
                     spanTracer = new SpanTracer(spanCollector, zipkinConfig.ServiceName, new ServiceEndpoint());
 
-                    this.requestName = requestName;
                     this.traceProvider = traceProvider;
                 }
                 catch (Exception ex)
@@ -56,17 +53,17 @@ namespace Medidata.ZipkinTracer.Core
             }
         }
 
-        public void StartClientTrace(Uri clientService)
+        public Span StartClientTrace(Uri clientService, string methodName)
         {
             if (isTraceOn)
             {
                 var clientServiceName = GetClientServiceName(clientService);
-                if (string.IsNullOrWhiteSpace(clientServiceName)) { return; }
+                if (string.IsNullOrWhiteSpace(clientServiceName)) { return null; }
 
                 try
                 {
-                    clientSpan = spanTracer.SendClientSpan(
-                        requestName,
+                    return spanTracer.SendClientSpan(
+                        GetSpanName(clientService, methodName),
                         traceProvider.TraceId,
                         traceProvider.ParentSpanId,
                         traceProvider.SpanId,
@@ -77,20 +74,16 @@ namespace Medidata.ZipkinTracer.Core
                     logger.Error("Error Starting Client Trace", ex);
                 }
             }
+            return null;
         }
 
-        public void EndClientTrace(Uri clientService)
+        public void EndClientTrace(Span clientSpan)
         {
-            if (isTraceOn)
+            if (isTraceOn && clientSpan != null)
             {
-                var clientServiceName = GetClientServiceName(clientService);
-                if (string.IsNullOrWhiteSpace(clientServiceName)) { return; }
-
                 try
                 {
-                    spanTracer.ReceiveClientSpan(
-                        clientSpan,
-                        clientServiceName);
+                    spanTracer.ReceiveClientSpan(clientSpan);
                 }
                 catch (Exception ex)
                 {
@@ -115,14 +108,19 @@ namespace Medidata.ZipkinTracer.Core
             return host;
         }
 
-        public void StartServerTrace()
+        private string GetSpanName(Uri uri, string methodName)
+        {
+            return string.Format("{0} {1}", methodName, uri.AbsolutePath);
+        }
+
+        public Span StartServerTrace(Uri requestUri, string methodName)
         {
             if (isTraceOn)
             {
                 try
                 {
-                    serverSpan = spanTracer.ReceiveServerSpan(
-                        requestName,
+                    return spanTracer.ReceiveServerSpan(
+                        GetSpanName(requestUri, methodName),
                         traceProvider.TraceId,
                         traceProvider.ParentSpanId,
                         traceProvider.SpanId);
@@ -132,11 +130,12 @@ namespace Medidata.ZipkinTracer.Core
                     logger.Error("Error Starting Server Trace", ex);
                 }
             }
+            return null;
         }
 
-        public void EndServerTrace()
+        public void EndServerTrace(Span serverSpan)
         {
-            if (isTraceOn)
+            if (isTraceOn && serverSpan != null)
             {
                 try
                 {

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Web;
+﻿using System.Web;
 using Medidata.CrossApplicationTracer;
 using Medidata.ZipkinTracer.Core;
 using System.Diagnostics.CodeAnalysis;
@@ -13,37 +12,39 @@ namespace Medidata.ZipkinTracer.HttpModule
         public void Init(HttpApplication context)
         {
             context.BeginRequest += (sender, args) =>
-                {
-                    string url = HttpContext.Current.Request.Path;
+            {
+                var zipkinConfig = new ZipkinConfig();
 
-                    var zipkinConfig = new ZipkinConfig();
+                var traceProvider = new TraceProvider(new HttpContextWrapper(HttpContext.Current), zipkinConfig.DontSampleListCsv, zipkinConfig.ZipkinSampleRate);
+                var logger = LogManager.GetLogger(GetType());
 
-                    var traceProvider = new TraceProvider(new System.Web.HttpContextWrapper(HttpContext.Current), zipkinConfig.DontSampleListCsv, zipkinConfig.ZipkinSampleRate);
-                    var logger = LogManager.GetLogger(this.GetType());
+                ITracerClient zipkinClient = new ZipkinClient(traceProvider, logger);
+                var span = zipkinClient.StartServerTrace(HttpContext.Current.Request.Url, HttpContext.Current.Request.HttpMethod);
 
-                    ITracerClient zipkinClient = new ZipkinClient(traceProvider, url, logger);
-                    zipkinClient.StartServerTrace();
-
-                    HttpContext.Current.Items["zipkinClient"] = zipkinClient;
-                };
+                HttpContext.Current.Items["zipkinClient"] = zipkinClient;
+                HttpContext.Current.Items["zipkinSpan"] = span;
+            };
 
             context.EndRequest += (sender, args) =>
-                {
-                    var zipkinClient = (ITracerClient)HttpContext.Current.Items["zipkinClient"];
-                    zipkinClient.EndServerTrace();
-                };
+            {
+                var zipkinClient = (ITracerClient)HttpContext.Current.Items["zipkinClient"];
+                var span = (Span)HttpContext.Current.Items["zipkinSpan"];
+                zipkinClient.EndServerTrace(span);
+            };
 
             context.Error += (sender, args) =>
-                {
-                    var zipkinClient = (ITracerClient)HttpContext.Current.Items["zipkinClient"];
-                    zipkinClient.EndServerTrace();
-                };
+            {
+                var zipkinClient = (ITracerClient)HttpContext.Current.Items["zipkinClient"];
+                var span = (Span)HttpContext.Current.Items["zipkinSpan"];
+                zipkinClient.EndServerTrace(span);
+            };
         }
 
         public void Dispose()
         {
             if (HttpContext.Current == null) return;
             HttpContext.Current.Items["zipkinClient"] = null;
+            HttpContext.Current.Items["zipkinSpan"] = null;
         }
     }
 }

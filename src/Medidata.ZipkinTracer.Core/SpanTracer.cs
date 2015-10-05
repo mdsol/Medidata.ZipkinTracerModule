@@ -32,9 +32,9 @@ namespace Medidata.ZipkinTracer.Core
             this.zipkinEndpoint = zipkinEndpoint;
         }
 
-        public virtual Span ReceiveServerSpan(string requestName, string traceId, string parentSpanId, string spanId)
+        public virtual Span ReceiveServerSpan(string spanName, string traceId, string parentSpanId, string spanId)
         {
-            var newSpan = CreateNewSpan(requestName, traceId, parentSpanId, spanId);
+            var newSpan = CreateNewSpan(spanName, traceId, parentSpanId, spanId);
 
             var annotation = new Annotation()
             {
@@ -65,9 +65,9 @@ namespace Medidata.ZipkinTracer.Core
             spanCollector.Collect(span);
         }
 
-        public virtual Span SendClientSpan(string requestName, string traceId, string parentSpanId, string spanId, string clientServiceName)
+        public virtual Span SendClientSpan(string spanName, string traceId, string parentSpanId, string spanId, string clientServiceName)
         {
-            var newSpan = CreateNewSpan(requestName, traceId, parentSpanId, spanId);
+            var newSpan = CreateNewSpan(spanName, traceId, parentSpanId, spanId);
 
             var annotation = new Annotation()
             {
@@ -81,11 +81,11 @@ namespace Medidata.ZipkinTracer.Core
             return newSpan;
         }
 
-        public virtual void ReceiveClientSpan(Span span, string clientServiceName)
+        public virtual void ReceiveClientSpan(Span span)
         {
             var annotation = new Annotation()
             {
-                Host = zipkinEndpoint.GetEndpoint(clientServiceName),
+                Host = span.Annotations[0].Host,
                 Timestamp = GetTimeStamp(),
                 Value = zipkinCoreConstants.CLIENT_RECV
             };
@@ -95,7 +95,7 @@ namespace Medidata.ZipkinTracer.Core
             spanCollector.Collect(span);
         }
 
-        private Span CreateNewSpan(string requestName, string traceId, string parentSpanId, string spanId)
+        private Span CreateNewSpan(string spanName, string traceId, string parentSpanId, string spanId)
         {
             var newSpan = new Span();
             newSpan.Id = Int64.Parse(spanId, System.Globalization.NumberStyles.HexNumber);
@@ -106,7 +106,7 @@ namespace Medidata.ZipkinTracer.Core
                 newSpan.Parent_id = Int64.Parse(parentSpanId, System.Globalization.NumberStyles.HexNumber);
             }
 
-            newSpan.Name = requestName;
+            newSpan.Name = spanName;
             newSpan.Annotations = new List<Annotation>();
             newSpan.Binary_annotations = new List<BinaryAnnotation>();
             return newSpan;
