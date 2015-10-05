@@ -156,6 +156,42 @@ namespace Medidata.ZipkinTracer.Core.Test
                     ))
                 );
         }
+        
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ReceiveClientSpan_NullAnnotation()
+        {
+            var serviceName = fixture.Create<string>();
+            var clientServiceName = fixture.Create<string>();
+            var spanTracer = new SpanTracer(spanCollectorStub, serviceName, zipkinEndpointStub);
+            var endpoint = new Endpoint() { Service_name = clientServiceName };
+            var expectedSpan = new Span()
+            {
+                Annotations = null
+            };
+
+            zipkinEndpointStub.Expect(x => x.GetEndpoint(clientServiceName)).Return(endpoint);
+
+            spanTracer.ReceiveClientSpan(expectedSpan);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ReceiveClientSpan_EmptyAnnotationsList()
+        {
+            var serviceName = fixture.Create<string>();
+            var clientServiceName = fixture.Create<string>();
+            var spanTracer = new SpanTracer(spanCollectorStub, serviceName, zipkinEndpointStub);
+            var endpoint = new Endpoint() { Service_name = clientServiceName };
+            var expectedSpan = new Span()
+            {
+                Annotations = new System.Collections.Generic.List<Annotation>()
+            };
+
+            zipkinEndpointStub.Expect(x => x.GetEndpoint(clientServiceName)).Return(endpoint);
+
+            spanTracer.ReceiveClientSpan(expectedSpan);
+        }
 
         private bool ValidateReceiveClientSpan(Span y, string serviceName)
         {

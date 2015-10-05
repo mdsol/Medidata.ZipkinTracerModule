@@ -83,6 +83,11 @@ namespace Medidata.ZipkinTracer.Core
 
         public virtual void ReceiveClientSpan(Span span)
         {
+            if (span.Annotations == null || span.Annotations.Count < 1)
+            {
+                throw new ArgumentNullException("Invalid span: Annotations list is invalid.");
+            }
+
             var annotation = new Annotation()
             {
                 Host = span.Annotations[0].Host,
