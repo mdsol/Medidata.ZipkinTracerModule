@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Medidata.ZipkinTracer.Core
@@ -53,6 +54,16 @@ namespace Medidata.ZipkinTracer.Core
 
         public virtual void SendServerSpan(Span span)
         {
+            if (span == null)
+            {
+                throw new ArgumentNullException("Null server span");
+            }
+
+            if (span.Annotations == null || !span.Annotations.Any())
+            {
+                throw new ArgumentException("Invalid server span: Annotations list is invalid.");
+            }
+
             var annotation = new Annotation()
             {
                 Host = zipkinEndpoint.GetEndpoint(serviceName),
@@ -83,14 +94,19 @@ namespace Medidata.ZipkinTracer.Core
 
         public virtual void ReceiveClientSpan(Span span)
         {
-            if (span.Annotations == null || span.Annotations.Count < 1)
+            if (span == null)
             {
-                throw new ArgumentNullException("Invalid span: Annotations list is invalid.");
+                throw new ArgumentNullException("Null client span");
+            }
+
+            if (span.Annotations == null || !span.Annotations.Any())
+            {
+                throw new ArgumentException("Invalid client span: Annotations list is invalid.");
             }
 
             var annotation = new Annotation()
             {
-                Host = span.Annotations[0].Host,
+                Host = span.Annotations.First().Host,
                 Timestamp = GetTimeStamp(),
                 Value = zipkinCoreConstants.CLIENT_RECV
             };

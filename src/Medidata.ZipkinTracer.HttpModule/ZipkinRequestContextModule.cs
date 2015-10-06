@@ -31,13 +31,6 @@ namespace Medidata.ZipkinTracer.HttpModule
                 var span = (Span)HttpContext.Current.Items["zipkinSpan"];
                 zipkinClient.EndServerTrace(span);
             };
-
-            context.Error += (sender, args) =>
-            {
-                var zipkinClient = (ITracerClient)HttpContext.Current.Items["zipkinClient"];
-                var span = (Span)HttpContext.Current.Items["zipkinSpan"];
-                zipkinClient.EndServerTrace(span);
-            };
         }
 
         public void Dispose()

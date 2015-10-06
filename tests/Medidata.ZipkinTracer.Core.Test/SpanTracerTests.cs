@@ -88,7 +88,9 @@ namespace Medidata.ZipkinTracer.Core.Test
             var serviceName = fixture.Create<string>();
             var spanTracer = new SpanTracer(spanCollectorStub, serviceName, zipkinEndpointStub);
 
+            var endpoint = new Endpoint() { Service_name = serviceName };
             var expectedSpan = new Span() { Annotations = new System.Collections.Generic.List<Annotation>() };
+            expectedSpan.Annotations.Add(new Annotation() { Host = endpoint, Value = zipkinCoreConstants.SERVER_RECV, Timestamp = 1 });
 
             zipkinEndpointStub.Expect(x => x.GetEndpoint(serviceName)).Return(new Endpoint() { Service_name = serviceName });
 
@@ -98,6 +100,40 @@ namespace Medidata.ZipkinTracer.Core.Test
                     ValidateSendServerSpan(y, serviceName)
                     ))
                 );
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void SendServerSpan_NullSpan()
+        {
+            var serviceName = fixture.Create<string>();
+            var spanTracer = new SpanTracer(spanCollectorStub, serviceName, zipkinEndpointStub);
+
+            spanTracer.SendServerSpan(null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void SendServerSpan_NullAnnotation()
+        {
+            var serviceName = fixture.Create<string>();
+            var spanTracer = new SpanTracer(spanCollectorStub, serviceName, zipkinEndpointStub);
+
+            var expectedSpan = new Span();
+
+            spanTracer.SendServerSpan(expectedSpan);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void SendServerSpan_InvalidAnnotation()
+        {
+            var serviceName = fixture.Create<string>();
+            var spanTracer = new SpanTracer(spanCollectorStub, serviceName, zipkinEndpointStub);
+
+            var expectedSpan = new Span() { Annotations = new System.Collections.Generic.List<Annotation>() };
+
+            spanTracer.SendServerSpan(expectedSpan);
         }
 
         [TestMethod]
@@ -145,7 +181,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             {
                 Annotations = new System.Collections.Generic.List<Annotation>()
             };
-            expectedSpan.Annotations.Add(new Annotation() { Host = endpoint, Value = zipkinCoreConstants.CLIENT_RECV, Timestamp = 1 });
+            expectedSpan.Annotations.Add(new Annotation() { Host = endpoint, Value = zipkinCoreConstants.CLIENT_SEND, Timestamp = 1 });
 
             zipkinEndpointStub.Expect(x => x.GetEndpoint(clientServiceName)).Return(endpoint);
 
@@ -158,7 +194,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         }
         
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [ExpectedException(typeof(ArgumentException))]
         public void ReceiveClientSpan_NullAnnotation()
         {
             var serviceName = fixture.Create<string>();
@@ -176,7 +212,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [ExpectedException(typeof(ArgumentException))]
         public void ReceiveClientSpan_EmptyAnnotationsList()
         {
             var serviceName = fixture.Create<string>();
@@ -195,24 +231,38 @@ namespace Medidata.ZipkinTracer.Core.Test
 
         private bool ValidateReceiveClientSpan(Span y, string serviceName)
         {
-            var annotation = (Annotation)y.Annotations[0];
-            var endpoint = (Endpoint)annotation.Host;
+            var firstannotation = (Annotation)y.Annotations[0];
+            var firstEndpoint = (Endpoint)firstannotation.Host;
 
-            Assert.AreEqual(serviceName, endpoint.Service_name);
-            Assert.AreEqual(zipkinCoreConstants.CLIENT_RECV, annotation.Value);
-            Assert.IsNotNull(annotation.Timestamp);
+            Assert.AreEqual(serviceName, firstEndpoint.Service_name);
+            Assert.AreEqual(zipkinCoreConstants.CLIENT_SEND, firstannotation.Value);
+            Assert.IsNotNull(firstannotation.Timestamp);
+
+            var secondAnnotation = (Annotation)y.Annotations[1];
+            var secondEndpoint = (Endpoint)secondAnnotation.Host;
+
+            Assert.AreEqual(serviceName, secondEndpoint.Service_name);
+            Assert.AreEqual(zipkinCoreConstants.CLIENT_RECV, secondAnnotation.Value);
+            Assert.IsNotNull(secondAnnotation.Timestamp);
 
             return true;
         }
 
         private bool ValidateSendServerSpan(Span y, string serviceName)
         {
-            var annotation = (Annotation)y.Annotations[0];
-            var endpoint = (Endpoint)annotation.Host;
+            var firstAnnotation = (Annotation)y.Annotations[0];
+            var firstEndpoint = (Endpoint)firstAnnotation.Host;
 
-            Assert.AreEqual(serviceName, endpoint.Service_name);
-            Assert.AreEqual(zipkinCoreConstants.SERVER_SEND, annotation.Value);
-            Assert.IsNotNull(annotation.Timestamp);
+            Assert.AreEqual(serviceName, firstEndpoint.Service_name);
+            Assert.AreEqual(zipkinCoreConstants.SERVER_RECV, firstAnnotation.Value);
+            Assert.IsNotNull(firstAnnotation.Timestamp);
+
+            var secondAnnotation = (Annotation)y.Annotations[1];
+            var secondEndpoint = (Endpoint)secondAnnotation.Host;
+
+            Assert.AreEqual(serviceName, secondEndpoint.Service_name);
+            Assert.AreEqual(zipkinCoreConstants.SERVER_SEND, secondAnnotation.Value);
+            Assert.IsNotNull(secondAnnotation.Timestamp);
 
             return true;
         }

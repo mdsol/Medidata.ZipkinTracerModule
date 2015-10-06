@@ -26,7 +26,7 @@ namespace Medidata.ZipkinTracer.Core
             this.logger = logger;
             isTraceOn = true;
 
-            if ( logger == null || IsConfigValuesNull(zipkinConfig) || !IsConfigValuesValid(zipkinConfig) || !IsTraceProviderValidAndSamplingOn(traceProvider))
+            if ( logger == null || !IsConfigValuesValid(zipkinConfig) || !IsTraceProviderValidAndSamplingOn(traceProvider))
             {
                 isTraceOn = false;
             }
@@ -79,7 +79,7 @@ namespace Medidata.ZipkinTracer.Core
 
         public void EndClientTrace(Span clientSpan)
         {
-            if (isTraceOn && clientSpan != null)
+            if (isTraceOn)
             {
                 try
                 {
@@ -90,27 +90,6 @@ namespace Medidata.ZipkinTracer.Core
                     logger.Error("Error Ending Client Trace", ex);
                 }
             }
-        }
-
-        private string GetClientServiceName(Uri uri)
-        {
-            if (uri == null)
-            {
-                logger.Error("clientService uri is null");
-                return null;
-            }
-
-            var host = uri.Host;
-            foreach (var domain in zipkinNotToBeDisplayedDomainList)
-            {
-                host = host.Replace(domain, "");
-            }
-            return host;
-        }
-
-        private string GetSpanName(Uri uri, string methodName)
-        {
-            return string.Format("{0} {1}", methodName, uri.AbsolutePath);
         }
 
         public Span StartServerTrace(Uri requestUri, string methodName)
@@ -135,7 +114,7 @@ namespace Medidata.ZipkinTracer.Core
 
         public void EndServerTrace(Span serverSpan)
         {
-            if (isTraceOn && serverSpan != null)
+            if (isTraceOn)
             {
                 try
                 {
@@ -156,42 +135,59 @@ namespace Medidata.ZipkinTracer.Core
             }
         }
 
-        private bool IsConfigValuesNull(IZipkinConfig zipkinConfig)
+        private string GetClientServiceName(Uri uri)
+        {
+            if (uri == null)
+            {
+                logger.Error("clientService uri is null");
+                return null;
+            }
+
+            var host = uri.Host;
+            foreach (var domain in zipkinNotToBeDisplayedDomainList)
+            {
+                host = host.Replace(domain, "");
+            }
+            return host;
+        }
+
+        private string GetSpanName(Uri uri, string methodName)
+        {
+            return string.Format("{0} {1}", methodName, uri.AbsolutePath);
+        }
+
+        private bool IsConfigValuesValid(IZipkinConfig zipkinConfig)
         {
             if (String.IsNullOrEmpty(zipkinConfig.ZipkinServerName))
             {
                 logger.Error("zipkinConfig.ZipkinServerName is null");
-                return true;
+                return false;
             }
 
             if (String.IsNullOrEmpty(zipkinConfig.ZipkinServerPort))
             {
                 logger.Error("zipkinConfig.ZipkinServerPort is null");
-                return true;
+                return false;
             }
 
             if (String.IsNullOrEmpty(zipkinConfig.ServiceName))
             {
                 logger.Error("zipkinConfig.ServiceName value is null");
-                return true;
+                return false;
             }
 
             if (String.IsNullOrEmpty(zipkinConfig.SpanProcessorBatchSize))
             {
                 logger.Error("zipkinConfig.SpanProcessorBatchSize value is null");
-                return true;
+                return false;
             }
 
             if (String.IsNullOrEmpty(zipkinConfig.ZipkinSampleRate))
             {
                 logger.Error("zipkinConfig.ZipkinSampleRate value is null");
-                return true;
+                return false;
             }
-            return false;
-        }
 
-        private bool IsConfigValuesValid(IZipkinConfig zipkinConfig)
-        {
             int port;
             int spanProcessorBatchSize;
             if (!int.TryParse(zipkinConfig.ZipkinServerPort, out port))
