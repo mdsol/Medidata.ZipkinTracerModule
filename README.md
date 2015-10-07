@@ -108,13 +108,14 @@ The following will be added to add the httpModule to your project.  Please don't
 
 #### Usage Examples
 
-1) Under namespace Medidata.ZipkinTracer.HttpModule, please register IHttpModule "ZipkinRequestContextModule" to your web app.
-   Note: To do client trace on other parts of your web app, you can access present ITracerClient instance using:
+Two ways to use .NET Zipkin Tracer Client
+1) Under namespace Medidata.ZipkinTracer.HttpModule, please register IHttpModule "ZipkinRequestContextModule" to your web app. This will do server trace automatically.
+   Note: To do client trace (Please see below for clieny trace example) on other parts of your web app, you can access present ITracerClient instance using:
 ```
 (ITracerClient)HttpContext.Current.Items["zipkinClient"];
 ```
 
-2) To be more flexible on your implementation, you can insert the calls manually by using ITracerClient methods which is found under the Medidata.ZipkinTracer.Core namespace.
+2) To be more flexible on your implementation, you can insert the server trace calls manually by using ITracerClient methods which is found under the Medidata.ZipkinTracer.Core namespace.
 
 - Instantiate your ITracerClient instance globally [context-wide]. (On each beginning of your request)
 - Then do event handling on begin and end request of your requests for server trace
@@ -141,7 +142,8 @@ context.EndRequest += (sender, args) =>
 };
 ```
 
-- f0r client trace, use it by doing a trace before and after a remote request call
+Client trace example
+Trace before and after a remote request call
 ```
 var zipkinClient = (ITracerClient)HttpContext.Current.Items["zipkinClient"];
 var url = "https://abc.xyz.com:8000";
