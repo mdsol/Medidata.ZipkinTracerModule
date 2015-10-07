@@ -141,7 +141,7 @@ context.EndRequest += (sender, args) =>
 };
 ```
 
-- fpr client trace, use it by doing a trace before and after a remote request call
+- f0r client trace, use it by doing a trace before and after a remote request call
 ```
 var zipkinClient = (ITracerClient)HttpContext.Current.Items["zipkinClient"];
 var url = "https://abc.xyz.com:8000";
