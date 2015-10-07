@@ -106,48 +106,62 @@ The following will be added to add the httpModule to your project.  Please don't
   </system.webServer>
   ```
 
-#### Usage
+#### Usage Examples
 
-1. Under namespace Medidata.ZipkinTracer.HttpModule, please register IHttpModule "ZipkinRequestContextModule" to your web app
+1. Under namespace Medidata.ZipkinTracer.HttpModule, please register IHttpModule "ZipkinRequestContextModule" to your web app.
+   Note: To do client trace on other parts of your web app, you can access present ITracerClient instance using:
+```
+(ITracerClient)HttpContext.Current.Items["zipkinClient"];
+```
 
-2. Or you can insert the calls manually by using ITracerClient methods which is found under the Medidata.ZipkinTracer.Core namespace.
+2. To be more flexible on your implementation, you can insert the calls manually by using ITracerClient methods which is found under the Medidata.ZipkinTracer.Core namespace.
 
-Server trace example, use it by doing a trace on beginning and ending of request:
+First you gotta instantiate your ITracerClient instance globally [context-wide]. (On each beginning of your request)
+Then do event handling on begin and end request of your requests.
 ```
 context.BeginRequest += (sender, args) =>
 {
-    ...
+	var traceProvider = new TraceProvider(
+        new HttpContextWrapper(HttpContext.Current),
+        ConfigurationManager.AppSettings["zipkinExcludedUriList"],
+        ConfigurationManager.AppSettings["zipkinSampleRate"];
+    var logger = LogManager.GetLogger(GetType());
     ITracerClient zipkinClient = new ZipkinClient(traceProvider, logger);
+    HttpContext.Current.Items["zipkinClient"] = zipkinClient;
+
     var span = zipkinClient.StartServerTrace(HttpContext.Current.Request.Url, HttpContext.Current.Request.HttpMethod);	
-	HttpContext.Current.Items["zipkinClient"] = zipkinClient;
     HttpContext.Current.Items["zipkinSpan"] = span;
-	...
 }
 
 context.EndRequest += (sender, args) =>
 {
-    ...
-	var zipkinClient = (ITracerClient)HttpContext.Current.Items["zipkinClient"];
-	var span = (Span)HttpContext.Current.Items["zipkinSpan"];
-	zipkinClient.EndServerTrace(span);
-	...
+    var zipkinClient = (ITracerClient)HttpContext.Current.Items["zipkinClient"];
+    var span = (Span)HttpContext.Current.Items["zipkinSpan"];
+    zipkinClient.EndServerTrace(span);
 };
 ```
 
 Client trace example, use it by doing a trace before and after a remote request call
 ```
-...
+var zipkinClient = (ITracerClient)HttpContext.Current.Items["zipkinClient"];
+var url = "https://abc.xyz.com:8000";
+var requestUri = "/object/1";
+HttpResponseMessage result;
 using (var client = new HttpClient())
 {
     client.BaseAddress = new Uri(url);
-	ITracerClient zipkinClient = new ZipkinClient(traceProvider, logger);
-	var span = tracerClient.StartClientTrace(new Uri(client.BaseAddress, requestUri), "GET");
-	var result = await client.GetAsync(requestUri);
-	tracerClient.EndClientTrace(span);
+
+	// start client trace
+    var span = tracerClient.StartClientTrace(new Uri(client.BaseAddress, requestUri), "GET");
+
+    result = await client.GetAsync(requestUri);
+
+	// end client trace
+    tracerClient.EndClientTrace(span);	
 }
 ...
 ```
-  
+
 ## Contributors
 ZipkinTracer is (c) Medidata Solutions Worldwide and owned by its major contributors:
 * Tomoko Kwan
