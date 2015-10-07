@@ -111,7 +111,7 @@ The following will be added to add the httpModule to your project.  Please don't
 Two ways to use .NET Zipkin Tracer Client
 
 1) Under namespace Medidata.ZipkinTracer.HttpModule, please register IHttpModule "ZipkinRequestContextModule" to your web app. This will do server trace automatically.
-   Note: To do client trace (Please see below for clieny trace example) on other parts of your web app, you can access present ITracerClient instance using:
+   Note: To do client trace (Please see below for client trace example) on other parts of your web app, you can access present ITracerClient instance using:
 ```
 (ITracerClient)HttpContext.Current.Items["zipkinClient"];
 ```
