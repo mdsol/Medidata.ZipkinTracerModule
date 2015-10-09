@@ -22,6 +22,11 @@ namespace Medidata.ZipkinTracer.Core
             get {  return ConfigurationManager.AppSettings["zipkinScribeServerPort"];}
         }
 
+        public string ZipkinProxyType
+        {
+            get { return ConfigurationManager.AppSettings["zipkinProxyType"]; }
+        }
+
         public string SpanProcessorBatchSize
         {
             get { return ConfigurationManager.AppSettings["zipkinSpanProcessorBatchSize"]; }

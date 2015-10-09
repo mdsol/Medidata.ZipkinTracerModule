@@ -6,4 +6,5 @@
   <add key="zipkinSampleRate" value="0.5" />
   <add key="zipkinNotToBeDisplayedDomainList" value="***Domains Here***" />
   <add key="zipkinExcludedUriList" value="***Excluded Uris Here***" />
+   <add key="zipkinProxyType" value="***zipkin proxy type here***" /> 
 </appSettings>

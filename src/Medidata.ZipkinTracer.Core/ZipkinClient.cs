@@ -39,7 +39,8 @@ namespace Medidata.ZipkinTracer.Core
                         int.Parse(zipkinConfig.ZipkinServerPort),
                         int.Parse(zipkinConfig.SpanProcessorBatchSize),
                         logger,
-                        zipkinConfig.GetZipkinProxyServer());
+                        zipkinConfig.GetZipkinProxyServer(),
+                        zipkinConfig.ZipkinProxyType);
 
                     spanTracer = new SpanTracer(spanCollector, zipkinConfig.ServiceName, new ServiceEndpoint());
 

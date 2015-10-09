@@ -20,4 +20,7 @@
   <parameter name="Zipkin Excluded Uri List" description="uri list that is not needed for tracing" defaultValue="***Excluded Uris Here***">
     <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinExcludedUriList']/@value" />
   </parameter>
+  <parameter name="Zipkin Proxy Type" description="zipkin proxy type ie. Http, Socks4, Socks4a, Socks5" defaultValue="***zipkin proxy type here***">
+    <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinProxyType']/@value" />
+  </parameter>
 </parameters>

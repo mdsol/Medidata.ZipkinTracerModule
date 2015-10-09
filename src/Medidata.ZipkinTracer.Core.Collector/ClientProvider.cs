@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Starksoft.Aspen.Proxy;
+using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using Thrift.Protocol;
@@ -11,22 +12,26 @@ namespace Medidata.ZipkinTracer.Core.Collector
         private readonly string host;
         private readonly int port;
         private Uri proxyServer;
+        private ProxyType proxyType;
         private TTransport transport;
         private ZipkinCollector.Client client;
         private static ClientProvider instance;
 
-        private ClientProvider(string host, int port, Uri proxyServer = null) 
+        private ClientProvider(string host, int port, Uri proxyServer = null, string proxyType = null) 
         {
             this.host = host;
             this.port = port;
             this.proxyServer = proxyServer;
+
+            this.proxyType = ProxyType.None;
+            Enum.TryParse(proxyType, out this.proxyType);
         }
 
-        public static ClientProvider GetInstance(string host, int port, Uri proxyServer = null)
+        public static ClientProvider GetInstance(string host, int port, Uri proxyServer = null, string proxyType = null)
         {
             if (instance == null)
             {
-                instance = new ClientProvider(host, port, proxyServer);
+                instance = new ClientProvider(host, port, proxyServer, proxyType);
             }
             return instance;
         }
@@ -37,16 +42,17 @@ namespace Medidata.ZipkinTracer.Core.Collector
             transport = new TFramedTransport(socket);
             var protocol = new TBinaryProtocol(transport);
             client = new ZipkinCollector.Client(protocol);
-            transport.Open();
         }
 
         private TSocket GetProxyEnabledSocket()
         {
+
             TcpClient zipkinTcpClient;
             if (proxyServer != null)
             {
-                var proxy = new Proxy.Socks5ProxyClient(proxyServer.Host, proxyServer.Port);
-                zipkinTcpClient = proxy.CreateConnection(host, port);
+                var proxy = new ProxyClientFactory().CreateProxyClient(proxyType, proxyServer.Host, proxyServer.Port);
+                proxy.TcpClient = new TcpClient(host, port);
+                zipkinTcpClient = proxy.TcpClient;
             }
             else
             {
