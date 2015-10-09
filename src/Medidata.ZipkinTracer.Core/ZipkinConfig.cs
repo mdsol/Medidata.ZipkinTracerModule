@@ -49,5 +49,15 @@ namespace Medidata.ZipkinTracer.Core
 
             return zipkinNotToBeDisplayedDomainList;
         }
+
+        public Uri GetZipkinProxyServer()
+        {
+            var proxy = System.Web.Configuration.WebConfigurationManager.GetSection("system.net/defaultProxy") as System.Net.Configuration.DefaultProxySection;
+            if (proxy != null && proxy.Enabled)
+            {
+                return proxy.Proxy.ProxyAddress;
+            }
+            return null;
+        }
     }
 }

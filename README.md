@@ -101,7 +101,7 @@ The following will be added to add the httpModule to your project.  Please don't
  ```
   <system.webServer>
     <modules>
-      <add name="ZipkinRequestContextModule" type="Medidata.ZipkinTracerModule.HttpModule.ZipkinRequestContextModule" />
+      <add name="ZipkinRequestContextModule" type="Medidata.ZipkinTracer.HttpModule.ZipkinRequestContextModule" />
     </modules>
   </system.webServer>
   ```

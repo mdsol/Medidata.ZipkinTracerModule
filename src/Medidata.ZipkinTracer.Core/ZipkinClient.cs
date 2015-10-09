@@ -12,7 +12,6 @@ namespace Medidata.ZipkinTracer.Core
         internal SpanCollector spanCollector;
         internal SpanTracer spanTracer;
 
-        private string requestName;
         private ITraceProvider traceProvider;
         private ILog logger;
         private List<string> zipkinNotToBeDisplayedDomainList;
@@ -39,7 +38,8 @@ namespace Medidata.ZipkinTracer.Core
                         zipkinConfig.ZipkinServerName,
                         int.Parse(zipkinConfig.ZipkinServerPort),
                         int.Parse(zipkinConfig.SpanProcessorBatchSize),
-                        logger);
+                        logger,
+                        zipkinConfig.GetZipkinProxyServer());
 
                     spanTracer = new SpanTracer(spanCollector, zipkinConfig.ServiceName, new ServiceEndpoint());
 

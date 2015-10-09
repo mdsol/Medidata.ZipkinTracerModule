@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Medidata.ZipkinTracer.Core
 {
@@ -11,5 +12,6 @@ namespace Medidata.ZipkinTracer.Core
         string DontSampleListCsv { get; }
         string ZipkinSampleRate { get; }
         List<string> GetNotToBeDisplayedDomainList();
+        Uri GetZipkinProxyServer();
     }
 }
