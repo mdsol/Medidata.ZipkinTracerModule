@@ -574,7 +574,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             zipkinConfigStub.Expect(x => x.DontSampleListCsv).Return("foo,bar,baz");
             zipkinConfigStub.Expect(x => x.ZipkinSampleRate).Return("0.5");
             zipkinConfigStub.Expect(x => x.GetNotToBeDisplayedDomainList()).Return(new List<string>() { ".xyz.net" });
-            zipkinConfigStub.Expect(x => x.GetZipkinProxyServer()).Return(new Uri("https://www.proxy.com:8081"));
+            zipkinConfigStub.Expect(x => x.GetZipkinProxyServer).Return(new Uri("https://www.proxy.com:8081"));
             zipkinConfigStub.Expect(x => x.ZipkinProxyType).Return("Http");
             return zipkinConfigStub;
         }
@@ -589,7 +589,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             zipkinConfigStub.Expect(x => x.DontSampleListCsv).Return(filterListCsv);
             zipkinConfigStub.Expect(x => x.ZipkinSampleRate).Return(zipkinSampleRate);
             zipkinConfigStub.Expect(x => x.GetNotToBeDisplayedDomainList()).Return(domainList);
-            zipkinConfigStub.Expect(x => x.GetZipkinProxyServer()).Return(proxyUri);
+            zipkinConfigStub.Expect(x => x.GetZipkinProxyServer).Return(proxyUri);
             zipkinConfigStub.Expect(x => x.ZipkinProxyType).Return(proxyType);
             return zipkinConfigStub;
         }

@@ -13,6 +13,6 @@ namespace Medidata.ZipkinTracer.Core
         string DontSampleListCsv { get; }
         string ZipkinSampleRate { get; }
         List<string> GetNotToBeDisplayedDomainList();
-        Uri GetZipkinProxyServer();
+        Uri GetZipkinProxyServer { get; }
     }
 }

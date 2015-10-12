@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Net;
 
 namespace Medidata.ZipkinTracer.Core
 {
@@ -55,14 +56,17 @@ namespace Medidata.ZipkinTracer.Core
             return zipkinNotToBeDisplayedDomainList;
         }
 
-        public Uri GetZipkinProxyServer()
+        public Uri GetZipkinProxyServer
         {
-            var proxy = System.Web.Configuration.WebConfigurationManager.GetSection("system.net/defaultProxy") as System.Net.Configuration.DefaultProxySection;
-            if (proxy != null && proxy.Enabled)
+            get
             {
-                return proxy.Proxy.ProxyAddress;
+                if (WebRequest.DefaultWebProxy == null)
+                {
+                    return null;
+                }
+
+                return WebRequest.DefaultWebProxy.GetProxy(new Uri("http://" + ZipkinServerName + ":" + ZipkinServerPort));
             }
-            return null;
         }
     }
 }
