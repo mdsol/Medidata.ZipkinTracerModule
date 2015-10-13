@@ -21,10 +21,7 @@ namespace Medidata.ZipkinTracer.Core.Collector
         {
             this.host = host;
             this.port = port;
-            if (proxyServer != null && proxyServer.Host != host && proxyServer.Port != port)
-            {
-                this.proxyServer = proxyServer;
-            }
+            this.proxyServer = proxyServer;
 
             this.proxyType = ProxyType.None;
             Enum.TryParse(proxyType, out this.proxyType);
