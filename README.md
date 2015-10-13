@@ -42,6 +42,7 @@ Add the below additional configurations. Please verify these values and modify t
   <add key="zipkinSampleRate" value="0.5" />
   <add key="zipkinNotToBeDisplayedDomainList" value=".xyz.com,.myApplication.net" />
   <add key="zipkinExcludedUriList" value="/check_uri,/status" />
+  <add key="zipkinProxyType" value="Http" /> 
 </appSettings>
 ```
 
@@ -59,6 +60,8 @@ Add the below additional configurations. Please verify these values and modify t
                                  e.g. domain: ".xyz.com", host: "abc.xyz.com" will be logged as "abc" only    
 
     zipkinExcludedUriList - uri list that is not needed for tracing
+
+    zipkinProxyType - zipkin proxy type i.e. Http, Socks4, Socks4a, Socks5 
 
 2) parameters.xml
 
@@ -88,6 +91,9 @@ The values are the same as appsettings.template.config
   </parameter>
   <parameter name="Zipkin Excluded Uri List" description="uri list that is not needed for tracing" defaultValue="/check_uri,/status">
     <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinExcludedUriList']/@value" />
+  </parameter>
+  <parameter name="Zipkin Proxy Type" description="zipkin proxy type ie. Http, Socks4, Socks4a, Socks5" defaultValue="***zipkin proxy type here***">
+    <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinProxyType']/@value" />
   </parameter>
 </parameters>
 ```
