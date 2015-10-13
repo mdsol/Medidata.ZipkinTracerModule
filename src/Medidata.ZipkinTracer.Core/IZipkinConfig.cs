@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Medidata.ZipkinTracer.Core
 {
@@ -6,6 +7,8 @@ namespace Medidata.ZipkinTracer.Core
     {
         string ZipkinServerName { get; }
         string ZipkinServerPort { get; }
+        Uri ZipkinProxyServer { get; }
+        string ZipkinProxyType { get; }
         string ServiceName { get; }
         string SpanProcessorBatchSize { get; }
         string DontSampleListCsv { get; }

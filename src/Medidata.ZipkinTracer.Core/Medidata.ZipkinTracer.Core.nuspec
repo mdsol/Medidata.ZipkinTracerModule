@@ -21,8 +21,5 @@
   </metadata>
   <files>
     <file src="\bin\Release\Medidata.ZipkinTracer.Core.Collector.dll" target="lib\net45" />
-	<file src="..\..\content\appsettings.config.transform" target="content" />
-    <file src="..\..\content\appsettings.template.config.transform" target="content" />
-    <file src="..\..\content\parameters.xml.transform" target="content" />
   </files>
 </package>

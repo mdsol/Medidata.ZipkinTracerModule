@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Net;
 
 namespace Medidata.ZipkinTracer.Core
 {
@@ -20,6 +21,25 @@ namespace Medidata.ZipkinTracer.Core
         public string ZipkinServerPort
         {
             get {  return ConfigurationManager.AppSettings["zipkinScribeServerPort"];}
+        }
+
+        public Uri ZipkinProxyServer
+        {
+            get
+            {
+                if (WebRequest.DefaultWebProxy == null) { return null; }
+
+                var proxy = WebRequest.DefaultWebProxy.GetProxy(new Uri("http://" + ZipkinServerName + ":" + ZipkinServerPort));
+
+                if (proxy.Host == ZipkinServerName) { return null; }
+
+                return proxy;
+            }
+        }
+
+        public string ZipkinProxyType
+        {
+            get { return ConfigurationManager.AppSettings["zipkinProxyType"]; }
         }
 
         public string SpanProcessorBatchSize

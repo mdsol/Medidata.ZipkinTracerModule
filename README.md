@@ -24,12 +24,10 @@ OR
 
 b) the url request is not in the mAuthWhitelist appsetting config, and using the zipkinSampleRate, CrossApplicationTracer will determine whether or not to trace this request. zipkinSampleRate is the approximate percentage of traces being recorded in zipkin.
 
-### Config transformations
-Below are the config transformations that is needed.  
+### Configurations
+Below are the configurations that are needed.  
 
-These transformations will be made automatically if the Medidata.ZipkinTracer.HttpModule nuget package is installed.  These changes will need to be made manually for Medidata.ZipkinTracer.Core nuget package.
-
-1) appsettings.template.config, app.config
+1) appsettings.config
 
 Add the below additional configurations. Please verify these values and modify them according to your service/environment.
 
@@ -42,6 +40,7 @@ Add the below additional configurations. Please verify these values and modify t
   <add key="zipkinSampleRate" value="0.5" />
   <add key="zipkinNotToBeDisplayedDomainList" value=".xyz.com,.myApplication.net" />
   <add key="zipkinExcludedUriList" value="/check_uri,/status" />
+  <add key="zipkinProxyType" value="Http" /> 
 </appSettings>
 ```
 
@@ -60,48 +59,18 @@ Add the below additional configurations. Please verify these values and modify t
 
     zipkinExcludedUriList - uri list that is not needed for tracing
 
-2) parameters.xml
+    zipkinProxyType - zipkin proxy type i.e. Http, Socks4, Socks4a, Socks5 
 
-This is used in opscode's xml when deploying service (i.e. MyApplication) to customize the values to be used in appsettings.
-
-The values are the same as appsettings.template.config
-
-```
-<parameters>
-  <parameter name="Zipkin Scribe Server Name" description="Zipkin scribe server name" defaultValue="zipkinvm.cloudapp.net">
-    <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinScribeServerName']/@value" />
-  </parameter>
-  <parameter name="Zipkin Scribe Server Port" description="Zipkin scribe server port" defaultValue="9410">
-    <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinScribeServerPort']/@value" />
-  </parameter>
-  <parameter name="Zipkin Service Name" description="Service name to be traced in Zipkin" defaultValue="MyApplication">
-    <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinServiceName']/@value" />
-  </parameter>
-  <parameter name="Zipkin Span Processor Batch Size" description="Number of spans to send to zipkin collector in one go" defaultValue="10">
-    <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinSpanProcessorBatchSize']/@value" />
-  </parameter>
-  <parameter name="Zipkin Sample Rate" description="float between 0 and 1 to determine whether to send a zipkin trace" defaultValue="0.5">
-    <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinSampleRate']/@value" />
-  </parameter>
-  <parameter name="Zipkin Not To Be Displayed Domain List" description="comma separate domain list, it will be used when logging hostname by excluding these strings in service name attribute" defaultValue=".myApplication.net">
-    <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinNotToBeDisplayedDomainList']/@value" />
-  </parameter>
-  <parameter name="Zipkin Excluded Uri List" description="uri list that is not needed for tracing" defaultValue="/check_uri,/status">
-    <parameterEntry kind="XmlFile" scope="\\appsettings.config$" match="//appSettings/add[@key='zipkinExcludedUriList']/@value" />
-  </parameter>
-</parameters>
-```
-
-#### Config transformations for HttpModule package
+#### Additional configuration for HttpModule package
 
 1) web.config 
 
-The following will be added to add the httpModule to your project.  Please don't modify this.
+The following should be added to add the httpModule to your project.
 
  ```
   <system.webServer>
     <modules>
-      <add name="ZipkinRequestContextModule" type="Medidata.ZipkinTracerModule.HttpModule.ZipkinRequestContextModule" />
+      <add name="ZipkinRequestContextModule" type="Medidata.ZipkinTracer.HttpModule.ZipkinRequestContextModule" />
     </modules>
   </system.webServer>
   ```
