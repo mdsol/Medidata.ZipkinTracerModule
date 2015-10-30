@@ -8,38 +8,14 @@ namespace Medidata.ZipkinTracer.Core
 {
     public class ZipkinConfig : IZipkinConfig
     {
+        public string ZipkinBaseUri
+        {
+            get { return ConfigurationManager.AppSettings["zipkinBaseUri"]; }
+        }
+
         public string ServiceName
         {
             get { return ConfigurationManager.AppSettings["zipkinServiceName"]; }
-        }
-
-        public string ZipkinServerName
-        {
-            get { return ConfigurationManager.AppSettings["zipkinScribeServerName"]; }
-        }
-
-        public string ZipkinServerPort
-        {
-            get {  return ConfigurationManager.AppSettings["zipkinScribeServerPort"];}
-        }
-
-        public Uri ZipkinProxyServer
-        {
-            get
-            {
-                if (WebRequest.DefaultWebProxy == null) { return null; }
-
-                var proxy = WebRequest.DefaultWebProxy.GetProxy(new Uri("http://" + ZipkinServerName + ":" + ZipkinServerPort));
-
-                if (proxy.Host == ZipkinServerName) { return null; }
-
-                return proxy;
-            }
-        }
-
-        public string ZipkinProxyType
-        {
-            get { return ConfigurationManager.AppSettings["zipkinProxyType"]; }
         }
 
         public string SpanProcessorBatchSize

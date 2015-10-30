@@ -5,6 +5,6 @@ namespace Medidata.ZipkinTracer.Core.Collector
 {
     public interface ISpanCollectorBuilder
     {
-        SpanCollector Build(string zipkinServer, int zipkinPort, int maxProcessorBatchSize, ILog logger);
+        SpanCollector Build(Uri uri, int maxProcessorBatchSize, ILog logger);
     }
 }

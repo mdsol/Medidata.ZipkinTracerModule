@@ -32,7 +32,7 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
             server = fixture.Create<string>();
             port = fixture.Create<int>();
             testMaxBatchSize = 10;
-            spanProcessor = MockRepository.GenerateStub<SpanProcessor>(server,port, queue, testMaxBatchSize, logger);
+            spanProcessor = MockRepository.GenerateStub<SpanProcessor>(new Uri("http://localhost"), queue, testMaxBatchSize, logger);
             spanProcessor.Stub(x => x.SendSpansToZipkin(Arg<string>.Is.Anything)).WhenCalled(s => { });
             taskFactory = MockRepository.GenerateStub<SpanProcessorTaskFactory>(logger, null);
             spanProcessor.spanProcessorTaskFactory = taskFactory;
@@ -42,14 +42,14 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullSpanQueue()
         {
-            new SpanProcessor(server, port, null, fixture.Create<int>(), logger);
+            new SpanProcessor(new Uri("http://localhost"), null, fixture.Create<int>(), logger);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullZipkinServer()
         {
-            new SpanProcessor(null, port, queue, fixture.Create<int>(), logger);
+            new SpanProcessor(null, queue, fixture.Create<int>(), logger);
         }
 
         [TestMethod]

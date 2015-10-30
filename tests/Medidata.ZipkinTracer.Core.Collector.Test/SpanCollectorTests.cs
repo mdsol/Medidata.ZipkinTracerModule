@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
@@ -27,7 +28,7 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         {
             SpanCollector.spanQueue = null;
 
-            spanCollector = SpanCollector.GetInstance(fixture.Create<string>(), fixture.Create<int>(), 0, logger);
+            spanCollector = SpanCollector.GetInstance(new Uri("http://localhost"), 0, logger);
 
             Assert.IsNotNull(SpanCollector.spanQueue);
         }
@@ -37,7 +38,7 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         {
             SpanCollector.spanQueue = null;
 
-            spanCollector = new SpanCollector(fixture.Create<string>(), fixture.Create<int>(), 0, logger);
+            spanCollector = new SpanCollector(new Uri("http://localhost"), 0, logger);
 
             Assert.IsNotNull(SpanCollector.spanQueue);
         }
@@ -48,7 +49,7 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
             var spanQueue = new BlockingCollection<Span>();
             SpanCollector.spanQueue = spanQueue;
 
-            spanCollector = new SpanCollector(fixture.Create<string>(), fixture.Create<int>(), 0, logger);
+            spanCollector = new SpanCollector(new Uri("http://localhost"), 0, logger);
 
             Assert.IsTrue(System.Object.ReferenceEquals(SpanCollector.spanQueue, spanQueue));
         }
@@ -99,10 +100,10 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
 
         private void SetupSpanCollector()
         {
-            spanCollector = new SpanCollector(fixture.Create<string>(), fixture.Create<int>(), 0, logger);
+            spanCollector = new SpanCollector(new Uri("http://localhost"), 0, logger);
 
             SpanCollector.spanQueue = fixture.Create<BlockingCollection<Span>>();
-            spanProcessorStub = MockRepository.GenerateStub<SpanProcessor>(fixture.Create<string>(),fixture.Create<int>(),
+            spanProcessorStub = MockRepository.GenerateStub<SpanProcessor>(new Uri("http://localhost"),
                     SpanCollector.spanQueue, 0, logger);
             spanCollector.spanProcessor = spanProcessorStub;
         }

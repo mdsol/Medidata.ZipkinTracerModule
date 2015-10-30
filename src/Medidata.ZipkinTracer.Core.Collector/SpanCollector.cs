@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using log4net;
 
 namespace Medidata.ZipkinTracer.Core.Collector
@@ -12,24 +13,24 @@ namespace Medidata.ZipkinTracer.Core.Collector
 
         private static SpanCollector instance;
 
-        public static SpanCollector GetInstance(string zipkinServer, int zipkinPort, int maxProcessorBatchSize, ILog logger)
+        public static SpanCollector GetInstance(Uri uri, int maxProcessorBatchSize, ILog logger)
         {
             if (instance == null)
             {
-                instance = new SpanCollector(zipkinServer, zipkinPort, maxProcessorBatchSize, logger);
+                instance = new SpanCollector(uri, maxProcessorBatchSize, logger);
                 instance.Start();
             }
             return instance;
         }
 
-        public SpanCollector(string zipkinServer, int zipkinPort, int maxProcessorBatchSize, ILog logger)
+        public SpanCollector(Uri uri, int maxProcessorBatchSize, ILog logger)
         {
             if ( spanQueue == null)
             {
                 spanQueue = new BlockingCollection<Span>(MAX_QUEUE_SIZE);
             }
 
-            spanProcessor = new SpanProcessor(zipkinServer, zipkinPort, spanQueue, maxProcessorBatchSize, logger);
+            spanProcessor = new SpanProcessor(uri, spanQueue, maxProcessorBatchSize, logger);
         }
 
         public virtual void Collect(Span span)

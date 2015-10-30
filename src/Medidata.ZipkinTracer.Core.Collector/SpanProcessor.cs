@@ -19,8 +19,7 @@ namespace Medidata.ZipkinTracer.Core.Collector
         //send contents of queue if it has pending items but less than max batch size after doing max number of polls
         internal const int MAX_NUMBER_OF_POLLS = 5;
 
-        private readonly string zipkinServer;
-        private readonly int zipkinPort;
+        private readonly Uri uri;
         internal BlockingCollection<Span> spanQueue;
         internal ConcurrentQueue<SerializableSpan> serializableSpans; 
 
@@ -30,20 +29,19 @@ namespace Medidata.ZipkinTracer.Core.Collector
         internal int maxBatchSize;
         private readonly ILog logger;
 
-        public SpanProcessor(string zipkinServer, int zipkinPort, BlockingCollection<Span> spanQueue, int maxBatchSize, ILog logger)
+        public SpanProcessor(Uri uri, BlockingCollection<Span> spanQueue, int maxBatchSize, ILog logger)
         {
             if ( spanQueue == null) 
             {
                 throw new ArgumentNullException("spanQueue is null");
             }
 
-            if (zipkinServer == null)
+            if (uri == null)
             {
-                throw new ArgumentNullException("zipkinServer is null");
+                throw new ArgumentNullException("zipkin Uri is uri");
             }
 
-            this.zipkinServer = zipkinServer;
-            this.zipkinPort = zipkinPort;
+            this.uri = uri;
             this.spanQueue = spanQueue;
             this.serializableSpans = new ConcurrentQueue<SerializableSpan>();
             this.maxBatchSize = maxBatchSize;
@@ -77,16 +75,10 @@ namespace Medidata.ZipkinTracer.Core.Collector
                 || (serializableSpans.Any() && spanProcessorTaskFactory.IsTaskCancelled())
                 || (subsequentPollCount > MAX_NUMBER_OF_POLLS))
             {
-                SerializableSpan serializableSpan;
-                var listOfSpans = new List<SerializableSpan>();
-                while (serializableSpans.TryDequeue(out serializableSpan))
-                {
-                    listOfSpans.Add(serializableSpan);
-                }
                 try
                 {
-                    if(listOfSpans.Any()) 
-                        SendSpansToZipkin(JsonConvert.SerializeObject(listOfSpans));
+                    if (serializableSpans.Any()) 
+                        SendSpansToZipkin(JsonConvert.SerializeObject(serializableSpans.ToList()));
                 }
                 catch (WebException ex)
                 {
@@ -99,17 +91,12 @@ namespace Medidata.ZipkinTracer.Core.Collector
         {
             using (var client = new WebClient())
             {
-                var tracerPath = "/api/v1/spans";
-                UriBuilder uriBuilder = new UriBuilder();
-                uriBuilder.Host = zipkinServer;
-                uriBuilder.Port = zipkinPort;
-                uriBuilder.Scheme = zipkinPort == 443 ? "https" : "http";
+                const string tracerPath = "/api/v1/spans";
 
                 try
                 {
-                    client.BaseAddress = uriBuilder.Uri.ToString();
+                    client.BaseAddress = uri.ToString();
                     client.UploadString(tracerPath, "POST", requestBody);
-                    logger.Info("Sending Spans to Zipkin Success");
                 }
                 catch (WebException ex)
                 {

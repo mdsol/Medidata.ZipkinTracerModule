@@ -35,8 +35,7 @@ namespace Medidata.ZipkinTracer.Core
                 try
                 {
                     spanCollector = spanCollectorBuilder.Build(
-                        zipkinConfig.ZipkinServerName,
-                        int.Parse(zipkinConfig.ZipkinServerPort),
+                        new Uri(zipkinConfig.ZipkinBaseUri),
                         int.Parse(zipkinConfig.SpanProcessorBatchSize),
                         logger);
 
@@ -157,15 +156,9 @@ namespace Medidata.ZipkinTracer.Core
 
         private bool IsConfigValuesValid(IZipkinConfig zipkinConfig)
         {
-            if (String.IsNullOrEmpty(zipkinConfig.ZipkinServerName))
+            if (String.IsNullOrEmpty(zipkinConfig.ZipkinBaseUri))
             {
                 logger.Error("zipkinConfig.ZipkinServerName is null");
-                return false;
-            }
-
-            if (String.IsNullOrEmpty(zipkinConfig.ZipkinServerPort))
-            {
-                logger.Error("zipkinConfig.ZipkinServerPort is null");
                 return false;
             }
 
@@ -189,11 +182,6 @@ namespace Medidata.ZipkinTracer.Core
 
             int port;
             int spanProcessorBatchSize;
-            if (!int.TryParse(zipkinConfig.ZipkinServerPort, out port))
-            {
-                logger.Error("zipkinConfig port is not an int");
-                return false;
-            }
 
             if (!int.TryParse(zipkinConfig.SpanProcessorBatchSize, out spanProcessorBatchSize))
             {
