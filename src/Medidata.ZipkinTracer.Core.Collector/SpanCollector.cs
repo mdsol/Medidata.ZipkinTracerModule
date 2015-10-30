@@ -9,30 +9,27 @@ namespace Medidata.ZipkinTracer.Core.Collector
         internal static BlockingCollection<Span> spanQueue;
 
         internal SpanProcessor spanProcessor;
-        private IClientProvider clientProvider;
 
         private static SpanCollector instance;
 
-        public static SpanCollector GetInstance(IClientProvider clientProvider, int maxProcessorBatchSize, ILog logger)
+        public static SpanCollector GetInstance(string zipkinServer, int zipkinPort, int maxProcessorBatchSize, ILog logger)
         {
             if (instance == null)
             {
-                instance = new SpanCollector(clientProvider, maxProcessorBatchSize, logger);
+                instance = new SpanCollector(zipkinServer, zipkinPort, maxProcessorBatchSize, logger);
                 instance.Start();
             }
             return instance;
         }
 
-        public SpanCollector(IClientProvider clientProvider, int maxProcessorBatchSize, ILog logger)
+        public SpanCollector(string zipkinServer, int zipkinPort, int maxProcessorBatchSize, ILog logger)
         {
             if ( spanQueue == null)
             {
                 spanQueue = new BlockingCollection<Span>(MAX_QUEUE_SIZE);
             }
 
-            this.clientProvider = clientProvider;
-
-            spanProcessor = new SpanProcessor(spanQueue, clientProvider, maxProcessorBatchSize, logger);
+            spanProcessor = new SpanProcessor(zipkinServer, zipkinPort, spanQueue, maxProcessorBatchSize, logger);
         }
 
         public virtual void Collect(Span span)
@@ -48,7 +45,6 @@ namespace Medidata.ZipkinTracer.Core.Collector
         public virtual void Stop()
         {
             spanProcessor.Stop();
-            clientProvider.Close();
         }
     }
 }

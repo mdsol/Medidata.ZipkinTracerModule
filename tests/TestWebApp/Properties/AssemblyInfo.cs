@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Medidata.ZipkinTracer.Core.Collector")]
+[assembly: AssemblyTitle("WebApplication9")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Medidata Solutions Inc")]
-[assembly: AssemblyProduct("Medidata.ZipkinTracer.Core.Collector")]
-[assembly: AssemblyCopyright("Copyright © Medidata Solutions Inc 2014")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("WebApplication9")]
+[assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("7d1a17a8-c4e9-46f0-83e1-623065b141a4")]
+[assembly: Guid("67c0245c-a7e2-481b-a63d-304580f9c434")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -29,10 +29,7 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-// You can specify all the values or you can default the Build and Revision Numbers 
+// You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.0.7")]
-[assembly: AssemblyFileVersion("0.0.7")]
-[assembly: AssemblyInformationalVersion("0.0.7")]
-[assembly: InternalsVisibleTo("Medidata.ZipkinTracer.Core.Collector.Test")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]

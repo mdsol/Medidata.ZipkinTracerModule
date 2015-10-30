@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Collections;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
 using System.Collections.Concurrent;
@@ -10,7 +11,6 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
     public class SpanCollectorTests
     {
         IFixture fixture;
-        private IClientProvider clientProviderStub;
         private SpanCollector spanCollector;
         private SpanProcessor spanProcessorStub;
         private ILog logger;
@@ -27,8 +27,7 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         {
             SpanCollector.spanQueue = null;
 
-            clientProviderStub = MockRepository.GenerateStub<IClientProvider>();
-            spanCollector = SpanCollector.GetInstance(clientProviderStub, 0, logger);
+            spanCollector = SpanCollector.GetInstance(fixture.Create<string>(), fixture.Create<int>(), 0, logger);
 
             Assert.IsNotNull(SpanCollector.spanQueue);
         }
@@ -38,8 +37,7 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         {
             SpanCollector.spanQueue = null;
 
-            clientProviderStub = MockRepository.GenerateStub<IClientProvider>();
-            spanCollector = new SpanCollector(clientProviderStub, 0, logger);
+            spanCollector = new SpanCollector(fixture.Create<string>(), fixture.Create<int>(), 0, logger);
 
             Assert.IsNotNull(SpanCollector.spanQueue);
         }
@@ -50,8 +48,7 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
             var spanQueue = new BlockingCollection<Span>();
             SpanCollector.spanQueue = spanQueue;
 
-            clientProviderStub = MockRepository.GenerateStub<IClientProvider>();
-            spanCollector = new SpanCollector(clientProviderStub, 0, logger);
+            spanCollector = new SpanCollector(fixture.Create<string>(), fixture.Create<int>(), 0, logger);
 
             Assert.IsTrue(System.Object.ReferenceEquals(SpanCollector.spanQueue, spanQueue));
         }
@@ -98,16 +95,15 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
             spanCollector.Stop();
 
             spanProcessorStub.AssertWasCalled(x => x.Stop());
-            clientProviderStub.AssertWasCalled(x => x.Close());
         }
 
         private void SetupSpanCollector()
         {
-            clientProviderStub = MockRepository.GenerateStub<IClientProvider>();
-            spanCollector = new SpanCollector(clientProviderStub, 0, logger);
+            spanCollector = new SpanCollector(fixture.Create<string>(), fixture.Create<int>(), 0, logger);
 
             SpanCollector.spanQueue = fixture.Create<BlockingCollection<Span>>();
-            spanProcessorStub = MockRepository.GenerateStub<SpanProcessor>(SpanCollector.spanQueue, clientProviderStub, 0, logger);
+            spanProcessorStub = MockRepository.GenerateStub<SpanProcessor>(fixture.Create<string>(),fixture.Create<int>(),
+                    SpanCollector.spanQueue, 0, logger);
             spanCollector.spanProcessor = spanProcessorStub;
         }
     }

@@ -3,7 +3,11 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Text;
 using log4net;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Thrift;
 using Thrift.Protocol;
 using Thrift.Transport;
@@ -15,33 +19,35 @@ namespace Medidata.ZipkinTracer.Core.Collector
         //send contents of queue if it has pending items but less than max batch size after doing max number of polls
         internal const int MAX_NUMBER_OF_POLLS = 5;
 
-        private TBinaryProtocol.Factory protocolFactory;
+        private readonly string zipkinServer;
+        private readonly int zipkinPort;
         internal BlockingCollection<Span> spanQueue;
-        private IClientProvider clientProvider;
+        internal ConcurrentQueue<SerializableSpan> serializableSpans; 
 
-        internal List<LogEntry> logEntries;
         internal SpanProcessorTaskFactory spanProcessorTaskFactory;
         internal int subsequentPollCount;
         internal int retries;
         internal int maxBatchSize;
+        private readonly ILog logger;
 
-        public SpanProcessor(BlockingCollection<Span> spanQueue, IClientProvider clientProvider, int maxBatchSize, ILog logger)
+        public SpanProcessor(string zipkinServer, int zipkinPort, BlockingCollection<Span> spanQueue, int maxBatchSize, ILog logger)
         {
             if ( spanQueue == null) 
             {
                 throw new ArgumentNullException("spanQueue is null");
             }
 
-            if ( clientProvider == null) 
+            if (zipkinServer == null)
             {
-                throw new ArgumentNullException("clientProvider is null");
+                throw new ArgumentNullException("zipkinServer is null");
             }
 
+            this.zipkinServer = zipkinServer;
+            this.zipkinPort = zipkinPort;
             this.spanQueue = spanQueue;
-            this.clientProvider = clientProvider;
+            this.serializableSpans = new ConcurrentQueue<SerializableSpan>();
             this.maxBatchSize = maxBatchSize;
-            logEntries = new List<LogEntry>();
-            protocolFactory = new TBinaryProtocol.Factory();
+            this.logger = logger;
             spanProcessorTaskFactory = new SpanProcessorTaskFactory(logger);
         }
 
@@ -53,71 +59,73 @@ namespace Medidata.ZipkinTracer.Core.Collector
 
         public virtual void Start()
         {
-            spanProcessorTaskFactory.CreateAndStart(() => LogSubmittedSpans());
+            spanProcessorTaskFactory.CreateAndStart(LogSubmittedSpans);
         }
 
         internal virtual void LogSubmittedSpans()
         {
             Span span;
-            spanQueue.TryTake(out span);
-            if (span != null)
+            while (spanQueue.TryTake(out span))
             {
-                logEntries.Add(Create(span));
+                serializableSpans.Enqueue(new SerializableSpan(span));
                 subsequentPollCount = 0;
             }
-            else if (logEntries.Any())
-            {
-                subsequentPollCount++;
-            }
+            if(serializableSpans.Count > 0) subsequentPollCount++;
 
-            if ((logEntries.Count() >= maxBatchSize)
-                || (logEntries.Any() && spanProcessorTaskFactory.IsTaskCancelled())
+
+            if ((serializableSpans.Count() >= maxBatchSize)
+                || (serializableSpans.Any() && spanProcessorTaskFactory.IsTaskCancelled())
                 || (subsequentPollCount > MAX_NUMBER_OF_POLLS))
             {
-                var entries = logEntries;
-                logEntries = new List<LogEntry>();
-                subsequentPollCount = 0;
-                Log(clientProvider, entries);
-            }
-        }
-
-        internal void Log(IClientProvider client, List<LogEntry> logEntries)
-        {
-            try
-            {
-                clientProvider.Log(logEntries);
-                retries = 0;
-            }
-            catch (TException)
-            {
-                if ( retries < 3 )
+                SerializableSpan serializableSpan;
+                var listOfSpans = new List<SerializableSpan>();
+                while (serializableSpans.TryDequeue(out serializableSpan))
                 {
-                    retries++;
-                    Log(client, logEntries);
+                    listOfSpans.Add(serializableSpan);
                 }
-                else
+                try
                 {
-                    throw;
+                    if(listOfSpans.Any()) 
+                        SendSpansToZipkin(JsonConvert.SerializeObject(listOfSpans));
+                }
+                catch (WebException ex)
+                {
+                    logger.Error("Failed to send to zipking with error: " + ex.Message);
                 }
             }
         }
 
-        private LogEntry Create(Span span)
+        public virtual void SendSpansToZipkin(string requestBody)
         {
-            var spanAsString = Convert.ToBase64String(ConvertSpanToBytes(span));
-            return new LogEntry()
+            using (var client = new WebClient())
             {
-                Category = "zipkin",
-                Message = spanAsString
-            };
-        }
+                var tracerPath = "/api/v1/spans";
+                UriBuilder uriBuilder = new UriBuilder();
+                uriBuilder.Host = zipkinServer;
+                uriBuilder.Port = zipkinPort;
+                uriBuilder.Scheme = zipkinPort == 443 ? "https" : "http";
 
-        private byte[] ConvertSpanToBytes(Span span)
-        {
-            var buf = new MemoryStream();
-            TProtocol protocol = protocolFactory.GetProtocol(new TStreamTransport(buf, buf));
-            span.Write(protocol);
-            return buf.ToArray();
+                try
+                {
+                    client.BaseAddress = uriBuilder.Uri.ToString();
+                    client.UploadString(tracerPath, "POST", requestBody);
+                    logger.Info("Sending Spans to Zipkin Success");
+                }
+                catch (WebException ex)
+                {
+                    var response = ex.Response as HttpWebResponse;
+                    if ((response != null))
+                    {
+                        // read all response info
+                        var responseStream = response.GetResponseStream();
+                        if (responseStream != null)
+                        {
+                            var responseString = new StreamReader(responseStream).ReadToEnd();
+                            logger.Error("Sending Spans to Failed with error: " + ex.Message + " and message:" + responseString);
+                        }
+                    }
+                }
+            }
         }
     }
 }
