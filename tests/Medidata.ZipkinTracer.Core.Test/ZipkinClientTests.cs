@@ -18,7 +18,6 @@ namespace Medidata.ZipkinTracer.Core.Test
         private SpanCollector spanCollectorStub;
         private SpanTracer spanTracerStub;
         private ITraceProvider traceProvider;
-        private IClientProvider clientProvider;
         private ILog logger;
 
         [TestInitialize]
@@ -27,7 +26,6 @@ namespace Medidata.ZipkinTracer.Core.Test
             fixture = new Fixture();
             spanCollectorBuilder = MockRepository.GenerateStub<ISpanCollectorBuilder>();
             traceProvider = MockRepository.GenerateStub<ITraceProvider>();
-            clientProvider = MockRepository.GenerateStub<IClientProvider>();
             logger = MockRepository.GenerateStub<ILog>();
         }
 
