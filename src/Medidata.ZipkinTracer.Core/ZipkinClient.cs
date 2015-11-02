@@ -158,7 +158,7 @@ namespace Medidata.ZipkinTracer.Core
         {
             if (String.IsNullOrEmpty(zipkinConfig.ZipkinBaseUri))
             {
-                logger.Error("zipkinConfig.ZipkinServerName is null");
+                logger.Error("zipkinConfig.ZipkinBaseUri is null");
                 return false;
             }
 
@@ -180,7 +180,6 @@ namespace Medidata.ZipkinTracer.Core
                 return false;
             }
 
-            int port;
             int spanProcessorBatchSize;
 
             if (!int.TryParse(zipkinConfig.SpanProcessorBatchSize, out spanProcessorBatchSize))

@@ -89,8 +89,14 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         [TestMethod]
         public void LogSubmittedSpans_IncrementSubsequentPollCountIfSpanQueueHasAnItemLessThanMax()
         {
+            //put item in queue
             spanProcessor.spanQueue.Add(new Span());
             spanProcessor.LogSubmittedSpans();
+
+            //Proces Log with no new items
+            spanProcessor.LogSubmittedSpans();
+
+            //Subsquent count has incremented
             Assert.AreEqual(1, spanProcessor.subsequentPollCount);
         }
 
