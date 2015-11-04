@@ -5,10 +5,7 @@ namespace Medidata.ZipkinTracer.Core
 {
     public interface IZipkinConfig
     {
-        string ZipkinServerName { get; }
-        string ZipkinServerPort { get; }
-        Uri ZipkinProxyServer { get; }
-        string ZipkinProxyType { get; }
+        string ZipkinBaseUri { get; }
         string ServiceName { get; }
         string SpanProcessorBatchSize { get; }
         string DontSampleListCsv { get; }

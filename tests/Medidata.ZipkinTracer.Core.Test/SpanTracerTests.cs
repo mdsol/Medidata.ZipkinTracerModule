@@ -22,7 +22,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             fixture = new Fixture();
             logger = MockRepository.GenerateStub<ILog>();
-            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(MockRepository.GenerateStub<IClientProvider>(), 0, logger);
+            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(new Uri("http://localhost"), 0, logger);
             zipkinEndpointStub = MockRepository.GenerateStub<ServiceEndpoint>();
         }
 

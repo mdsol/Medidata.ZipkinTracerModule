@@ -36,9 +36,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="starksoft.aspen, Version=1.0.2.0, Culture=neutral, PublicKeyToken=56b8923a24d03eb3, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\starksoft.aspen.1.0.2.0\lib\net40\starksoft.aspen.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -52,10 +52,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClientProvider.cs" />
-    <Compile Include="IClientProvider.cs" />
     <Compile Include="ISpanCollectorBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SerializableAnnotation.cs" />
+    <Compile Include="SerializableBinaryAnnotation.cs" />
+    <Compile Include="SerializableEndpoint.cs" />
+    <Compile Include="SerializableSpan.cs" />
     <Compile Include="SpanCollector.cs" />
     <Compile Include="SpanCollectorBuilder.cs" />
     <Compile Include="SpanProcessor.cs" />

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracer.Core", "src\Medidata.ZipkinTracer.Core\Medidata.ZipkinTracer.Core.csproj", "{EB432891-204B-4B97-BFB1-A820E424284E}"
 EndProject
@@ -20,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracer.Core.Collector.Test", "tests\Medidata.ZipkinTracer.Core.Collector.Test\Medidata.ZipkinTracer.Core.Collector.Test.csproj", "{A6AFE0F7-F1DE-4E0B-B6F6-CFDC293CAE2D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracer.HttpModule", "src\Medidata.ZipkinTracer.HttpModule\Medidata.ZipkinTracer.HttpModule.csproj", "{44EF130E-7549-4860-ABBB-17050FC09F5C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestWebApp", "tests\TestWebApp\TestWebApp.csproj", "{ABDA3DE5-C7B8-42E8-A48C-0B97BB15B285}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{44EF130E-7549-4860-ABBB-17050FC09F5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44EF130E-7549-4860-ABBB-17050FC09F5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44EF130E-7549-4860-ABBB-17050FC09F5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABDA3DE5-C7B8-42E8-A48C-0B97BB15B285}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABDA3DE5-C7B8-42E8-A48C-0B97BB15B285}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABDA3DE5-C7B8-42E8-A48C-0B97BB15B285}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABDA3DE5-C7B8-42E8-A48C-0B97BB15B285}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

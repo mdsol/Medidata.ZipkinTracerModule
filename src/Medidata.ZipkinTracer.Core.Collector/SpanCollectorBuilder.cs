@@ -7,9 +7,9 @@ namespace Medidata.ZipkinTracer.Core.Collector
     [ExcludeFromCodeCoverage]  //excluded from code coverage since this class is a 1 liner to new up SpanCollector
     public class SpanCollectorBuilder : ISpanCollectorBuilder
     {
-        public SpanCollector Build(string zipkinServer, int zipkinPort, int maxProcessorBatchSize, ILog logger, Uri proxyServer = null, string proxyType = null)
+        public SpanCollector Build(Uri uri, int maxProcessorBatchSize, ILog logger)
         {
-            return SpanCollector.GetInstance(ClientProvider.GetInstance(zipkinServer, zipkinPort, proxyServer, proxyType), maxProcessorBatchSize, logger);
+            return SpanCollector.GetInstance(uri, maxProcessorBatchSize, logger);
         }
     }
 }

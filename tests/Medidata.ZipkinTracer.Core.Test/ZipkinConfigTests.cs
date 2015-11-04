@@ -56,54 +56,5 @@ namespace Medidata.ZipkinTracer.Core.Test
             Assert.AreEqual(0, result.Count);
         }
         #endregion
-
-        [TestMethod]
-        public void ZipkinProxyServer()
-        {
-            // Arrange
-            ZipkinConfig config = new ZipkinConfig();
-            Uri proxy = new Uri("http://localhost:8888");
-            WebRequest.DefaultWebProxy = new WebProxy(proxy, false);
-            ConfigurationManager.AppSettings["zipkinScribeServerName"] = "abc.xyz.com";
-            ConfigurationManager.AppSettings["zipkinScribeServerPort"] = "9410";
-
-            // Act
-            var result = config.ZipkinProxyServer;
-
-            // Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(proxy, result);
-        }
-
-        [TestMethod]
-        public void ZipkinProxyServerNullProxyServer()
-        {
-            // Arrange
-            ZipkinConfig config = new ZipkinConfig();
-            WebRequest.DefaultWebProxy = null;
-
-            // Act
-            var result = config.ZipkinProxyServer;
-
-            // Assert
-            Assert.IsNull(result);
-        }
-
-        [TestMethod]
-        public void ZipkinProxyServerByPassList()
-        {
-            // Arrange
-            ZipkinConfig config = new ZipkinConfig();
-            Uri proxy = new Uri("http://localhost:8888");
-            WebRequest.DefaultWebProxy = new WebProxy(proxy, false, new[] { "abc.xyz.com" });
-            ConfigurationManager.AppSettings["zipkinScribeServerName"] = "abc.xyz.com";
-            ConfigurationManager.AppSettings["zipkinScribeServerPort"] = "9410";
-
-            // Act
-            var result = config.ZipkinProxyServer;
-
-            // Assert
-            Assert.IsNull(result);
-        }
     }
 }
