@@ -60,12 +60,14 @@ namespace Medidata.ZipkinTracer.Core
 
                 try
                 {
+                    var nextTrace = traceProvider.GetNext();
                     return spanTracer.SendClientSpan(
-                        GetSpanName(clientService, methodName),
-                        traceProvider.TraceId,
-                        traceProvider.ParentSpanId,
-                        traceProvider.SpanId,
-                        clientServiceName);
+                        methodName.ToLower(),
+                        nextTrace.TraceId,
+                        nextTrace.ParentSpanId,
+                        nextTrace.SpanId,
+                        clientServiceName,
+                        clientService.AbsolutePath);
                 }
                 catch (Exception ex)
                 {
@@ -97,10 +99,11 @@ namespace Medidata.ZipkinTracer.Core
                 try
                 {
                     return spanTracer.ReceiveServerSpan(
-                        GetSpanName(requestUri, methodName),
+                        methodName.ToLower(),
                         traceProvider.TraceId,
                         traceProvider.ParentSpanId,
-                        traceProvider.SpanId);
+                        traceProvider.SpanId,
+                        requestUri.AbsolutePath);
                 }
                 catch (Exception ex)
                 {
@@ -147,11 +150,6 @@ namespace Medidata.ZipkinTracer.Core
                 host = host.Replace(domain, "");
             }
             return host;
-        }
-
-        private string GetSpanName(Uri uri, string methodName)
-        {
-            return string.Format("{0} {1}", methodName, uri.AbsolutePath);
         }
 
         private bool IsConfigValuesValid(IZipkinConfig zipkinConfig)

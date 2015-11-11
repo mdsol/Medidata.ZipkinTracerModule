@@ -22,7 +22,7 @@ using Thrift.Transport;
 public partial class BinaryAnnotation : TBase
 {
   private string _key;
-  private byte[] _value;
+  private string _value;
   private AnnotationType _annotation_type;
   private Endpoint _host;
 
@@ -39,7 +39,7 @@ public partial class BinaryAnnotation : TBase
     }
   }
 
-  public byte[] Value
+  public string Value
   {
     get
     {
@@ -118,7 +118,7 @@ public partial class BinaryAnnotation : TBase
           break;
         case 2:
           if (field.Type == TType.String) {
-            Value = iprot.ReadBinary();
+            Value = iprot.ReadString();
           } else { 
             TProtocolUtil.Skip(iprot, field.Type);
           }
@@ -164,7 +164,7 @@ public partial class BinaryAnnotation : TBase
       field.Type = TType.String;
       field.ID = 2;
       oprot.WriteFieldBegin(field);
-      oprot.WriteBinary(Value);
+      oprot.WriteString(Value);
       oprot.WriteFieldEnd();
     }
     if (__isset.annotation_type) {
