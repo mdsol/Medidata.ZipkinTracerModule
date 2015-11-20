@@ -15,7 +15,7 @@ namespace Medidata.ZipkinTracer.Core.Collector
         public string Key { get; private set; }
 
         [JsonProperty("value")]
-        public byte[] Value { get; private set; }
+        public string  Value { get; private set; }
 
         [JsonProperty("endpoint")]
         public SerializableEndpoint SerializableEndpoint { get; private set; }

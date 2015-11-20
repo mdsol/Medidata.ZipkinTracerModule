@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Medidata.ZipkinTracer.Core
 {
@@ -33,7 +32,7 @@ namespace Medidata.ZipkinTracer.Core
             this.zipkinEndpoint = zipkinEndpoint;
         }
 
-        public virtual Span ReceiveServerSpan(string spanName, string traceId, string parentSpanId, string spanId)
+        public virtual Span ReceiveServerSpan(string spanName, string traceId, string parentSpanId, string spanId, string path)
         {
             var newSpan = CreateNewSpan(spanName, traceId, parentSpanId, spanId);
 
@@ -45,9 +44,7 @@ namespace Medidata.ZipkinTracer.Core
             };
             newSpan.Annotations.Add(annotation);
 
-            AddBinaryAnnotation("trace_id", traceId, newSpan);
-            AddBinaryAnnotation("span_id", spanId, newSpan);
-            AddBinaryAnnotation("parent_id", parentSpanId, newSpan);
+            AddBinaryAnnotation("http.uri", path, newSpan);
 
             return newSpan;
         }
@@ -76,7 +73,7 @@ namespace Medidata.ZipkinTracer.Core
             spanCollector.Collect(span);
         }
 
-        public virtual Span SendClientSpan(string spanName, string traceId, string parentSpanId, string spanId, string clientServiceName)
+        public virtual Span SendClientSpan(string spanName, string traceId, string parentSpanId, string spanId, string clientServiceName, string path)
         {
             var newSpan = CreateNewSpan(spanName, traceId, parentSpanId, spanId);
 
@@ -88,6 +85,7 @@ namespace Medidata.ZipkinTracer.Core
             };
 
             newSpan.Annotations.Add(annotation);
+            AddBinaryAnnotation("http.uri", path, newSpan);
 
             return newSpan;
         }
@@ -146,7 +144,7 @@ namespace Medidata.ZipkinTracer.Core
                 Host = zipkinEndpoint.GetEndpoint(serviceName),
                 Annotation_type = AnnotationType.STRING,
                 Key = key,
-                Value = Encoding.Default.GetBytes(value)
+                Value = value
             };
 
             span.Binary_annotations.Add(binaryAnnotation);

@@ -18,6 +18,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         private SpanCollector spanCollectorStub;
         private SpanTracer spanTracerStub;
         private ITraceProvider traceProvider;
+        private ITraceProvider nextTraceProvider;
         private ILog logger;
 
         [TestInitialize]
@@ -26,6 +27,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             fixture = new Fixture();
             spanCollectorBuilder = MockRepository.GenerateStub<ISpanCollectorBuilder>();
             traceProvider = MockRepository.GenerateStub<ITraceProvider>();
+            nextTraceProvider = MockRepository.GenerateStub<ITraceProvider>();
             logger = MockRepository.GenerateStub<ILog>();
         }
 
@@ -213,10 +215,16 @@ namespace Medidata.ZipkinTracer.Core.Test
             var uriHost = "https://www.x@y.com";
             var uriAbsolutePath = "/object";
             var methodName = "GET";
-            var spanName = string.Format("{0} {1}", methodName, uriAbsolutePath);
+            var spanName = methodName;
 
             var expectedSpan = new Span();
-            spanTracerStub.Expect(x => x.ReceiveServerSpan(Arg<string>.Is.Equal(spanName), Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Return(expectedSpan);
+            spanTracerStub.Expect(
+                x => x.ReceiveServerSpan(
+                    Arg<string>.Is.Equal(spanName.ToLower()),
+                    Arg<string>.Is.Equal(traceProvider.TraceId),
+                    Arg<string>.Is.Equal(traceProvider.ParentSpanId),
+                    Arg<string>.Is.Equal(traceProvider.SpanId),
+                    Arg<string>.Is.Anything)).Return(expectedSpan);
 
             var result = tracerClient.StartServerTrace(new Uri(uriHost + uriAbsolutePath), methodName);
 
@@ -233,9 +241,15 @@ namespace Medidata.ZipkinTracer.Core.Test
             var uriHost = "https://www.x@y.com";
             var uriAbsolutePath = "/object";
             var methodName = "GET";
-            var spanName = string.Format("{0} {1}", methodName, uriAbsolutePath);
+            var spanName = methodName;
 
-            spanTracerStub.Expect(x => x.ReceiveServerSpan(Arg<string>.Is.Equal(spanName), Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything)).Throw(new Exception());
+            spanTracerStub.Expect(
+                x => x.ReceiveServerSpan(
+                    Arg<string>.Is.Equal(spanName.ToLower()),
+                    Arg<string>.Is.Anything,
+                    Arg<string>.Is.Anything,
+                    Arg<string>.Is.Anything,
+                    Arg<string>.Is.Anything)).Throw(new Exception());
 
             var result = tracerClient.StartServerTrace(new Uri(uriHost + uriAbsolutePath), methodName);
 
@@ -314,10 +328,17 @@ namespace Medidata.ZipkinTracer.Core.Test
             var clientServiceName = "abc-sandbox";
             var uriAbsolutePath = "/object";
             var methodName = "GET";
-            var spanName = string.Format("{0} {1}", methodName, uriAbsolutePath);
+            var spanName = methodName;
 
             var expectedSpan = new Span();
-            spanTracerStub.Expect(x => x.SendClientSpan(Arg<string>.Is.Equal(spanName), Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Equal(clientServiceName))).Return(expectedSpan);
+            spanTracerStub.Expect(
+                x => x.SendClientSpan(
+                    Arg<string>.Is.Equal(spanName.ToLower()),
+                    Arg<string>.Is.Equal(nextTraceProvider.TraceId),
+                    Arg<string>.Is.Equal(nextTraceProvider.ParentSpanId),
+                    Arg<string>.Is.Equal(nextTraceProvider.SpanId),
+                    Arg<string>.Is.Equal(clientServiceName),
+                    Arg<string>.Is.Anything)).Return(expectedSpan);
 
             var result = tracerClient.StartClientTrace(new Uri("https://" + clientServiceName + ".xyz.net:8000" + uriAbsolutePath), methodName);
 
@@ -334,10 +355,17 @@ namespace Medidata.ZipkinTracer.Core.Test
             var clientServiceName = "192.168.178.178";
             var uriAbsolutePath = "/object";
             var methodName = "GET";
-            var spanName = string.Format("{0} {1}", methodName, uriAbsolutePath);
+            var spanName = methodName;
 
             var expectedSpan = new Span();
-            spanTracerStub.Expect(x => x.SendClientSpan(Arg<string>.Is.Equal(spanName), Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Equal(clientServiceName))).Return(expectedSpan);
+            spanTracerStub.Expect(
+                x => x.SendClientSpan(
+                    Arg<string>.Is.Equal(spanName.ToLower()),
+                    Arg<string>.Is.Equal(nextTraceProvider.TraceId),
+                    Arg<string>.Is.Equal(nextTraceProvider.ParentSpanId),
+                    Arg<string>.Is.Equal(nextTraceProvider.SpanId),
+                    Arg<string>.Is.Equal(clientServiceName),
+                    Arg<string>.Is.Anything)).Return(expectedSpan);
 
             var result = tracerClient.StartClientTrace(new Uri("https://" + clientServiceName + ".xyz.net:8000" + uriAbsolutePath), methodName);
 
@@ -356,10 +384,17 @@ namespace Medidata.ZipkinTracer.Core.Test
             var clientServiceName = "abc-sandbox";
             var uriAbsolutePath = "/object";
             var methodName = "GET";
-            var spanName = string.Format("{0} {1}", methodName, uriAbsolutePath);
+            var spanName = methodName;
 
             var expectedSpan = new Span();
-            spanTracerStub.Expect(x => x.SendClientSpan(Arg<string>.Is.Equal(spanName), Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Equal(clientServiceName))).Return(expectedSpan);
+            spanTracerStub.Expect(
+                x => x.SendClientSpan(
+                    Arg<string>.Is.Equal(spanName.ToLower()),
+                    Arg<string>.Is.Equal(nextTraceProvider.TraceId),
+                    Arg<string>.Is.Equal(nextTraceProvider.ParentSpanId),
+                    Arg<string>.Is.Equal(nextTraceProvider.SpanId),
+                    Arg<string>.Is.Equal(clientServiceName),
+                    Arg<string>.Is.Anything)).Return(expectedSpan);
 
             var result = tracerClient.StartClientTrace(new Uri("https://" + clientServiceName + ".xyz.net:8000" + uriAbsolutePath), methodName);
 
@@ -376,9 +411,16 @@ namespace Medidata.ZipkinTracer.Core.Test
             var clientServiceName = "abc-sandbox";
             var uriAbsolutePath = "/object";
             var methodName = "GET";
-            var spanName = string.Format("{0} {1}", methodName, uriAbsolutePath);
+            var spanName = methodName;
 
-            spanTracerStub.Expect(x => x.SendClientSpan(Arg<string>.Is.Equal(spanName), Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Anything, Arg<string>.Is.Equal(clientServiceName))).Throw(new Exception());
+            spanTracerStub.Expect(
+                x => x.SendClientSpan(
+                    Arg<string>.Is.Equal(spanName.ToLower()),
+                    Arg<string>.Is.Anything,
+                    Arg<string>.Is.Anything,
+                    Arg<string>.Is.Anything,
+                    Arg<string>.Is.Equal(clientServiceName),
+                    Arg<string>.Is.Anything)).Throw(new Exception());
 
             var result = tracerClient.StartClientTrace(new Uri("https://" + clientServiceName + ".xyz.net:8000" + uriAbsolutePath), methodName);
 
@@ -480,7 +522,15 @@ namespace Medidata.ZipkinTracer.Core.Test
             spanCollectorBuilder.Expect(x => x.Build(Arg<Uri>.Is.Anything, Arg<int>.Is.Anything, Arg<ILog>.Is.Equal(logger))).Return(spanCollectorStub);
 
             traceProvider.Expect(x => x.TraceId).Return(fixture.Create<string>());
+            traceProvider.Expect(x => x.SpanId).Return(fixture.Create<string>());
+            traceProvider.Expect(x => x.ParentSpanId).Return(traceProvider.TraceId);
             traceProvider.Expect(x => x.IsSampled).Return(true);
+            
+            nextTraceProvider.Expect(x => x.TraceId).Return(fixture.Create<string>());
+            nextTraceProvider.Expect(x => x.SpanId).Return(fixture.Create<string>());
+            nextTraceProvider.Expect(x => x.ParentSpanId).Return(traceProvider.TraceId);
+            nextTraceProvider.Expect(x => x.IsSampled).Return(true);
+            traceProvider.Stub(x => x.GetNext()).Return(nextTraceProvider);
 
             IZipkinConfig zipkinConfigSetup = zipkinConfig;
             if (zipkinConfig == null)

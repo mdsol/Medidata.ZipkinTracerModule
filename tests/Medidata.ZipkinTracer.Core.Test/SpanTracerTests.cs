@@ -55,12 +55,13 @@ namespace Medidata.ZipkinTracer.Core.Test
             var traceId = fixture.Create<long>().ToString();
             var parentSpanId = fixture.Create<long>().ToString();
             var spanId = fixture.Create<long>().ToString();
+            var path = fixture.Create<long>().ToString();
 
             var spanTracer = new SpanTracer(spanCollectorStub, serviceName, zipkinEndpointStub);
 
             zipkinEndpointStub.Expect(x => x.GetEndpoint(serviceName)).Return(new Endpoint() { Service_name = serviceName });
 
-            var resultSpan = spanTracer.ReceiveServerSpan(requestName, traceId, parentSpanId, spanId);
+            var resultSpan = spanTracer.ReceiveServerSpan(requestName, traceId, parentSpanId, spanId, path);
 
             Assert.AreEqual(requestName, resultSpan.Name);
             Assert.AreEqual(Int64.Parse(traceId, System.Globalization.NumberStyles.HexNumber), resultSpan.Trace_id);
@@ -79,7 +80,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             Assert.IsNotNull(endpoint);
             Assert.AreEqual(serviceName, endpoint.Service_name);
 
-            AssertBinaryAnnotations(resultSpan.Binary_annotations, traceId, spanId, parentSpanId);
+            AssertBinaryAnnotations(resultSpan.Binary_annotations, path);
         }
 
         [TestMethod]
@@ -145,12 +146,13 @@ namespace Medidata.ZipkinTracer.Core.Test
             var traceId = fixture.Create<long>().ToString();
             var parentSpanId = fixture.Create<long>().ToString();
             var spanId = fixture.Create<long>().ToString();
+            var path = fixture.Create<long>().ToString();
 
             var spanTracer = new SpanTracer(spanCollectorStub, serviceName, zipkinEndpointStub);
 
             zipkinEndpointStub.Expect(x => x.GetEndpoint(clientServiceName)).Return(new Endpoint() { Service_name = clientServiceName });
 
-            var resultSpan = spanTracer.SendClientSpan(requestName, traceId, parentSpanId, spanId, clientServiceName);
+            var resultSpan = spanTracer.SendClientSpan(requestName, traceId, parentSpanId, spanId, clientServiceName, path);
             Assert.AreEqual(requestName, resultSpan.Name);
             Assert.AreEqual(Int64.Parse(traceId, System.Globalization.NumberStyles.HexNumber), resultSpan.Trace_id);
             Assert.AreEqual(Int64.Parse(parentSpanId, System.Globalization.NumberStyles.HexNumber), resultSpan.Parent_id);
@@ -163,7 +165,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             Assert.AreEqual(zipkinCoreConstants.CLIENT_SEND, annotation.Value);
             Assert.IsNotNull(annotation.Timestamp);
             Assert.IsNotNull(annotation.Host);
-            Assert.AreEqual(0, resultSpan.Binary_annotations.Count);
+            AssertBinaryAnnotations(resultSpan.Binary_annotations, path);
 
             var endpoint = annotation.Host as Endpoint;
             Assert.IsNotNull(endpoint);
@@ -267,13 +269,11 @@ namespace Medidata.ZipkinTracer.Core.Test
             return true;
         }
 
-        private void AssertBinaryAnnotations(System.Collections.Generic.List<BinaryAnnotation> list, string traceId, string spanId, string parentSpanId)
+        private void AssertBinaryAnnotations(System.Collections.Generic.List<BinaryAnnotation> list, string path)
         {
-            Assert.AreEqual(3, list.Count);
+            Assert.AreEqual(1, list.Count);
 
-            Assert.AreEqual(traceId, list.Where(x => x.Key.Equals("trace_id")).Select(x => Encoding.Default.GetString(x.Value)).First());
-            Assert.AreEqual(spanId, list.Where(x => x.Key.Equals("span_id")).Select(x => Encoding.Default.GetString(x.Value)).First());
-            Assert.AreEqual(parentSpanId, list.Where(x => x.Key.Equals("parent_id")).Select(x => Encoding.Default.GetString(x.Value)).First());
+            Assert.AreEqual(path, list.Where(x => x.Key.Equals("http.uri")).Select(x => x.Value).First());
         }
     }
 }
