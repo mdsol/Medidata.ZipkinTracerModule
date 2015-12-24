@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
@@ -210,12 +209,13 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             var tracerClient = SetupZipkinClient();
             var zipkinClient = (ZipkinClient)tracerClient;
-            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>());
             zipkinClient.spanTracer = spanTracerStub;
             var uriHost = "https://www.x@y.com";
             var uriAbsolutePath = "/object";
             var methodName = "GET";
             var spanName = methodName;
+            var requestUri = new Uri(uriHost + uriAbsolutePath);
 
             var expectedSpan = new Span();
             spanTracerStub.Expect(
@@ -224,9 +224,9 @@ namespace Medidata.ZipkinTracer.Core.Test
                     Arg<string>.Is.Equal(traceProvider.TraceId),
                     Arg<string>.Is.Equal(traceProvider.ParentSpanId),
                     Arg<string>.Is.Equal(traceProvider.SpanId),
-                    Arg<string>.Is.Anything)).Return(expectedSpan);
+                    Arg<Uri>.Is.Equal(requestUri))).Return(expectedSpan);
 
-            var result = tracerClient.StartServerTrace(new Uri(uriHost + uriAbsolutePath), methodName);
+            var result = tracerClient.StartServerTrace(requestUri, methodName);
 
             Assert.AreEqual(expectedSpan, result);
         }
@@ -236,12 +236,13 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             var tracerClient = SetupZipkinClient();
             var zipkinClient = (ZipkinClient)tracerClient;
-            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>());
             zipkinClient.spanTracer = spanTracerStub;
             var uriHost = "https://www.x@y.com";
             var uriAbsolutePath = "/object";
             var methodName = "GET";
             var spanName = methodName;
+            var requestUri = new Uri(uriHost + uriAbsolutePath);
 
             spanTracerStub.Expect(
                 x => x.ReceiveServerSpan(
@@ -249,9 +250,9 @@ namespace Medidata.ZipkinTracer.Core.Test
                     Arg<string>.Is.Anything,
                     Arg<string>.Is.Anything,
                     Arg<string>.Is.Anything,
-                    Arg<string>.Is.Anything)).Throw(new Exception());
+                    Arg<Uri>.Is.Equal(requestUri))).Throw(new Exception());
 
-            var result = tracerClient.StartServerTrace(new Uri(uriHost + uriAbsolutePath), methodName);
+            var result = tracerClient.StartServerTrace(requestUri, methodName);
 
             Assert.IsNull(result);
         }
@@ -276,7 +277,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             var tracerClient = SetupZipkinClient();
             var zipkinClient = (ZipkinClient)tracerClient;
-            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>());
             zipkinClient.spanTracer = spanTracerStub;
             var serverSpan = new Span();
 
@@ -290,7 +291,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             var tracerClient = SetupZipkinClient();
             var zipkinClient = (ZipkinClient)tracerClient;
-            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>());
             zipkinClient.spanTracer = spanTracerStub;
             var serverSpan = new Span();
 
@@ -323,7 +324,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             var tracerClient = SetupZipkinClient();
             var zipkinClient = (ZipkinClient)tracerClient;
-            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>());
             zipkinClient.spanTracer = spanTracerStub;
             var clientServiceName = "abc-sandbox";
             var uriAbsolutePath = "/object";
@@ -337,8 +338,7 @@ namespace Medidata.ZipkinTracer.Core.Test
                     Arg<string>.Is.Equal(nextTraceProvider.TraceId),
                     Arg<string>.Is.Equal(nextTraceProvider.ParentSpanId),
                     Arg<string>.Is.Equal(nextTraceProvider.SpanId),
-                    Arg<string>.Is.Equal(clientServiceName),
-                    Arg<string>.Is.Anything)).Return(expectedSpan);
+                    Arg<Uri>.Is.Anything)).Return(expectedSpan);
 
             var result = tracerClient.StartClientTrace(new Uri("https://" + clientServiceName + ".xyz.net:8000" + uriAbsolutePath), methodName);
 
@@ -350,7 +350,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             var tracerClient = SetupZipkinClient();
             var zipkinClient = (ZipkinClient)tracerClient;
-            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>());
             zipkinClient.spanTracer = spanTracerStub;
             var clientServiceName = "192.168.178.178";
             var uriAbsolutePath = "/object";
@@ -364,8 +364,7 @@ namespace Medidata.ZipkinTracer.Core.Test
                     Arg<string>.Is.Equal(nextTraceProvider.TraceId),
                     Arg<string>.Is.Equal(nextTraceProvider.ParentSpanId),
                     Arg<string>.Is.Equal(nextTraceProvider.SpanId),
-                    Arg<string>.Is.Equal(clientServiceName),
-                    Arg<string>.Is.Anything)).Return(expectedSpan);
+                    Arg<Uri>.Is.Anything)).Return(expectedSpan);
 
             var result = tracerClient.StartClientTrace(new Uri("https://" + clientServiceName + ".xyz.net:8000" + uriAbsolutePath), methodName);
 
@@ -379,7 +378,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             zipkinConfig.Expect(x => x.GetNotToBeDisplayedDomainList()).Return(new List<string>() { ".abc.net", ".xyz.net" });
             var tracerClient = SetupZipkinClient(zipkinConfig);
             var zipkinClient = (ZipkinClient)tracerClient;
-            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>());
             zipkinClient.spanTracer = spanTracerStub;
             var clientServiceName = "abc-sandbox";
             var uriAbsolutePath = "/object";
@@ -393,8 +392,7 @@ namespace Medidata.ZipkinTracer.Core.Test
                     Arg<string>.Is.Equal(nextTraceProvider.TraceId),
                     Arg<string>.Is.Equal(nextTraceProvider.ParentSpanId),
                     Arg<string>.Is.Equal(nextTraceProvider.SpanId),
-                    Arg<string>.Is.Equal(clientServiceName),
-                    Arg<string>.Is.Anything)).Return(expectedSpan);
+                    Arg<Uri>.Is.Anything)).Return(expectedSpan);
 
             var result = tracerClient.StartClientTrace(new Uri("https://" + clientServiceName + ".xyz.net:8000" + uriAbsolutePath), methodName);
 
@@ -406,7 +404,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             var tracerClient = SetupZipkinClient();
             var zipkinClient = (ZipkinClient)tracerClient;
-            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>());
             zipkinClient.spanTracer = spanTracerStub;
             var clientServiceName = "abc-sandbox";
             var uriAbsolutePath = "/object";
@@ -419,24 +417,9 @@ namespace Medidata.ZipkinTracer.Core.Test
                     Arg<string>.Is.Anything,
                     Arg<string>.Is.Anything,
                     Arg<string>.Is.Anything,
-                    Arg<string>.Is.Equal(clientServiceName),
-                    Arg<string>.Is.Anything)).Throw(new Exception());
+                    Arg<Uri>.Is.Anything)).Throw(new Exception());
 
             var result = tracerClient.StartClientTrace(new Uri("https://" + clientServiceName + ".xyz.net:8000" + uriAbsolutePath), methodName);
-
-            Assert.IsNull(result);
-        }
-
-        [TestMethod]
-        public void StartClientSpan_InvalidClientServiceName()
-        {
-            var tracerClient = SetupZipkinClient();
-            var zipkinClient = (ZipkinClient)tracerClient;
-            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
-            zipkinClient.spanTracer = spanTracerStub;
-            var methodName = "GET";
-
-            var result = tracerClient.StartClientTrace(null, methodName);
 
             Assert.IsNull(result);
         }
@@ -459,42 +442,45 @@ namespace Medidata.ZipkinTracer.Core.Test
         [TestMethod]
         public void EndClientSpan()
         {
+            var returnCode = fixture.Create<short>();
             var tracerClient = SetupZipkinClient();
             var zipkinClient = (ZipkinClient)tracerClient;
-            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>());
             zipkinClient.spanTracer = spanTracerStub;
             var clientSpan = new Span();
 
-            tracerClient.EndClientTrace(clientSpan);
+            tracerClient.EndClientTrace(clientSpan, returnCode);
 
-            spanTracerStub.AssertWasCalled(x => x.ReceiveClientSpan(clientSpan));
+            spanTracerStub.AssertWasCalled(x => x.ReceiveClientSpan(clientSpan, returnCode));
         }
 
         [TestMethod]
         public void EndClientSpan_Exception()
         {
+            var returnCode = fixture.Create<short>();
             var tracerClient = SetupZipkinClient();
             var zipkinClient = (ZipkinClient)tracerClient;
-            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>());
             zipkinClient.spanTracer = spanTracerStub;
             var clientSpan = new Span();
 
-            spanTracerStub.Expect(x => x.ReceiveClientSpan(clientSpan)).Throw(new Exception());
+            spanTracerStub.Expect(x => x.ReceiveClientSpan(clientSpan, returnCode)).Throw(new Exception());
 
-            tracerClient.EndClientTrace(clientSpan);
+            tracerClient.EndClientTrace(clientSpan, returnCode);
         }
 
         [TestMethod]
         public void EndClientSpan_NullClientTrace_DoesntThrow()
         {
+            var returnCode = fixture.Create<short>();
             var tracerClient = SetupZipkinClient();
-            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>());
 
             var called = false;
-            spanTracerStub.Stub(x => x.ReceiveClientSpan(Arg<Span>.Is.Anything))
+            spanTracerStub.Stub(x => x.ReceiveClientSpan(Arg<Span>.Is.Anything, Arg<short>.Is.Equal(returnCode)))
                 .WhenCalled(x => { called = true; });
 
-            tracerClient.EndClientTrace(null);
+            tracerClient.EndClientTrace(null, returnCode);
 
             Assert.IsFalse(called);
         }
@@ -502,16 +488,17 @@ namespace Medidata.ZipkinTracer.Core.Test
         [TestMethod]
         public void EndClientSpan_IsTraceOnIsFalse_DoesntThrow()
         {
+            var returnCode = fixture.Create<short>();
             var tracerClient = SetupZipkinClient();
-            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>());
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>());
             var zipkinClient = (ZipkinClient)tracerClient;
             zipkinClient.isTraceOn = false;
 
             var called = false;
-            spanTracerStub.Stub(x => x.ReceiveClientSpan(Arg<Span>.Is.Anything))
+            spanTracerStub.Stub(x => x.ReceiveClientSpan(Arg<Span>.Is.Anything, Arg<short>.Is.Equal(returnCode)))
                 .WhenCalled(x => { called = true; });
 
-            tracerClient.EndClientTrace(new Span());
+            tracerClient.EndClientTrace(new Span(), returnCode);
 
             Assert.IsFalse(called);
         }

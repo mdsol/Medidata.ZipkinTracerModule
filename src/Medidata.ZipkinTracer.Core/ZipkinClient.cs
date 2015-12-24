@@ -2,7 +2,6 @@
 using Medidata.ZipkinTracer.Core.Collector;
 using log4net;
 using System;
-using System.Collections.Generic;
 
 namespace Medidata.ZipkinTracer.Core
 {
@@ -14,14 +13,11 @@ namespace Medidata.ZipkinTracer.Core
 
         private ITraceProvider traceProvider;
         private ILog logger;
-        private List<string> zipkinNotToBeDisplayedDomainList;
 
         public ZipkinClient(ITraceProvider tracerProvider, ILog logger) : this(tracerProvider, logger, new ZipkinConfig(), new SpanCollectorBuilder()) { }
 
         public ZipkinClient(ITraceProvider traceProvider, ILog logger, IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder)
         {
-            zipkinNotToBeDisplayedDomainList = zipkinConfig.GetNotToBeDisplayedDomainList();
-
             this.logger = logger;
             isTraceOn = true;
 
@@ -39,7 +35,7 @@ namespace Medidata.ZipkinTracer.Core
                         int.Parse(zipkinConfig.SpanProcessorBatchSize),
                         logger);
 
-                    spanTracer = new SpanTracer(spanCollector, zipkinConfig.ServiceName, new ServiceEndpoint());
+                    spanTracer = new SpanTracer(spanCollector, zipkinConfig.ServiceName, new ServiceEndpoint(), zipkinConfig.GetNotToBeDisplayedDomainList());
 
                     this.traceProvider = traceProvider;
                 }
@@ -51,13 +47,10 @@ namespace Medidata.ZipkinTracer.Core
             }
         }
 
-        public Span StartClientTrace(Uri clientService, string methodName)
+        public Span StartClientTrace(Uri remoteUri, string methodName)
         {
             if (isTraceOn)
             {
-                var clientServiceName = GetClientServiceName(clientService);
-                if (string.IsNullOrWhiteSpace(clientServiceName)) { return null; }
-
                 try
                 {
                     var nextTrace = traceProvider.GetNext();
@@ -66,8 +59,7 @@ namespace Medidata.ZipkinTracer.Core
                         nextTrace.TraceId,
                         nextTrace.ParentSpanId,
                         nextTrace.SpanId,
-                        clientServiceName,
-                        clientService.AbsolutePath);
+                        remoteUri);
                 }
                 catch (Exception ex)
                 {
@@ -77,13 +69,13 @@ namespace Medidata.ZipkinTracer.Core
             return null;
         }
 
-        public void EndClientTrace(Span clientSpan)
+        public void EndClientTrace(Span clientSpan, int statusCode)
         {
             if (isTraceOn)
             {
                 try
                 {
-                    spanTracer.ReceiveClientSpan(clientSpan);
+                    spanTracer.ReceiveClientSpan(clientSpan, statusCode);
                 }
                 catch (Exception ex)
                 {
@@ -103,7 +95,7 @@ namespace Medidata.ZipkinTracer.Core
                         traceProvider.TraceId,
                         traceProvider.ParentSpanId,
                         traceProvider.SpanId,
-                        requestUri.AbsolutePath);
+                        requestUri);
                 }
                 catch (Exception ex)
                 {
@@ -134,22 +126,6 @@ namespace Medidata.ZipkinTracer.Core
             {
                 spanCollector.Stop();
             }
-        }
-
-        private string GetClientServiceName(Uri uri)
-        {
-            if (uri == null)
-            {
-                logger.Error("clientService uri is null");
-                return null;
-            }
-
-            var host = uri.Host;
-            foreach (var domain in zipkinNotToBeDisplayedDomainList)
-            {
-                host = host.Replace(domain, "");
-            }
-            return host;
         }
 
         private bool IsConfigValuesValid(IZipkinConfig zipkinConfig)
