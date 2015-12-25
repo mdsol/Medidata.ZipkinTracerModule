@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using System.Net;
 
 namespace Medidata.ZipkinTracer.Core
 {
@@ -31,6 +30,11 @@ namespace Medidata.ZipkinTracer.Core
         public string ZipkinSampleRate
         {
             get {  return ConfigurationManager.AppSettings["zipkinSampleRate"];}
+        }
+
+        public string Domain
+        {
+            get { return ConfigurationManager.AppSettings["domain"]; }
         }
 
         public List<string> GetNotToBeDisplayedDomainList()
