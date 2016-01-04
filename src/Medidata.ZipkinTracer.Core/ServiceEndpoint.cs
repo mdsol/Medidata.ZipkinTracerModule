@@ -7,16 +7,45 @@ namespace Medidata.ZipkinTracer.Core
 {
     public class ServiceEndpoint 
     {
-        public virtual Endpoint GetEndpoint(string serviceName)
+        public virtual Endpoint GetLocalEndpoint(string serviceName, short port = 443)
         {
-            var ipAddressStr = BitConverter.ToInt32(GetLocalIPAddress().GetAddressBytes(), 0);
-            var hostIpAddressStr = (int) IPAddress.NetworkToHostOrder(ipAddressStr);
+            // personally, it should have been nullable short for port. but since zipkin server requires it, 443
+            // has be chosen to be that magic number as most servers have it.
+            // TODO: get rid of this magic number
+
+            var addressBytes = GetLocalIPAddress().GetAddressBytes();
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(addressBytes);
+            }
+
+            var ipAddressStr = BitConverter.ToInt32(addressBytes, 0);
+            var hostIpAddressStr = (int)IPAddress.HostToNetworkOrder(ipAddressStr);
 
             return new Endpoint()
             {
                 Service_name = serviceName,
                 Ipv4 = hostIpAddressStr,
-                Port = 20065
+                Port = port
+            };
+        }
+
+        public virtual Endpoint GetRemoteEndpoint(Uri remoteServer, string remoteServiceName)
+        {
+            var addressBytes = GetRemoteIPAddress(remoteServer).GetAddressBytes();
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(addressBytes);
+            }
+
+            var ipAddressStr = BitConverter.ToInt32(addressBytes, 0);
+            var hostIpAddressStr = (int)IPAddress.HostToNetworkOrder(ipAddressStr);
+
+            return new Endpoint()
+            {
+                Service_name = remoteServiceName,
+                Ipv4 = hostIpAddressStr,
+                Port = (short)remoteServer.Port
             };
         }
 
@@ -32,6 +61,12 @@ namespace Medidata.ZipkinTracer.Core
             return host
                 .AddressList
                 .FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork);
+        }
+
+        private static IPAddress GetRemoteIPAddress(Uri remoteServer)
+        {
+            var adressList = Dns.GetHostAddresses(remoteServer.Host);
+            return adressList.FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork);
         }
     }
 }
