@@ -1,11 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 
 namespace Medidata.ZipkinTracer.Core
 {
     public class SpanTracer
     {
+        private static readonly Dictionary<Type, AnnotationType> annotationTypes = new Dictionary<Type, AnnotationType>()
+        {
+            { typeof(bool), AnnotationType.BOOL },
+            { typeof(byte[]), AnnotationType.BYTES },
+            { typeof(short), AnnotationType.I16 },
+            { typeof(int), AnnotationType.I32 },
+            { typeof(long), AnnotationType.I64 },
+            { typeof(double), AnnotationType.DOUBLE },
+            { typeof(string), AnnotationType.STRING }
+        };
+
         private Collector.SpanCollector spanCollector;
         private string serviceName;
         private ServiceEndpoint zipkinEndpoint;
@@ -133,6 +145,38 @@ namespace Medidata.ZipkinTracer.Core
             AddBinaryAnnotation("http.status", statusCode.ToString(), span, span.Annotations.First().Host);
 
             spanCollector.Collect(span);
+        }
+
+        public virtual void Record(Span span, string value)
+        {
+            if (span == null)
+                throw new ArgumentNullException("span", "In order to record an annotation, the span must be not null.");
+
+            span.Annotations.Add(new Annotation()
+            {
+                Host = zipkinEndpoint.GetLocalEndpoint(serviceName),
+                Timestamp = GetTimeStamp(),
+                Value = value
+            });
+        }
+
+        public void RecordBinary<T>(Span span, string key, T value)
+        {
+             if (span == null)
+                throw new ArgumentNullException("span", "In order to record a binary annotation, the span must be not null.");
+
+            span.Binary_annotations.Add(new BinaryAnnotation()
+            {
+                Host = zipkinEndpoint.GetLocalEndpoint(serviceName),
+                Annotation_type = GetAnnotationType(typeof(T)),
+                Key = key,
+                Value = value?.ToString()
+            });
+        }
+
+        private AnnotationType GetAnnotationType(Type type)
+        {
+            return annotationTypes.ContainsKey(type) ? annotationTypes[type] : AnnotationType.STRING;
         }
 
         private Span CreateNewSpan(string spanName, string traceId, string parentSpanId, string spanId)

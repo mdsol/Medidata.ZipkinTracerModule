@@ -1,11 +1,12 @@
-﻿using Medidata.CrossApplicationTracer;
-using Medidata.ZipkinTracer.Core.Collector;
+﻿using System;
+using System.Runtime.CompilerServices;
 using log4net;
-using System;
+using Medidata.CrossApplicationTracer;
+using Medidata.ZipkinTracer.Core.Collector;
 
 namespace Medidata.ZipkinTracer.Core
 {
-    public class ZipkinClient : ITracerClient
+    public class ZipkinClient: ITracerClient
     {
         internal bool isTraceOn;
         internal SpanCollector spanCollector;
@@ -19,109 +20,155 @@ namespace Medidata.ZipkinTracer.Core
         public ZipkinClient(ITraceProvider traceProvider, ILog logger, IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder)
         {
             this.logger = logger;
-            isTraceOn = true;
 
-            if ( logger == null || !IsConfigValuesValid(zipkinConfig) || !IsTraceProviderValidAndSamplingOn(traceProvider))
+            isTraceOn = logger != null && IsConfigValuesValid(zipkinConfig) && IsTraceProviderValidAndSamplingOn(traceProvider);
+
+            if (!isTraceOn)
+                return;
+
+            try
             {
-                isTraceOn = false;
+                spanCollector = spanCollectorBuilder.Build(
+                    new Uri(zipkinConfig.ZipkinBaseUri),
+                    int.Parse(zipkinConfig.SpanProcessorBatchSize),
+                    logger);
+
+                spanTracer = new SpanTracer(
+                    spanCollector,
+                    new ServiceEndpoint(),
+                    zipkinConfig.GetNotToBeDisplayedDomainList(),
+                    zipkinConfig.Domain,
+                    zipkinConfig.ServiceName);
+
+                this.traceProvider = traceProvider;
             }
-
-            if (isTraceOn)
+            catch (Exception ex)
             {
-                try
-                {
-                    spanCollector = spanCollectorBuilder.Build(
-                        new Uri(zipkinConfig.ZipkinBaseUri),
-                        int.Parse(zipkinConfig.SpanProcessorBatchSize),
-                        logger);
-
-                    spanTracer = new SpanTracer(
-                        spanCollector,
-                        new ServiceEndpoint(),
-                        zipkinConfig.GetNotToBeDisplayedDomainList(),
-                        zipkinConfig.Domain,
-                        zipkinConfig.ServiceName);
-
-                    this.traceProvider = traceProvider;
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("Error Building Zipkin Client Provider", ex);
-                    isTraceOn = false;
-                }
+                logger.Error("Error Building Zipkin Client Provider", ex);
+                isTraceOn = false;
             }
         }
 
         public Span StartClientTrace(Uri remoteUri, string methodName)
         {
-            if (isTraceOn)
+            if (!isTraceOn)
+                return null;
+
+            try
             {
-                try
-                {
-                    var nextTrace = traceProvider.GetNext();
-                    return spanTracer.SendClientSpan(
-                        methodName.ToLower(),
-                        nextTrace.TraceId,
-                        nextTrace.ParentSpanId,
-                        nextTrace.SpanId,
-                        remoteUri);
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("Error Starting Client Trace", ex);
-                }
+                var nextTrace = traceProvider.GetNext();
+                return spanTracer.SendClientSpan(
+                    methodName.ToLower(),
+                    nextTrace.TraceId,
+                    nextTrace.ParentSpanId,
+                    nextTrace.SpanId,
+                    remoteUri);
             }
-            return null;
+            catch (Exception ex)
+            {
+                logger.Error("Error Starting Client Trace", ex);
+                return null;
+            }
         }
 
         public void EndClientTrace(Span clientSpan, int statusCode)
         {
-            if (isTraceOn)
+            if (!isTraceOn)
+                return;
+
+            try
             {
-                try
-                {
-                    spanTracer.ReceiveClientSpan(clientSpan, statusCode);
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("Error Ending Client Trace", ex);
-                }
+                spanTracer.ReceiveClientSpan(clientSpan, statusCode);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error Ending Client Trace", ex);
             }
         }
 
         public Span StartServerTrace(Uri requestUri, string methodName)
         {
-            if (isTraceOn)
+            if (!isTraceOn)
+                return null;
+
+            try
             {
-                try
-                {
-                    return spanTracer.ReceiveServerSpan(
-                        methodName.ToLower(),
-                        traceProvider.TraceId,
-                        traceProvider.ParentSpanId,
-                        traceProvider.SpanId,
-                        requestUri);
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("Error Starting Server Trace", ex);
-                }
+                return spanTracer.ReceiveServerSpan(
+                    methodName.ToLower(),
+                    traceProvider.TraceId,
+                    traceProvider.ParentSpanId,
+                    traceProvider.SpanId,
+                    requestUri);
             }
-            return null;
+            catch (Exception ex)
+            {
+                logger.Error("Error Starting Server Trace", ex);
+                return null;
+            }
         }
 
         public void EndServerTrace(Span serverSpan)
         {
-            if (isTraceOn)
+            if (!isTraceOn)
+                return;
+
+            try
             {
-                try
-                {
-                    spanTracer.SendServerSpan(serverSpan);
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("Error Ending Server Trace", ex);
-                }
+                spanTracer.SendServerSpan(serverSpan);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error Ending Server Trace", ex);
+            }
+        }
+
+        /// <summary>
+        /// Records an annotation with the current timestamp and the provided value in the span.
+        /// </summary>
+        /// <param name="span">The span where the annotation will be recorded.</param>
+        /// <param name="value">The value of the annotation to be recorded. If this parameter is omitted
+        /// (or its value set to null), the method caller member name will be automatically passed.</param>
+        public void Record(Span span, [CallerMemberName] string value = null)
+        {
+            if (!isTraceOn)
+                return;
+
+            try
+            {
+                spanTracer.Record(span, value);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error recording the annotation", ex);
+            }
+        }
+
+        /// <summary>
+        /// Records a key-value pair as a binary annotiation in the span.
+        /// </summary>
+        /// <typeparam name="T">The type of the value to be recorded. See remarks for the currently supported types.</typeparam>
+        /// <param name="span">The span where the annotation will be recorded.</param>
+        /// <param name="key">The key which is a reference to the recorded value.</param>
+        /// <param name="value">The value of the annotation to be recorded.</param>
+        /// <remarks>The RecordBinary will record a key-value pair which can be used to tag some additional information
+        /// in the trace without any timestamps. The currently supported value types are <see cref="bool"/>,
+        /// <see cref="byte[]"/>, <see cref="short"/>, <see cref="int"/>, <see cref="long"/>, <see cref="double"/> and
+        /// <see cref="string"/>. Any other types will be passed as string annotation types.
+        /// 
+        /// Please note, that although the values have types, they will be recorded and sent by calling their
+        /// respective ToString() method.</remarks>
+        public void RecordBinary<T>(Span span, string key, T value)
+        {
+            if (!isTraceOn)
+                return;
+
+            try
+            {
+                spanTracer.RecordBinary<T>(span, key, value);
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Error recording a binary annotation (key: {key})", ex);
             }
         }
 
@@ -177,12 +224,7 @@ namespace Medidata.ZipkinTracer.Core
                 return false;
             }
 
-            if (string.IsNullOrEmpty(traceProvider.TraceId) || !traceProvider.IsSampled)
-            {
-                return false;
-            }
-            return true;
+            return !string.IsNullOrEmpty(traceProvider.TraceId) && traceProvider.IsSampled;
         }
-
     }
 }

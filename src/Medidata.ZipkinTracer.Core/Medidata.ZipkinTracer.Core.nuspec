@@ -20,6 +20,6 @@
     </references>
   </metadata>
   <files>
-    <file src="\bin\Release\Medidata.ZipkinTracer.Core.Collector.dll" target="lib\net45" />
+    <file src="\bin\$ConfigurationName$\Medidata.ZipkinTracer.Core.Collector.dll" target="lib\net45" />
   </files>
 </package>

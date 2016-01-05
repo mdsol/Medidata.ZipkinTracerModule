@@ -6,6 +6,8 @@ using Rhino.Mocks;
 using Medidata.ZipkinTracer.Core.Collector;
 using Medidata.CrossApplicationTracer;
 using log4net;
+using System.Linq;
+using System.Diagnostics;
 
 namespace Medidata.ZipkinTracer.Core.Test
 {
@@ -501,6 +503,70 @@ namespace Medidata.ZipkinTracer.Core.Test
             tracerClient.EndClientTrace(new Span(), returnCode);
 
             Assert.IsFalse(called);
+        }
+
+        [TestMethod]
+        [TestCategory("TraceRecordTests")]
+        public void Record_IsTraceOnIsFalse_DoesNotAddAnnotation()
+        {
+            // Arrange
+            var tracerClient = SetupZipkinClient();
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>(), fixture.Create<string>(), fixture.Create<string>());
+            var zipkinClient = (ZipkinClient)tracerClient;
+            zipkinClient.isTraceOn = false;
+
+            var testSpan = new Span() { Annotations = new List<Annotation>() };
+
+            // Act
+            tracerClient.Record(testSpan, "irrelevant");
+
+            // Assert
+            Assert.AreEqual(0, testSpan.Annotations.Count, "There are annotations but the trace is off.");
+        }
+
+        [TestMethod]
+        [TestCategory("TraceRecordTests")]
+        public void Record_WithoutValue_AddsAnnotationWithCallerName()
+        {
+            // Arrange
+            var callerMemberName = new StackTrace().GetFrame(0).GetMethod().Name;
+            var tracerClient = SetupZipkinClient();
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>(), fixture.Create<string>(), fixture.Create<string>());
+            var zipkinClient = (ZipkinClient)tracerClient;
+            zipkinClient.isTraceOn = true;
+
+            var testSpan = new Span() { Annotations = new List<Annotation>() };
+
+            // Act
+            tracerClient.Record(testSpan);
+
+            // Assert
+            Assert.AreEqual(1, testSpan.Annotations.Count, "There is not exactly one annotation added.");
+            Assert.IsNotNull(
+                testSpan.Annotations.SingleOrDefault(a => a.Value == callerMemberName),
+                "The record with the caller name is not found in the Annotations."
+            );
+        }
+
+        [TestMethod]
+        [TestCategory("TraceRecordTests")]
+        public void RecordBinary_IsTraceOnIsFalse_DoesNotAddBinaryAnnotation()
+        {
+            // Arrange
+            var keyName = "TestKey";
+            var testValue = "Some Value";
+            var tracerClient = SetupZipkinClient();
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>(), fixture.Create<string>(), fixture.Create<string>());
+            var zipkinClient = (ZipkinClient)tracerClient;
+            zipkinClient.isTraceOn = false;
+
+            var testSpan = new Span() { Binary_annotations = new List<BinaryAnnotation>() };
+
+            // Act
+            tracerClient.RecordBinary(testSpan, keyName, testValue);
+
+            // Assert
+            Assert.AreEqual(0, testSpan.Binary_annotations.Count, "There are annotations but the trace is off.");
         }
 
         private ITracerClient SetupZipkinClient(IZipkinConfig zipkinConfig = null)
