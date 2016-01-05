@@ -26,83 +26,83 @@ namespace Medidata.ZipkinTracer.Core
             if (!isTraceOn)
                 return;
 
-                try
-                {
-                    spanCollector = spanCollectorBuilder.Build(
-                        new Uri(zipkinConfig.ZipkinBaseUri),
-                        int.Parse(zipkinConfig.SpanProcessorBatchSize),
-                        logger);
+            try
+            {
+                spanCollector = spanCollectorBuilder.Build(
+                    new Uri(zipkinConfig.ZipkinBaseUri),
+                    int.Parse(zipkinConfig.SpanProcessorBatchSize),
+                    logger);
 
-                    spanTracer = new SpanTracer(
-                        spanCollector,
-                        new ServiceEndpoint(),
-                        zipkinConfig.GetNotToBeDisplayedDomainList(),
-                        zipkinConfig.Domain,
-                        zipkinConfig.ServiceName);
+                spanTracer = new SpanTracer(
+                    spanCollector,
+                    new ServiceEndpoint(),
+                    zipkinConfig.GetNotToBeDisplayedDomainList(),
+                    zipkinConfig.Domain,
+                    zipkinConfig.ServiceName);
 
-                    this.traceProvider = traceProvider;
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("Error Building Zipkin Client Provider", ex);
-                    isTraceOn = false;
-                }
+                this.traceProvider = traceProvider;
             }
+            catch (Exception ex)
+            {
+                logger.Error("Error Building Zipkin Client Provider", ex);
+                isTraceOn = false;
+            }
+        }
 
         public Span StartClientTrace(Uri remoteUri, string methodName)
         {
             if (!isTraceOn)
                 return null;
 
-                try
-                {
-                    var nextTrace = traceProvider.GetNext();
-                    return spanTracer.SendClientSpan(
-                        methodName.ToLower(),
-                        nextTrace.TraceId,
-                        nextTrace.ParentSpanId,
-                        nextTrace.SpanId,
-                        remoteUri);
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("Error Starting Client Trace", ex);
-                return null;
-                }
+            try
+            {
+                var nextTrace = traceProvider.GetNext();
+                return spanTracer.SendClientSpan(
+                    methodName.ToLower(),
+                    nextTrace.TraceId,
+                    nextTrace.ParentSpanId,
+                    nextTrace.SpanId,
+                    remoteUri);
             }
+            catch (Exception ex)
+            {
+                logger.Error("Error Starting Client Trace", ex);
+                return null;
+            }
+        }
 
         public void EndClientTrace(Span clientSpan, int statusCode)
         {
             if (!isTraceOn)
                 return;
 
-                try
-                {
-                    spanTracer.ReceiveClientSpan(clientSpan, statusCode);
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("Error Ending Client Trace", ex);
-                }
+            try
+            {
+                spanTracer.ReceiveClientSpan(clientSpan, statusCode);
             }
+            catch (Exception ex)
+            {
+                logger.Error("Error Ending Client Trace", ex);
+            }
+        }
 
         public Span StartServerTrace(Uri requestUri, string methodName)
         {
             if (!isTraceOn)
                 return null;
 
-                try
-                {
-                    return spanTracer.ReceiveServerSpan(
-                        methodName.ToLower(),
-                        traceProvider.TraceId,
-                        traceProvider.ParentSpanId,
-                        traceProvider.SpanId,
-                        requestUri);
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("Error Starting Server Trace", ex);
+            try
+            {
+                return spanTracer.ReceiveServerSpan(
+                    methodName.ToLower(),
+                    traceProvider.TraceId,
+                    traceProvider.ParentSpanId,
+                    traceProvider.SpanId,
+                    requestUri);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error Starting Server Trace", ex);
                 return null;
             }
         }
@@ -112,14 +112,14 @@ namespace Medidata.ZipkinTracer.Core
             if (!isTraceOn)
                 return;
 
-                try
-                {
-                    spanTracer.SendServerSpan(serverSpan);
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("Error Ending Server Trace", ex);
-                }
+            try
+            {
+                spanTracer.SendServerSpan(serverSpan);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error Ending Server Trace", ex);
+            }
         }
 
         /// <summary>
