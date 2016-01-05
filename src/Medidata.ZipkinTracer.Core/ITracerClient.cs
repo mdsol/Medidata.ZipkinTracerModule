@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace Medidata.ZipkinTracer.Core
 {
@@ -8,5 +9,7 @@ namespace Medidata.ZipkinTracer.Core
         Span StartClientTrace(Uri remoteUri, string methodName);
         void EndServerTrace(Span serverSpan);
         void EndClientTrace(Span clientSpan, int statusCode);
+        void Record(Span span, [CallerMemberName] string value = null);
+        void RecordBinary<T>(Span span, string key, T value);
     }
 }

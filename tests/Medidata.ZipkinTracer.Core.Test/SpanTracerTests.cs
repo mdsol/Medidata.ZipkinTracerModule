@@ -346,6 +346,62 @@ namespace Medidata.ZipkinTracer.Core.Test
             spanTracer.ReceiveClientSpan(expectedSpan, returnCode);
         }
 
+        [TestMethod]
+        [TestCategory("TraceRecordTests")]
+        public void Record_WithSpanAndValue_AddsNewAnnotation()
+        {
+            // Arrange
+            var expectedDescription = "Description";
+            var expectedSpan = new Span() { Annotations = new List<Annotation>() };
+            var serviceName = fixture.Create<string>();
+            var spanTracer = new SpanTracer(spanCollectorStub, serviceName, zipkinEndpointStub, zipkinNotToBeDisplayedDomainList);
+
+            // Act
+            spanTracer.Record(expectedSpan, expectedDescription);
+            
+            // Assert
+            Assert.IsNotNull(
+                expectedSpan.Annotations.SingleOrDefault(a => a.Value == expectedDescription),
+                "The record is not found in the Annotations."
+            );
+        }
+
+        [TestMethod]
+        [TestCategory("TraceRecordTests")]
+        public void RecordBinary_WithSpanAndValue_AddsNewTypeCorrectBinaryAnnotation()
+        {
+            // Arrange
+            var keyName = "TestKey";
+            var testValues = new dynamic[]
+            {
+                new { Value = true, Result = "True", Type = AnnotationType.BOOL },
+                new { Value = short.MaxValue, Result = short.MaxValue.ToString(), Type = AnnotationType.I16 },
+                new { Value = int.MaxValue, Result = int.MaxValue.ToString(), Type = AnnotationType.I32 },
+                new { Value = long.MaxValue, Result = long.MaxValue.ToString(), Type = AnnotationType.I64 },
+                new { Value = double.MaxValue, Result = double.MaxValue.ToString(), Type = AnnotationType.DOUBLE },
+                new { Value = "String", Result = "String", Type = AnnotationType.STRING },
+                new { Value = DateTime.MaxValue, Result = DateTime.MaxValue.ToString(), Type = AnnotationType.STRING }
+            };
+
+            var serviceName = fixture.Create<string>();
+            var spanTracer = new SpanTracer(spanCollectorStub, serviceName, zipkinEndpointStub, zipkinNotToBeDisplayedDomainList);
+
+            foreach (var testValue in testValues)
+            {
+                var expectedSpan = new Span() { Binary_annotations = new List<BinaryAnnotation>() };
+ 
+                // Act
+                spanTracer.RecordBinary(expectedSpan, keyName, testValue.Value);
+
+                // Assert
+                var actualAnnotation = expectedSpan.Binary_annotations.SingleOrDefault(a => a.Key == keyName);
+                var result = actualAnnotation?.Value;
+                var annotationType = actualAnnotation?.Annotation_type;
+                Assert.AreEqual(testValue.Result, result, "The recorded value in the annotation is wrong.");
+                Assert.AreEqual(testValue.Type, annotationType, "The Annotation Type is wrong.");
+            }
+        }
+
         private bool ValidateReceiveClientSpan(Span y, string serviceName)
         {
             var firstannotation = (Annotation)y.Annotations[0];
