@@ -354,7 +354,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             var expectedDescription = "Description";
             var expectedSpan = new Span() { Annotations = new List<Annotation>() };
             var serviceName = fixture.Create<string>();
-            var spanTracer = new SpanTracer(spanCollectorStub, serviceName, zipkinEndpointStub, zipkinNotToBeDisplayedDomainList);
+            var spanTracer = new SpanTracer(spanCollectorStub, zipkinEndpointStub, zipkinNotToBeDisplayedDomainList, null, serviceName);
 
             // Act
             spanTracer.Record(expectedSpan, expectedDescription);
@@ -384,7 +384,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             };
 
             var serviceName = fixture.Create<string>();
-            var spanTracer = new SpanTracer(spanCollectorStub, serviceName, zipkinEndpointStub, zipkinNotToBeDisplayedDomainList);
+            var spanTracer = new SpanTracer(spanCollectorStub, zipkinEndpointStub, zipkinNotToBeDisplayedDomainList, null, serviceName);
 
             foreach (var testValue in testValues)
             {

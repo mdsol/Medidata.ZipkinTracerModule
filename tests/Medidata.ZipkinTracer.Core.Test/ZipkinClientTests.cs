@@ -511,7 +511,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             // Arrange
             var tracerClient = SetupZipkinClient();
-            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>());
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>(), fixture.Create<string>(), fixture.Create<string>());
             var zipkinClient = (ZipkinClient)tracerClient;
             zipkinClient.isTraceOn = false;
 
@@ -531,7 +531,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             // Arrange
             var callerMemberName = new StackTrace().GetFrame(0).GetMethod().Name;
             var tracerClient = SetupZipkinClient();
-            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>());
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>(), fixture.Create<string>(), fixture.Create<string>());
             var zipkinClient = (ZipkinClient)tracerClient;
             zipkinClient.isTraceOn = true;
 
@@ -556,7 +556,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             var keyName = "TestKey";
             var testValue = "Some Value";
             var tracerClient = SetupZipkinClient();
-            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, fixture.Create<string>(), MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>());
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>(), fixture.Create<string>(), fixture.Create<string>());
             var zipkinClient = (ZipkinClient)tracerClient;
             zipkinClient.isTraceOn = false;
 
