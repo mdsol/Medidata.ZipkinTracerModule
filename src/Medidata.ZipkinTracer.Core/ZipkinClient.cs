@@ -35,7 +35,12 @@ namespace Medidata.ZipkinTracer.Core
                         int.Parse(zipkinConfig.SpanProcessorBatchSize),
                         logger);
 
-                    spanTracer = new SpanTracer(spanCollector, zipkinConfig.ServiceName, new ServiceEndpoint(), zipkinConfig.GetNotToBeDisplayedDomainList());
+                    spanTracer = new SpanTracer(
+                        spanCollector,
+                        new ServiceEndpoint(),
+                        zipkinConfig.GetNotToBeDisplayedDomainList(),
+                        zipkinConfig.Domain,
+                        zipkinConfig.ServiceName);
 
                     this.traceProvider = traceProvider;
                 }

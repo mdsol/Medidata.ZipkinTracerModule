@@ -33,6 +33,7 @@ Add the below additional configurations. Please verify these values and modify t
 
 ```
 <appSettings>
+  <add key="domain" value="ampridatvir-sandbox.xyz.com" />
   <add key="zipkinScribeServerName" value="zipkinvm.cloudapp.net" />
   <add key="zipkinScribeServerPort" value="9410" />
   <add key="zipkinServiceName" value="Name of your Service i.e. MyApplication" />
@@ -43,6 +44,7 @@ Add the below additional configurations. Please verify these values and modify t
   <add key="zipkinProxyType" value="Http" /> 
 </appSettings>
 ```
+	domain - host url for the host instance.
 
 	zipkinScribeServerName - the zipkin scribe/collector server name to connect to send the Spans
 

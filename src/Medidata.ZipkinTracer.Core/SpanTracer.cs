@@ -11,27 +11,27 @@ namespace Medidata.ZipkinTracer.Core
         private ServiceEndpoint zipkinEndpoint;
         private IEnumerable<string> zipkinNotToBeDisplayedDomainList;
 
-        public SpanTracer(Collector.SpanCollector spanCollector, string serviceName, ServiceEndpoint zipkinEndpoint, IEnumerable<string> zipkinNotToBeDisplayedDomainList)
+        public SpanTracer(Collector.SpanCollector spanCollector, ServiceEndpoint zipkinEndpoint, IEnumerable<string> zipkinNotToBeDisplayedDomainList, string domain, string serviceName)
         {
             if ( spanCollector == null) 
             {
                 throw new ArgumentNullException("spanCollector is null");
             }
+            this.spanCollector = spanCollector;
 
             if ( String.IsNullOrEmpty(serviceName)) 
             {
                 throw new ArgumentNullException("serviceName is null or empty");
             }
+            this.zipkinEndpoint = zipkinEndpoint;
 
             if ( zipkinEndpoint == null) 
             {
                 throw new ArgumentNullException("zipkinEndpoint is null");
             }
-
-            this.serviceName = serviceName;
-            this.spanCollector = spanCollector;
-            this.zipkinEndpoint = zipkinEndpoint;
             this.zipkinNotToBeDisplayedDomainList = zipkinNotToBeDisplayedDomainList;
+            var cleanDomain = CleanServiceName(domain);
+            this.serviceName = string.IsNullOrWhiteSpace(cleanDomain) ? serviceName : cleanDomain;
         }
 
         public virtual Span ReceiveServerSpan(string spanName, string traceId, string parentSpanId, string spanId, Uri requestUri)
@@ -80,9 +80,9 @@ namespace Medidata.ZipkinTracer.Core
         {
             var newSpan = CreateNewSpan(spanName, traceId, parentSpanId, spanId);
             var serviceEndpoint = zipkinEndpoint.GetLocalEndpoint(serviceName);
-            var clientServiceName = GetClientServiceName(remoteUri);
+            var clientServiceName = CleanServiceName(remoteUri.Host);
 
-            var annotation = new Annotation()
+            var annotation = new Annotation
             {
                 Host = serviceEndpoint,
                 Timestamp = GetTimeStamp(),
@@ -96,9 +96,13 @@ namespace Medidata.ZipkinTracer.Core
             return newSpan;
         }
 
-        private string GetClientServiceName(Uri uri)
+        private string CleanServiceName(string host)
         {
-            var host = uri.Host;
+            if (string.IsNullOrWhiteSpace(host))
+            {
+                return null;
+            }
+
             foreach (var domain in zipkinNotToBeDisplayedDomainList)
             {
                 host = host.Replace(domain, "");

@@ -9,6 +9,7 @@ namespace Medidata.ZipkinTracer.Core
         string SpanProcessorBatchSize { get; }
         string DontSampleListCsv { get; }
         string ZipkinSampleRate { get; }
+        string Domain { get; }
         List<string> GetNotToBeDisplayedDomainList();
     }
 }
