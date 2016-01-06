@@ -77,7 +77,7 @@ The following should be added to add the httpModule to your project.
   </system.webServer>
   ```
 
-#### Usage Examples
+### Usage Examples
 
 Two ways to use .NET Zipkin Tracer Client
 
@@ -91,6 +91,7 @@ Two ways to use .NET Zipkin Tracer Client
 
 - Instantiate your ITracerClient instance globally [context-wide]. (On each beginning of your request)
 - Then do event handling on begin and end request of your requests for server trace
+
 ```
 context.BeginRequest += (sender, args) =>
 {
@@ -114,8 +115,9 @@ context.EndRequest += (sender, args) =>
 };
 ```
 
-Client trace example
+#### Client trace example
 Trace before and after a remote request call
+
 ```
 var zipkinClient = (ITracerClient)HttpContext.Current.Items["zipkinClient"];
 var url = "https://abc.xyz.com:8000";
@@ -135,6 +137,36 @@ using (var client = new HttpClient())
 }
 ...
 ```
+
+#### Recording arbitrary events and additional information
+Additional annotations can be recorded by using the ZipkinClient's `Record()` and `RecordBinary&lt;T&gt;()` methods:
+
+```
+var zipkinClient = (ITracerClient)HttpContext.Current.Items["zipkinClient"];
+var url = "https://abc.xyz.com:8000";
+var requestUri = "/object/1";
+HttpResponseMessage result;
+using (var client = new HttpClient())
+{
+    client.BaseAddress = new Uri(url);
+
+	// start client trace
+    var span = tracerClient.StartClientTrace(new Uri(client.BaseAddress, requestUri), "GET");
+
+    tracerClient.Record(span, "A description which will gets recorded with a timestamp.");
+
+    result = await client.GetAsync(requestUri);
+
+    // Record the total memory used after the call
+    tracerClient.RecordBinary(span, "client.memory", GC.GetTotalMemory(false));
+
+	// end client trace
+    tracerClient.EndClientTrace(span);	
+}
+...
+```
+
+In case of the `ZipkinClient.Record()` method, the second parameter(`value`) can be omitted during the call, in that case the caller member name (method, property etc.) will get recorded.
 
 ## Contributors
 ZipkinTracer is (c) Medidata Solutions Worldwide and owned by its major contributors:
