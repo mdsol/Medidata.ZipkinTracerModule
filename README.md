@@ -139,7 +139,7 @@ using (var client = new HttpClient())
 ```
 
 #### Recording arbitrary events and additional information
-Additional annotations can be recorded by using the ZipkinClient's `Record()` and `RecordBinary&lt;T&gt;()` methods:
+Additional annotations can be recorded by using the ZipkinClient's `Record()` and `RecordBinary<T>()` methods:
 
 ```
 var zipkinClient = (ITracerClient)HttpContext.Current.Items["zipkinClient"];
@@ -173,3 +173,4 @@ ZipkinTracer is (c) Medidata Solutions Worldwide and owned by its major contribu
 * Tomoko Kwan
 * [Kenya Matsumoto](https://github.com/kenyamat)
 * [Brent Villanueva](https://github.com/bvillanueva-mdsol)
+* [Laszlo Schreck](https://github.com/lschreck-mdsol)
