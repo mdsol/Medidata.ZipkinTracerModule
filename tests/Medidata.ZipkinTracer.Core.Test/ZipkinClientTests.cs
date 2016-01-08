@@ -569,6 +569,48 @@ namespace Medidata.ZipkinTracer.Core.Test
             Assert.AreEqual(0, testSpan.Binary_annotations.Count, "There are annotations but the trace is off.");
         }
 
+        [TestMethod]
+        [TestCategory("TraceRecordTests")]
+        public void RecordLocalComponent_WithNotNullValue_AddsLocalComponentAnnotation()
+        {
+            // Arrange
+            var testValue = "Some Value";
+            var tracerClient = SetupZipkinClient();
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>(), fixture.Create<string>(), fixture.Create<string>());
+            var zipkinClient = (ZipkinClient)tracerClient;
+            zipkinClient.isTraceOn = true;
+
+            var testSpan = new Span() { Binary_annotations = new List<BinaryAnnotation>() };
+
+            // Act
+            tracerClient.RecordLocalComponent(testSpan, testValue);
+
+            // Assert
+            var annotation = testSpan.Binary_annotations.SingleOrDefault(a => a.Key == zipkinCoreConstants.LOCAL_COMPONENT);
+            Assert.IsNotNull(annotation, "There is no local trace annotation in the binary annotations.");
+            Assert.AreEqual(testValue, annotation.Value, "The local component annotation value is not correct.");
+        }
+
+        [TestMethod]
+        [TestCategory("TraceRecordTests")]
+        public void RecordLocalComponent_IsTraceOnIsFalse_DoesNotAddLocalComponentAnnotation()
+        {
+            // Arrange
+            var testValue = "Some Value";
+            var tracerClient = SetupZipkinClient();
+            spanTracerStub = MockRepository.GenerateStub<SpanTracer>(spanCollectorStub, MockRepository.GenerateStub<ServiceEndpoint>(), new List<string>(), fixture.Create<string>(), fixture.Create<string>());
+            var zipkinClient = (ZipkinClient)tracerClient;
+            zipkinClient.isTraceOn = false;
+
+            var testSpan = new Span() { Binary_annotations = new List<BinaryAnnotation>() };
+
+            // Act
+            tracerClient.RecordBinary(testSpan, zipkinCoreConstants.LOCAL_COMPONENT, testValue);
+
+            // Assert
+            Assert.AreEqual(0, testSpan.Binary_annotations.Count, "There are annotations but the trace is off.");
+        }
+
         private ITracerClient SetupZipkinClient(IZipkinConfig zipkinConfig = null)
         {
             spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(new Uri("http://localhost"), 0, logger);
