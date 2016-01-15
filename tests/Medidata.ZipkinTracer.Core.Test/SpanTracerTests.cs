@@ -94,7 +94,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         }
 
         [TestMethod]
-        public void ReceiveServerSpan_UsingCleanedDomainName()
+        public void ReceiveServerSpan_UsingToBeCleanedDomainName()
         {
             var serviceName = fixture.Create<string>();
             var requestName = fixture.Create<string>();
@@ -103,7 +103,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             var spanId = fixture.Create<long>().ToString();
             var serverUri = new Uri("https://" + clientServiceName + ":" + port + api);
 
-            var domain = serverServiceName + zipkinNotToBeDisplayedDomainList.First();
+            var domain = "https://" + serverServiceName + zipkinNotToBeDisplayedDomainList.First();
 
             var spanTracer = new SpanTracer(spanCollectorStub, zipkinEndpointStub, zipkinNotToBeDisplayedDomainList, domain, serviceName);
 
@@ -117,7 +117,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         }
 
         [TestMethod]
-        public void ReceiveServerSpan_UsingDomainName()
+        public void ReceiveServerSpan_UsingAlreadyCleanedDomainName()
         {
             var serviceName = fixture.Create<string>();
             var requestName = fixture.Create<string>();
@@ -126,12 +126,36 @@ namespace Medidata.ZipkinTracer.Core.Test
             var spanId = fixture.Create<long>().ToString();
             var serverUri = new Uri("https://" + clientServiceName + ":" + port + api);
 
-            var domain = serverServiceName;
+            var domain = "https://" + serverServiceName;
 
             var spanTracer = new SpanTracer(spanCollectorStub, zipkinEndpointStub, zipkinNotToBeDisplayedDomainList, domain, serviceName);
 
             var localEndpoint = new Endpoint { Service_name = serverServiceName, Port = port };
             zipkinEndpointStub.Expect(x => x.GetLocalEndpoint(Arg.Is(serverServiceName), Arg.Is(port))).Return(localEndpoint);
+
+            var resultSpan = spanTracer.ReceiveServerSpan(requestName, traceId, parentSpanId, spanId, serverUri);
+
+            var annotation = resultSpan.Annotations[0] as Annotation;
+            Assert.AreEqual(localEndpoint, annotation.Host);
+        }
+
+        [TestMethod]
+        public void ReceiveServerSpan_UsingInvalidDomainName()
+        {
+            var serviceName = fixture.Create<string>();
+            var requestName = fixture.Create<string>();
+            var traceId = fixture.Create<long>().ToString();
+            var parentSpanId = fixture.Create<long>().ToString();
+            var spanId = fixture.Create<long>().ToString();
+            var serverUri = new Uri("https://" + clientServiceName + ":" + port + api);
+
+            // domain url string is an invalid url
+            var domain = "invalid-url-here";
+
+            var spanTracer = new SpanTracer(spanCollectorStub, zipkinEndpointStub, zipkinNotToBeDisplayedDomainList, domain, serviceName);
+
+            var localEndpoint = new Endpoint { Service_name = serviceName, Port = port };
+            zipkinEndpointStub.Expect(x => x.GetLocalEndpoint(Arg.Is(serviceName), Arg.Is(port))).Return(localEndpoint);
 
             var resultSpan = spanTracer.ReceiveServerSpan(requestName, traceId, parentSpanId, spanId, serverUri);
 

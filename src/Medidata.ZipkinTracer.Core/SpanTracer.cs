@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 
 namespace Medidata.ZipkinTracer.Core
@@ -42,7 +41,8 @@ namespace Medidata.ZipkinTracer.Core
                 throw new ArgumentNullException("zipkinEndpoint is null");
             }
             this.zipkinNotToBeDisplayedDomainList = zipkinNotToBeDisplayedDomainList;
-            var cleanDomain = CleanServiceName(domain);
+            var domainHost = GetHostFromUriString(domain);
+            var cleanDomain = CleanServiceName(domainHost);
             this.serviceName = string.IsNullOrWhiteSpace(cleanDomain) ? serviceName : cleanDomain;
         }
 
@@ -120,6 +120,19 @@ namespace Medidata.ZipkinTracer.Core
                 host = host.Replace(domain, "");
             }
             return host;
+        }
+
+        private string GetHostFromUriString(string rawUri)
+        {
+            try
+            {
+                var uri = new Uri(rawUri);
+                return uri.Host;
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
 
         public virtual void ReceiveClientSpan(Span span, int statusCode)
