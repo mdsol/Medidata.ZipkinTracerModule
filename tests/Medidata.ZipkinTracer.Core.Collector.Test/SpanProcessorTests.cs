@@ -20,8 +20,6 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         private BlockingCollection<Span> queue;
         private int testMaxBatchSize;
         private ILog logger;
-        private string server;
-        private int  port;
  
         [TestInitialize]
         public void Init()
@@ -29,8 +27,6 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
             fixture = new Fixture();
             logger = MockRepository.GenerateStub<ILog>();
             queue = new BlockingCollection<Span>();
-            server = fixture.Create<string>();
-            port = fixture.Create<int>();
             testMaxBatchSize = 10;
             spanProcessor = MockRepository.GenerateStub<SpanProcessor>(new Uri("http://localhost"), queue, testMaxBatchSize, logger);
             spanProcessor.Stub(x => x.SendSpansToZipkin(Arg<string>.Is.Anything)).WhenCalled(s => { });

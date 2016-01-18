@@ -44,7 +44,7 @@ Add the below additional configurations. Please verify these values and modify t
   <add key="zipkinProxyType" value="Http" /> 
 </appSettings>
 ```
-	domain - host url for the host instance.
+	domain - a valid host url string of the host instance. (if not valid, SpanTracer.serviceName = config.zipkinServiceName )
 
 	zipkinScribeServerName - the zipkin scribe/collector server name to connect to send the Spans
 
