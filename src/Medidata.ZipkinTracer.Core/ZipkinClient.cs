@@ -172,6 +172,26 @@ namespace Medidata.ZipkinTracer.Core
             }
         }
 
+        /// <summary>
+        /// Records a local component annotation in the span.
+        /// </summary>
+        /// <param name="span">The span where the annotation will be recorded.</param>
+        /// <param name="value">The value of the local trace to be recorder.</param>
+        public void RecordLocalComponent(Span span, string value)
+        {
+            if (!isTraceOn)
+                return;
+
+            try
+            {
+                spanTracer.RecordBinary(span, zipkinCoreConstants.LOCAL_COMPONENT, value);
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Error recording local trace (value: {value})", ex);
+            }
+        }
+
         public void ShutDown()
         {
             if (spanCollector != null)

@@ -11,5 +11,6 @@ namespace Medidata.ZipkinTracer.Core
         void EndClientTrace(Span clientSpan, int statusCode);
         void Record(Span span, [CallerMemberName] string value = null);
         void RecordBinary<T>(Span span, string key, T value);
+        void RecordLocalComponent(Span span, string value);
     }
 }

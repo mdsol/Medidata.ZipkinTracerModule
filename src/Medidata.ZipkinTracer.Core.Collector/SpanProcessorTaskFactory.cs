@@ -11,6 +11,8 @@ namespace Medidata.ZipkinTracer.Core.Collector
         private Task spanProcessorTaskInstance;
         private CancellationTokenSource cancellationTokenSource;
         private ILog logger;
+        private const int defaultDelayTime = 500;
+        private const int encounteredAnErrorDelayTime = 30000;
 
         public SpanProcessorTaskFactory(ILog logger, CancellationTokenSource cancellationTokenSource = null)
         {
@@ -46,7 +48,7 @@ namespace Medidata.ZipkinTracer.Core.Collector
         {
             while (!IsTaskCancelled())
             {
-                int delayTime = 500;
+                int delayTime = defaultDelayTime;
                 try
                 {
                     action();
@@ -54,9 +56,19 @@ namespace Medidata.ZipkinTracer.Core.Collector
                 catch (Exception ex)
                 {
                     logger.Error("Error in SpanProcessorTask", ex);
-                    delayTime = 30000;
+                    delayTime = encounteredAnErrorDelayTime;
                 }
-                await Task.Delay(delayTime, cancellationTokenSource.Token);
+
+                // stop loop if task is cancelled while delay is in process
+                try
+                {
+                    await Task.Delay(delayTime, cancellationTokenSource.Token);
+                }
+                catch (TaskCanceledException)
+                {
+                    break;
+                }
+                
             }
         }
 

@@ -168,6 +168,9 @@ using (var client = new HttpClient())
 
 In case of the `ZipkinClient.Record()` method, the second parameter(`value`) can be omitted during the call, in that case the caller member name (method, property etc.) will get recorded.
 
+#### Recording a local component
+With the `RecordLocalComponent()` method of the client a local component (or information) can be recorded for the current trace. This will result an additional binary annotation with the 'lc' key (LOCAL_COMPONENT) and a custom value.
+
 ## Contributors
 ZipkinTracer is (c) Medidata Solutions Worldwide and owned by its major contributors:
 * Tomoko Kwan
