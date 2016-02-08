@@ -33,24 +33,20 @@ Add the below additional configurations. Please verify these values and modify t
 
 ```
 <appSettings>
-  <add key="domain" value="ampridatvir-sandbox.xyz.com" />
-  <add key="zipkinScribeServerName" value="zipkinvm.cloudapp.net" />
-  <add key="zipkinScribeServerPort" value="9410" />
+  <add key="domain" value="http://application-sandbox.xyz.com" />
+  <add key="zipkinBaseUri" value="http://zipkinvm.cloudapp.net:9411" />
   <add key="zipkinServiceName" value="Name of your Service i.e. MyApplication" />
   <add key="zipkinSpanProcessorBatchSize" value="10" />
   <add key="zipkinSampleRate" value="0.5" />
   <add key="zipkinNotToBeDisplayedDomainList" value=".xyz.com,.myApplication.net" />
   <add key="zipkinExcludedUriList" value="/check_uri,/status" />
-  <add key="zipkinProxyType" value="Http" /> 
 </appSettings>
 ```
-	domain - a valid host url string of the host instance. (if not valid, SpanTracer.serviceName = config.zipkinServiceName )
+	domain -  is a valid public facing base url for your app instance.(if not valid, SpanTracer.serviceName = config.zipkinServiceName )
 
-	zipkinScribeServerName - the zipkin scribe/collector server name to connect to send the Spans
+	zipkinBaseUri - is the zipkin scribe/collector server uri with port to send the Spans
 
-	zipkinScribeServerPort - the zipkin scribe/collector server port to connect to send the Spans
-
-	zipkinServiceName- name of your Service that zipkin will use to label the trace
+	zipkinServiceName - name of your Service that zipkin will use to label the trace
 
 	zipkinSpanProcessorBatchSize - how many Spans should be sent to the zipkin scribe/collector in one go.
 	
@@ -60,8 +56,6 @@ Add the below additional configurations. Please verify these values and modify t
                                  e.g. domain: ".xyz.com", host: "abc.xyz.com" will be logged as "abc" only    
 
     zipkinExcludedUriList - uri list that is not needed for tracing
-
-    zipkinProxyType - zipkin proxy type i.e. Http, Socks4, Socks4a, Socks5 
 
 #### Additional configuration for HttpModule package
 
