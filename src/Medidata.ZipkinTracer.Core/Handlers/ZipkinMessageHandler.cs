@@ -1,4 +1,6 @@
-﻿using System.Net.Http;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,6 +10,10 @@ namespace Medidata.ZipkinTracer.Core.Handlers
     {
         private readonly ITraceProvider _provider;
         private readonly ITracerClient _client;
+
+        public string RecordValue { get; set; }
+        public string RecordLocalComponentValue { get; set; }
+        public IList<ZipkinBinaryAnnotation> BinaryAnnotations { get; set; } = new List<ZipkinBinaryAnnotation>();
 
         public ZipkinMessageHandler(ITraceProvider provider, ITracerClient client)
             : this(provider, client, new HttpClientHandler())
@@ -33,6 +39,25 @@ namespace Medidata.ZipkinTracer.Core.Handlers
 
             var span = _client.StartClientTrace(request.RequestUri, request.Method.ToString(), nextTrace);
             var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
+
+            if (RecordValue != null)
+            {
+                _client.Record(span, RecordValue);
+            }
+
+            if (RecordLocalComponentValue != null)
+            {
+                _client.RecordLocalComponent(span, RecordLocalComponentValue);
+            }
+
+            if (BinaryAnnotations != null && BinaryAnnotations.Any())
+            {
+                foreach (var annotation in BinaryAnnotations)
+                {
+                    _client.RecordBinary(span, annotation.Key, annotation.Func());
+                }
+            }
+
             _client.EndClientTrace(span, (int)response.StatusCode);
             return response;
         }
