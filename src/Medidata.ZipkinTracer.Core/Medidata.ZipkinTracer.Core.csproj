@@ -64,7 +64,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Handlers\ZipkinBinaryAnnotation.cs" />
     <Compile Include="ITraceProvider.cs" />
     <Compile Include="ITracerClient.cs" />
     <Compile Include="IZipkinConfig.cs" />
