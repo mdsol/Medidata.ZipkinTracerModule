@@ -9,4 +9,4 @@ src/*/lib/*
 
 TestResults/
 packages/
-
+.vs/*/*
