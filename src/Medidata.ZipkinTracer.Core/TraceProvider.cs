@@ -17,7 +17,7 @@ namespace Medidata.ZipkinTracer.Core
         /// <summary>
         /// Key name for context.Environment
         /// </summary>
-        private const string Key = "Medidata.CrossApplicationTracer.TraceProvider";
+        private const string Key = "Medidata.ZipkinTracer.Core.TraceProvider";
 
         /// <summary>
         /// Gets a TraceId
