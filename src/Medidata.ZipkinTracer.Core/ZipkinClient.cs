@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using log4net;
-using Medidata.CrossApplicationTracer;
 using Medidata.ZipkinTracer.Core.Collector;
 
 namespace Medidata.ZipkinTracer.Core
@@ -49,19 +48,18 @@ namespace Medidata.ZipkinTracer.Core
             }
         }
 
-        public Span StartClientTrace(Uri remoteUri, string methodName)
+        public Span StartClientTrace(Uri remoteUri, string methodName, ITraceProvider trace)
         {
             if (!isTraceOn)
                 return null;
 
             try
             {
-                var nextTrace = traceProvider.GetNext();
                 return spanTracer.SendClientSpan(
                     methodName.ToLower(),
-                    nextTrace.TraceId,
-                    nextTrace.ParentSpanId,
-                    nextTrace.SpanId,
+                    trace.TraceId,
+                    trace.ParentSpanId,
+                    trace.SpanId,
                     remoteUri);
             }
             catch (Exception ex)
