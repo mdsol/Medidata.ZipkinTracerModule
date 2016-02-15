@@ -141,7 +141,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             var providerInContext = MockRepository.GenerateStub<ITraceProvider>();
             var environment = new Dictionary<string, object>
             {
-                { "Medidata.CrossApplicationTracer.TraceProvider", providerInContext }
+                { "Medidata.ZipkinTracer.Core.TraceProvider", providerInContext }
             };
             context.Stub(x => x.Environment).Return(environment);
 
