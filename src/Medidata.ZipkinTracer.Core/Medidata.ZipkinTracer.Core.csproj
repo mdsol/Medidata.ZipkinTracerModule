@@ -68,7 +68,6 @@
     <Compile Include="ITracerClient.cs" />
     <Compile Include="IZipkinConfig.cs" />
     <Compile Include="Middlewares\ZipkinMiddleware.cs" />
-    <Compile Include="Middlewares\ZipkinMiddlewareOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpanTracer.cs" />
     <Compile Include="TraceProvider.cs" />

@@ -17,7 +17,7 @@ namespace Medidata.ZipkinTracer.Core
         /// <summary>
         /// Key name for context.Environment
         /// </summary>
-        private const string Key = "Medidata.ZipkinTracer.Core.TraceProvider";
+        public const string Key = "Medidata.ZipkinTracer.Core.TraceProvider";
 
         /// <summary>
         /// Gets a TraceId
@@ -92,7 +92,7 @@ namespace Medidata.ZipkinTracer.Core
         /// <param name="spanId"></param>
         /// <param name="parentSpanId"></param>
         /// <param name="isSampled"></param>
-        private TraceProvider(string traceId, string spanId, string parentSpanId, bool isSampled)
+        internal TraceProvider(string traceId, string spanId, string parentSpanId, bool isSampled)
         {
             TraceId = traceId;
             SpanId = spanId;

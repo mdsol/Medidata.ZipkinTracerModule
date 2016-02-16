@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using log4net;
 using Medidata.ZipkinTracer.Core.Collector;
+using Microsoft.Owin;
 
 namespace Medidata.ZipkinTracer.Core
 {
@@ -15,17 +16,18 @@ namespace Medidata.ZipkinTracer.Core
         public ITraceProvider TraceProvider { get; }
         public IZipkinConfig ZipkinConfig { get; }
 
-        public ZipkinClient(ITraceProvider tracerProvider, ILog logger, IZipkinConfig zipkinConfig)
-            : this(tracerProvider, logger, zipkinConfig, new SpanCollectorBuilder()) { }
-
-        public ZipkinClient(ITraceProvider traceProvider, ILog logger, IZipkinConfig zipkinConfig,
-            ISpanCollectorBuilder spanCollectorBuilder)
+        public ZipkinClient(ILog logger, IZipkinConfig zipkinConfig, IOwinContext context = null)
+            : this (logger, zipkinConfig, new SpanCollectorBuilder(), context)
         {
-            if (traceProvider == null) throw new ArgumentNullException(nameof(traceProvider));
+        }
+
+        public ZipkinClient(ILog logger, IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder, IOwinContext context = null)
+        {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (zipkinConfig == null) throw new ArgumentNullException(nameof(zipkinConfig));
             if (spanCollectorBuilder == null) throw new ArgumentNullException(nameof(spanCollectorBuilder));
 
+            var traceProvider = new TraceProvider(zipkinConfig, context);
             IsTraceOn = zipkinConfig.Enable && IsTraceProviderSamplingOn(traceProvider);
 
             if (!IsTraceOn)
