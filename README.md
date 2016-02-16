@@ -8,11 +8,11 @@ This nuget package implements the zipkin tracer client for .net applications.
 
 ### Enable/Disable zipkin tracing
 
-Zipkin will record traces if TraceProvider's IsSampled is true.  
+Zipkin will record traces if IsSampled HTTP header is true.  
 This will happen if :
-**a)** the caller of the app has set the IsSampled http header value to true.
-**OR**
-**b)** the url request is not in the `zipkinExcludedUriList` appsettings.config, and using the `zipkinSampleRate`, it will determine whether or not to trace this request. `zipkinSampleRate` is the approximate percentage of traces being recorded in zipkin.
+- **a)** the caller of the app has set the IsSampled HTTP header value to true.
+- **OR**
+- **b)** the url request is not in the `ExcludedPathList` of ZipkinConfig , and using the `SampleRate`, it will determine whether or not to trace this request. `SampleRate` is the approximate percentage of traces being recorded in zipkin.
 
 ## Configurations
 Please use `ZipkinConig` class to configure the module and verify these values and modify them according to your service/environment.
