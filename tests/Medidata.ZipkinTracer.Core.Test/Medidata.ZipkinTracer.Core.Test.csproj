@@ -90,6 +90,7 @@
     <Compile Include="SpanTracerTests.cs" />
     <Compile Include="TraceProviderTests.cs" />
     <Compile Include="ZipkinClientTests.cs" />
+    <Compile Include="ZipkinConfigTests.cs" />
     <Compile Include="ZipkinEndpointTests.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -9,10 +9,11 @@ namespace Medidata.ZipkinTracer.Core
         Uri ZipkinBaseUri { get; set; }
         string ServiceName { get; set; }
         uint SpanProcessorBatchSize { get; set; }
-        IList<string> DontSampleList { get; set; }
+        IList<string> ExcludedPathList { get; set; }
         double SampleRate { get; set; }
         string Domain { get; set; }
         IList<string> NotToBeDisplayedDomainList { get; set; }
         bool ShouldBeSampled(IOwinContext context, string sampled);
+        void Validate();
     }
 }

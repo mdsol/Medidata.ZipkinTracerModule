@@ -30,9 +30,9 @@ namespace Medidata.ZipkinTracer.Core.Middlewares
 
     public static class AppBuilderExtensions
     {
-        public static void UseZipkin(this IAppBuilder app, ZipkinMiddlewareOptions options = null)
+        public static void UseZipkin(this IAppBuilder app, ZipkinMiddlewareOptions options)
         {
-            options = options ?? new ZipkinMiddlewareOptions();
+            options.Validate();
             app.Use<ZipkinMiddleware>(options);
         }
     }

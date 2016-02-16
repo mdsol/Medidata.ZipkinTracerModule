@@ -7,23 +7,51 @@ namespace Medidata.ZipkinTracer.Core
 {
     public class ZipkinConfig : IZipkinConfig
     {
-        private double _sampleRage;
-
         public Uri ZipkinBaseUri { get; set; }
         public string ServiceName { get; set; }
         public uint SpanProcessorBatchSize { get; set; }
-        public IList<string> DontSampleList { get; set; } = new List<string>();
-        public double SampleRate
-        {
-            get { return _sampleRage; }
-            set
-            {
-                if (value < 0 || value > 1) throw new ArgumentException($"{nameof(SampleRate)} must range from 0 to 1.");
-                _sampleRage = value;
-            }
-        }
+        public IList<string> ExcludedPathList { get; set; } = new List<string>();
+        public double SampleRate { get; set; }
         public string Domain { get; set; }
         public IList<string> NotToBeDisplayedDomainList { get; set; } = new List<string>();
+
+        public void Validate()
+        {
+            if (ZipkinBaseUri == null)
+            {
+                throw new ArgumentNullException("ZipkinBaseUri");
+            }
+
+            if (string.IsNullOrWhiteSpace(ServiceName))
+            {
+                throw new ArgumentNullException("ServiceName");
+            }
+
+            if (ExcludedPathList == null)
+            {
+                throw new ArgumentNullException("ExcludedPathList");
+            }
+
+            if (ExcludedPathList.Any(item => !item.StartsWith("/")))
+            {
+                throw new ArgumentException("Item of ExcludedPathList must start with '/'. ex.) '/check_uri'");
+            }
+
+            if (SampleRate < 0 || SampleRate > 1)
+            {
+                throw new ArgumentException("SampleRate must range from 0 to 1.");
+            }
+
+            if (string.IsNullOrWhiteSpace(Domain))
+            {
+                throw new ArgumentNullException("Domain");
+            }
+
+            if (NotToBeDisplayedDomainList == null)
+            {
+                throw new ArgumentNullException("NotToBeDisplayedDomainList");
+            }
+        }
 
         public bool ShouldBeSampled(IOwinContext context, string sampled)
         {
@@ -53,7 +81,7 @@ namespace Medidata.ZipkinTracer.Core
         {
             if (path != null)
             {
-                if (DontSampleList.Any(uri => path.StartsWith(uri, StringComparison.InvariantCultureIgnoreCase)))
+                if (ExcludedPathList.Any(uri => path.StartsWith(uri, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     return true;
                 }

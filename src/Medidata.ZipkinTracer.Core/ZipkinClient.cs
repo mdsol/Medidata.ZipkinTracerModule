@@ -20,9 +20,11 @@ namespace Medidata.ZipkinTracer.Core
         public ZipkinClient(ITraceProvider traceProvider, ILog logger, IZipkinConfig zipkinConfig,
             ISpanCollectorBuilder spanCollectorBuilder)
         {
+            zipkinConfig.Validate();
+
             this.logger = logger;
 
-            isTraceOn = logger != null && IsConfigValuesValid(zipkinConfig) && IsTraceProviderValidAndSamplingOn(traceProvider);
+            isTraceOn = logger != null && IsTraceProviderValidAndSamplingOn(traceProvider);
 
             if (!isTraceOn)
                 return;
@@ -198,34 +200,6 @@ namespace Medidata.ZipkinTracer.Core
             {
                 spanCollector.Stop();
             }
-        }
-
-        private bool IsConfigValuesValid(IZipkinConfig zipkinConfig)
-        {
-            if (zipkinConfig.ZipkinBaseUri == null)
-            {
-                logger.Error("zipkinConfig.ZipkinBaseUri is null");
-                return false;
-            }
-
-            if (String.IsNullOrEmpty(zipkinConfig.ServiceName))
-            {
-                logger.Error("zipkinConfig.ServiceName value is null");
-                return false;
-            }
-
-            if (zipkinConfig.SpanProcessorBatchSize < 0)
-            {
-                logger.Error("zipkinConfig.SpanProcessorBatchSize must be a number greater than 0.");
-                return false;
-            }
-
-            if (zipkinConfig.SampleRate < 0 || zipkinConfig.SampleRate > 1)
-            {
-                logger.Error("zipkinConfig.SampleRate must range from 0 to 1.");
-                return false;
-            }
-            return true;
         }
 
         private bool IsTraceProviderValidAndSamplingOn(ITraceProvider traceProvider)
