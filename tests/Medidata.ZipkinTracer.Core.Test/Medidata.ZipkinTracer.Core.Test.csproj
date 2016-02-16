@@ -90,9 +90,7 @@
     <Compile Include="SpanTracerTests.cs" />
     <Compile Include="TraceProviderTests.cs" />
     <Compile Include="ZipkinClientTests.cs" />
-    <Compile Include="ZipkinConfigTests.cs" />
     <Compile Include="ZipkinEndpointTests.cs" />
-    <Compile Include="ZipkinSamplerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Medidata.ZipkinTracer.Core.Collector\Medidata.ZipkinTracer.Core.Collector.csproj">

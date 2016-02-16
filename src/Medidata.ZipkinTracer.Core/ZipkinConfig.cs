@@ -1,53 +1,64 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
+using Microsoft.Owin;
 
 namespace Medidata.ZipkinTracer.Core
 {
     public class ZipkinConfig : IZipkinConfig
     {
-        public string ZipkinBaseUri
-        {
-            get { return ConfigurationManager.AppSettings["zipkinBaseUri"]; }
-        }
+        private double _sampleRage;
 
-        public string ServiceName
+        public Uri ZipkinBaseUri { get; set; }
+        public string ServiceName { get; set; }
+        public uint SpanProcessorBatchSize { get; set; }
+        public IList<string> DontSampleList { get; set; } = new List<string>();
+        public double SampleRate
         {
-            get { return ConfigurationManager.AppSettings["zipkinServiceName"]; }
-        }
-
-        public string SpanProcessorBatchSize
-        {
-            get { return ConfigurationManager.AppSettings["zipkinSpanProcessorBatchSize"]; }
-        }
-
-        public string DontSampleListCsv
-        {
-            get { return ConfigurationManager.AppSettings["zipkinExcludedUriList"]; }
-        }
-
-        public string ZipkinSampleRate
-        {
-            get {  return ConfigurationManager.AppSettings["zipkinSampleRate"];}
-        }
-
-        public string Domain
-        {
-            get { return ConfigurationManager.AppSettings["domain"]; }
-        }
-
-        public List<string> GetNotToBeDisplayedDomainList()
-        {
-            var zipkinNotToBeDisplayedDomainList = new List<string>();
-
-            var rawInternalDomainList = ConfigurationManager.AppSettings["zipkinNotToBeDisplayedDomainList"];
-            if (!string.IsNullOrWhiteSpace(rawInternalDomainList))
+            get { return _sampleRage; }
+            set
             {
-                zipkinNotToBeDisplayedDomainList.AddRange(rawInternalDomainList.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries).Select(w => w.Trim()).ToList());
+                if (value < 0 || value > 1) throw new ArgumentException($"{nameof(SampleRate)} must range from 0 to 1.");
+                _sampleRage = value;
+            }
+        }
+        public string Domain { get; set; }
+        public IList<string> NotToBeDisplayedDomainList { get; set; } = new List<string>();
+
+        public bool ShouldBeSampled(IOwinContext context, string sampled)
+        {
+            if (context == null)
+            {
+                return false;
             }
 
-            return zipkinNotToBeDisplayedDomainList;
+            bool result;
+            if (!string.IsNullOrWhiteSpace(sampled) && Boolean.TryParse(sampled, out result))
+            {
+                return result;
+            }
+
+            if (!IsInDontSampleList(context.Request.Path.ToString()))
+            {
+                var random = new Random();
+                if (random.NextDouble() <= SampleRate)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        internal bool IsInDontSampleList(string path)
+        {
+            if (path != null)
+            {
+                if (DontSampleList.Any(uri => path.StartsWith(uri, StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

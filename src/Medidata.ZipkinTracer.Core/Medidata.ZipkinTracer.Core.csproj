@@ -76,7 +76,6 @@
     <Compile Include="ZipkinConfig.cs" />
     <Compile Include="ServiceEndpoint.cs" />
     <Compile Include="Handlers\ZipkinMessageHandler.cs" />
-    <Compile Include="ZipkinSampler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Medidata.ZipkinTracer.Core.nuspec">

@@ -14,7 +14,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         public void ConstructorWithNullContext()
         {
             // Arrange & Act
-            var traceProvider = new TraceProvider();
+            var traceProvider = new TraceProvider(new ZipkinConfig());
 
             // Assert
             Assert.AreEqual(traceProvider.TraceId, traceProvider.SpanId);
@@ -48,7 +48,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             context.Stub(x => x.Environment).Return(environment);
 
             // Act
-            var sut = new TraceProvider(context);
+            var sut = new TraceProvider(new ZipkinConfig(), context);
 
             // Assert
             Assert.AreEqual(traceId, sut.TraceId);
@@ -81,7 +81,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             context.Stub(x => x.Environment).Return(environment);
 
             var expectedIsSampled = fixture.Create<bool>();
-            var sampleFilter = MockRepository.GenerateStub<ZipkinSampler>(fixture.Create<string>(), fixture.Create<string>());
+            var sampleFilter = MockRepository.GenerateStub<IZipkinConfig>();
             sampleFilter.Expect(x => x.ShouldBeSampled(context, null)).Return(expectedIsSampled);
 
             // Act
@@ -120,7 +120,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             context.Stub(x => x.Environment).Return(environment);
 
             var expectedIsSampled = fixture.Create<bool>();
-            var sampleFilter = MockRepository.GenerateStub<ZipkinSampler>(fixture.Create<string>(), fixture.Create<string>());
+            var sampleFilter = MockRepository.GenerateStub<IZipkinConfig>();
             sampleFilter.Expect(x => x.ShouldBeSampled(context, isSampled)).Return(expectedIsSampled);
 
             // Act
@@ -146,7 +146,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             context.Stub(x => x.Environment).Return(environment);
 
             // Act
-            var sut = new TraceProvider(context);
+            var sut = new TraceProvider(new ZipkinConfig(), context);
 
             // Assert
             Assert.AreEqual(providerInContext.TraceId, sut.TraceId);
@@ -180,7 +180,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             context.Stub(x => x.Environment).Return(environment);
 
             // Act
-            new TraceProvider(context);
+            new TraceProvider(new ZipkinConfig(), context);
         }
 
         [TestMethod]
@@ -208,7 +208,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             context.Stub(x => x.Request).Return(request);
             context.Stub(x => x.Environment).Return(environment);
 
-            var sut = new TraceProvider(context);
+            var sut = new TraceProvider(new ZipkinConfig(), context);
 
             // Act
             var nextTraceProvider = sut.GetNext();

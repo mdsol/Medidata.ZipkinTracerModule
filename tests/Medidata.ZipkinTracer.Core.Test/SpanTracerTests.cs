@@ -27,7 +27,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             fixture = new Fixture();
             logger = MockRepository.GenerateStub<ILog>();
-            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(new Uri("http://localhost"), 0, logger);
+            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(new Uri("http://localhost"), (uint)0, logger);
             zipkinEndpointStub = MockRepository.GenerateStub<ServiceEndpoint>();
             zipkinNotToBeDisplayedDomainList = new List<string> {".xyz.net"};
             serverServiceName = "xyz-sandbox";

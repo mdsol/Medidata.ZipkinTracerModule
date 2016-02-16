@@ -14,9 +14,11 @@ namespace Medidata.ZipkinTracer.Core
         private ITraceProvider traceProvider;
         private ILog logger;
 
-        public ZipkinClient(ITraceProvider tracerProvider, ILog logger) : this(tracerProvider, logger, new ZipkinConfig(), new SpanCollectorBuilder()) { }
+        public ZipkinClient(ITraceProvider tracerProvider, ILog logger, IZipkinConfig zipkinConfig)
+            : this(tracerProvider, logger, zipkinConfig, new SpanCollectorBuilder()) { }
 
-        public ZipkinClient(ITraceProvider traceProvider, ILog logger, IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder)
+        public ZipkinClient(ITraceProvider traceProvider, ILog logger, IZipkinConfig zipkinConfig,
+            ISpanCollectorBuilder spanCollectorBuilder)
         {
             this.logger = logger;
 
@@ -28,14 +30,14 @@ namespace Medidata.ZipkinTracer.Core
             try
             {
                 spanCollector = spanCollectorBuilder.Build(
-                    new Uri(zipkinConfig.ZipkinBaseUri),
-                    int.Parse(zipkinConfig.SpanProcessorBatchSize),
+                    zipkinConfig.ZipkinBaseUri,
+                    zipkinConfig.SpanProcessorBatchSize,
                     logger);
 
                 spanTracer = new SpanTracer(
                     spanCollector,
                     new ServiceEndpoint(),
-                    zipkinConfig.GetNotToBeDisplayedDomainList(),
+                    zipkinConfig.NotToBeDisplayedDomainList,
                     zipkinConfig.Domain,
                     zipkinConfig.ServiceName);
 
@@ -200,7 +202,7 @@ namespace Medidata.ZipkinTracer.Core
 
         private bool IsConfigValuesValid(IZipkinConfig zipkinConfig)
         {
-            if (String.IsNullOrEmpty(zipkinConfig.ZipkinBaseUri))
+            if (zipkinConfig.ZipkinBaseUri == null)
             {
                 logger.Error("zipkinConfig.ZipkinBaseUri is null");
                 return false;
@@ -212,23 +214,15 @@ namespace Medidata.ZipkinTracer.Core
                 return false;
             }
 
-            if (String.IsNullOrEmpty(zipkinConfig.SpanProcessorBatchSize))
+            if (zipkinConfig.SpanProcessorBatchSize < 0)
             {
-                logger.Error("zipkinConfig.SpanProcessorBatchSize value is null");
+                logger.Error("zipkinConfig.SpanProcessorBatchSize must be a number greater than 0.");
                 return false;
             }
 
-            if (String.IsNullOrEmpty(zipkinConfig.ZipkinSampleRate))
+            if (zipkinConfig.SampleRate < 0 || zipkinConfig.SampleRate > 1)
             {
-                logger.Error("zipkinConfig.ZipkinSampleRate value is null");
-                return false;
-            }
-
-            int spanProcessorBatchSize;
-
-            if (!int.TryParse(zipkinConfig.SpanProcessorBatchSize, out spanProcessorBatchSize))
-            {
-                logger.Error("zipkinConfig spanProcessorBatchSize is not an int");
+                logger.Error("zipkinConfig.SampleRate must range from 0 to 1.");
                 return false;
             }
             return true;

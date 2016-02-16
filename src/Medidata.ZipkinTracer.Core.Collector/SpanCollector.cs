@@ -13,7 +13,7 @@ namespace Medidata.ZipkinTracer.Core.Collector
 
         private static SpanCollector instance;
 
-        public static SpanCollector GetInstance(Uri uri, int maxProcessorBatchSize, ILog logger)
+        public static SpanCollector GetInstance(Uri uri, uint maxProcessorBatchSize, ILog logger)
         {
             if (instance == null)
             {
@@ -23,7 +23,7 @@ namespace Medidata.ZipkinTracer.Core.Collector
             return instance;
         }
 
-        public SpanCollector(Uri uri, int maxProcessorBatchSize, ILog logger)
+        public SpanCollector(Uri uri, uint maxProcessorBatchSize, ILog logger)
         {
             if ( spanQueue == null)
             {

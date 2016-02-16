@@ -104,7 +104,7 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
 
             SpanCollector.spanQueue = fixture.Create<BlockingCollection<Span>>();
             spanProcessorStub = MockRepository.GenerateStub<SpanProcessor>(new Uri("http://localhost"),
-                    SpanCollector.spanQueue, 0, logger);
+                    SpanCollector.spanQueue, (uint)0, logger);
             spanCollector.spanProcessor = spanProcessorStub;
         }
     }

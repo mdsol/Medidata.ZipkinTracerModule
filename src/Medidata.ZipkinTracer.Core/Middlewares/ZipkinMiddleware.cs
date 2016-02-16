@@ -18,9 +18,9 @@ namespace Medidata.ZipkinTracer.Core.Middlewares
         {
             if (_options.Enable)
             {
-                var traceProvider = new TraceProvider(context);
+                var traceProvider = new TraceProvider(_options, context);
                 var logger = LogManager.GetLogger("ZipkinMiddleware");
-                var zipkin = new ZipkinClient(traceProvider, logger);
+                var zipkin = new ZipkinClient(traceProvider, logger, _options);
                 var span = zipkin.StartServerTrace(context.Request.Uri, context.Request.Method);
                 await Next.Invoke(context);
                 zipkin.EndServerTrace(span);

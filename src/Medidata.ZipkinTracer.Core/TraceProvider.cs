@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.Owin;
 
@@ -7,7 +8,7 @@ namespace Medidata.ZipkinTracer.Core
     /// <summary>
     /// TraceProvider class
     /// </summary>
-    public class TraceProvider : ITraceProvider
+    internal class TraceProvider : ITraceProvider
     {
         public const string TraceIdHeaderName = "X-B3-TraceId";
         public const string SpanIdHeaderName = "X-B3-SpanId";
@@ -42,19 +43,9 @@ namespace Medidata.ZipkinTracer.Core
         /// <summary>
         /// Initializes a new instance of the TraceProvider class.
         /// </summary>
+        /// <param name="config">ZipkinConfig instance</param>
         /// <param name="context">the IOwinContext</param>
-        /// <param name="dontSampleListCsv">the dontSampleListCsv</param>
-        /// <param name="sampleRate">the sampleRate</param>
-        public TraceProvider(IOwinContext context = null, string dontSampleListCsv = null, string sampleRate = null) : this
-            (new ZipkinSampler(dontSampleListCsv, sampleRate), context)
-        {}
-
-        /// <summary>
-        /// Initializes a new instance of the TraceProvider class.
-        /// </summary>
-        /// <param name="context">the IOwinContext</param>
-        /// <param name="zipkinSampler">zipkinSampler instance</param>
-        internal TraceProvider(ZipkinSampler zipkinSampler, IOwinContext context = null)
+        internal TraceProvider(IZipkinConfig config, IOwinContext context = null)
         {
             string headerTraceId = null;
             string headerSpanId = null;
@@ -85,7 +76,7 @@ namespace Medidata.ZipkinTracer.Core
             TraceId = Parse(headerTraceId) ? headerTraceId : GenerateHexEncodedInt64FromNewGuid();
             SpanId = Parse(headerSpanId) ? headerSpanId : TraceId;
             ParentSpanId = Parse(headerParentSpanId) ? headerParentSpanId : string.Empty;
-            IsSampled = zipkinSampler.ShouldBeSampled(context, headerSampled);
+            IsSampled = config.ShouldBeSampled(context, headerSampled);
            
             if (SpanId == ParentSpanId)
             {
