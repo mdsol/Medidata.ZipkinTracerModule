@@ -2,6 +2,5 @@
 {
     public class ZipkinMiddlewareOptions : ZipkinConfig
     {
-        public bool Enable { get; set; } = true;
     }
 }

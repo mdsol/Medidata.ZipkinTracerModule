@@ -5,6 +5,8 @@ namespace Medidata.ZipkinTracer.Core
 {
     public interface ITracerClient
     {
+        bool IsTraceOn { get; }
+        ITraceProvider TraceProvider { get; }
         Span StartServerTrace(Uri requestUri, string methodName);
         Span StartClientTrace(Uri remoteUri, string methodName, ITraceProvider trace);
         void EndServerTrace(Span serverSpan);

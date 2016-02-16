@@ -6,25 +6,28 @@ namespace Medidata.ZipkinTracer.Core.Handlers
 {
     public class ZipkinMessageHandler : DelegatingHandler
     {
-        private readonly ITraceProvider _provider;
         private readonly ITracerClient _client;
 
-        public ZipkinMessageHandler(ITraceProvider provider, ITracerClient client)
-            : this(provider, client, new HttpClientHandler())
+        public ZipkinMessageHandler(ITracerClient client)
+            : this(client, new HttpClientHandler())
         {
         }
 
-        public ZipkinMessageHandler(ITraceProvider provider, ITracerClient client, HttpMessageHandler innerHandler)
+        public ZipkinMessageHandler(ITracerClient client, HttpMessageHandler innerHandler)
             : base(innerHandler)
         {
-            _provider = provider;
             _client = client;
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            var nextTrace = _provider.GetNext();
+            if (!_client.IsTraceOn)
+            {
+                return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
+            }
+
+            var nextTrace = _client.TraceProvider.GetNext();
 
             request.Headers.Add(TraceProvider.TraceIdHeaderName, nextTrace.TraceId);
             request.Headers.Add(TraceProvider.SpanIdHeaderName, nextTrace.SpanId);

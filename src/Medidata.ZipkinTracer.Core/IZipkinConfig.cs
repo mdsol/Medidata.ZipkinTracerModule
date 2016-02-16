@@ -6,6 +6,7 @@ namespace Medidata.ZipkinTracer.Core
 {
     public interface IZipkinConfig
     {
+        bool Enable { get; set; }
         Uri ZipkinBaseUri { get; set; }
         string ServiceName { get; set; }
         uint SpanProcessorBatchSize { get; set; }
