@@ -16,12 +16,11 @@ namespace Medidata.ZipkinTracer.Core.Test
             var fixture = new Fixture();
             _sut = new ZipkinConfig
             {
-                ZipkinBaseUri = new Uri("http://localhost"),
-                ServiceName = fixture.Create<string>(),
+                ZipkinBaseUri = new Uri("http://zipkin.com"),
+                Domain = new Uri("http://server.com"),
                 SpanProcessorBatchSize = fixture.Create<uint>(),
                 ExcludedPathList = new List<string>(),
                 SampleRate = 0,
-                Domain = fixture.Create<string>(),
                 NotToBeDisplayedDomainList = new List<string>()
             };
         }
@@ -37,14 +36,6 @@ namespace Medidata.ZipkinTracer.Core.Test
         public void ValidateWithNullZipkinBaseUri()
         {
             _sut.Domain = null;
-            _sut.Validate();
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void ValidateWithNullServiceName()
-        {
-            _sut.ServiceName = null;
             _sut.Validate();
         }
 

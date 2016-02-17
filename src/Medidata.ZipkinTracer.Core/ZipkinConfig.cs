@@ -9,11 +9,10 @@ namespace Medidata.ZipkinTracer.Core
     {
         public bool Enable { get; set; } = true;
         public Uri ZipkinBaseUri { get; set; }
-        public string ServiceName { get; set; }
+        public Uri Domain { get; set; }
         public uint SpanProcessorBatchSize { get; set; }
         public IList<string> ExcludedPathList { get; set; } = new List<string>();
         public double SampleRate { get; set; }
-        public string Domain { get; set; }
         public IList<string> NotToBeDisplayedDomainList { get; set; } = new List<string>();
 
         public void Validate()
@@ -23,9 +22,9 @@ namespace Medidata.ZipkinTracer.Core
                 throw new ArgumentNullException("ZipkinBaseUri");
             }
 
-            if (string.IsNullOrWhiteSpace(ServiceName))
+            if (Domain == null)
             {
-                throw new ArgumentNullException("ServiceName");
+                throw new ArgumentNullException("Domain");
             }
 
             if (ExcludedPathList == null)
@@ -35,17 +34,12 @@ namespace Medidata.ZipkinTracer.Core
 
             if (ExcludedPathList.Any(item => !item.StartsWith("/")))
             {
-                throw new ArgumentException("Item of ExcludedPathList must start with '/'. ex.) '/check_uri'");
+                throw new ArgumentException("Item of ExcludedPathList must start with '/'. e.g.) '/check_uri'");
             }
 
             if (SampleRate < 0 || SampleRate > 1)
             {
                 throw new ArgumentException("SampleRate must range from 0 to 1.");
-            }
-
-            if (string.IsNullOrWhiteSpace(Domain))
-            {
-                throw new ArgumentNullException("Domain");
             }
 
             if (NotToBeDisplayedDomainList == null)

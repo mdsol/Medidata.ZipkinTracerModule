@@ -48,8 +48,7 @@ namespace Medidata.ZipkinTracer.Core
                     spanCollector,
                     new ServiceEndpoint(),
                     zipkinConfig.NotToBeDisplayedDomainList,
-                    zipkinConfig.Domain,
-                    zipkinConfig.ServiceName);
+                    zipkinConfig.Domain);
 
                 TraceProvider = traceProvider;
             }

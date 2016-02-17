@@ -556,27 +556,12 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             return new ZipkinConfig
             {
-                ZipkinBaseUri = new Uri("http://localhost"),
-                Domain = fixture.Create<string>(),
+                ZipkinBaseUri = new Uri("http://zipkin.com"),
+                Domain = new Uri("http://server.com"),
                 SpanProcessorBatchSize = 123,
-                ServiceName = fixture.Create<string>(),
                 ExcludedPathList = new List<string> { "/foo", "/bar", "/baz" },
                 SampleRate = 0.5,
                 NotToBeDisplayedDomainList = new List<string> { ".xyz.net" }
-            };
-        }
-
-        private IZipkinConfig CreateZipkinConfigWithValues(string zipkinServerName, uint spanProcessorBatchSize, string serviceName, IList<string> filterList, double sampleRate, List<string> domainList = null, Uri proxyUri = null, string proxyType = null)
-        {
-            return new ZipkinConfig
-            {
-                ZipkinBaseUri = new Uri(zipkinServerName),
-                Domain = fixture.Create<string>(),
-                SpanProcessorBatchSize = spanProcessorBatchSize,
-                ServiceName = serviceName,
-                ExcludedPathList = filterList,
-                SampleRate = sampleRate,
-                NotToBeDisplayedDomainList = domainList
             };
         }
 
@@ -587,8 +572,7 @@ namespace Medidata.ZipkinTracer.Core.Test
                     spanCollectorStub,
                     MockRepository.GenerateStub<ServiceEndpoint>(),
                     new List<string>(),
-                    fixture.Create<string>(),
-                    fixture.Create<string>()
+                    new Uri("http://server.com")
                 );
         }
     }

@@ -17,10 +17,9 @@ This will happen if :
 ## Configurations
 Please use `ZipkinConig` class to configure the module and verify these values and modify them according to your service/environment.
 
-- `Enable` - true: enable ZipkinMiddleware, false: disable ZipkinMiddleware.
-- `Domain` - is a valid public facing base url for your app instance.
+- `Enable` - true: enable ZipkinMiddleware/ZipkinMessageHandler, false: disable ZipkinMiddleware/ZipkinMessageHandler.
 - `ZipkinBaseUri` - is the zipkin scribe/collector server URI with port to send the Spans
-- `ServiceName` - name of your Service that zipkin will use to label the trace
+- `Domain` - is a valid public facing base url for your app instance. Zipkin will use to label the trace.
 - `SpanProcessorBatchSize` - how many Spans should be sent to the zipkin scribe/collector in one go.
 - `SampleRate` - 1 decimal point float value between 0 and 1. This value will determine randomly if the current request will be traced or not.	 
 - `NotToBeDisplayedDomainList`(optional) - It will be used when logging host name by excluding these strings in service name attribute
@@ -32,9 +31,8 @@ Please use `ZipkinConig` class to configure the module and verify these values a
 var config = new ZipkinConfig
 {
 	Enable = true,
-	Domain = "service.com",
+	Domain = new Uri("https://yourservice.com"),
 	ZipkinBaseUri = new Uri("http://zipkin.xyz.net:9411"),
-	ServiceName = "TestService",
 	SpanProcessorBatchSize = 10,
 	SampleRate = 0.5,
 	NotToBeDisplayedDomainList = new[] { ".xyz.com", ".myApplication.net" },
@@ -59,9 +57,8 @@ public class Startup
 		app.UseZipkin(new ZipkinConfig
 		{
 		    Enable = true,
-		    Domain = "service.com",
+		    Domain = new Uri("https://yourservice.com"),
 			ZipkinBaseUri = new Uri("http://zipkin.xyz.net:9411"),
-			ServiceName = "TestService",
 			SpanProcessorBatchSize = 10,
 		    SampleRate = 0.5    
 		};
