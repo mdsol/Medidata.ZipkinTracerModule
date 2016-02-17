@@ -1,60 +1,90 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Configuration;
-using System.Net;
+using Ploeh.AutoFixture;
 
 namespace Medidata.ZipkinTracer.Core.Test
 {
     [TestClass]
     public class ZipkinConfigTests
     {
-        #region Get Not To Be Displayed Domain List
-        [TestMethod]
-        public void GetNotToBeDisplayedDomainList()
+        private ZipkinConfig _sut;
+
+        [TestInitialize]
+        public void Init()
         {
-            // Arrange
-            ZipkinConfig config = new ZipkinConfig();
-            ConfigurationManager.AppSettings["zipkinNotToBeDisplayedDomainList"] = ".xyz.net,.abc.com";
-
-            // Act
-            var result = config.GetNotToBeDisplayedDomainList();
-
-            // Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(2, result.Count);
-            Assert.AreEqual(".xyz.net", result[0]);
-            Assert.AreEqual(".abc.com", result[1]);
+            var fixture = new Fixture();
+            _sut = new ZipkinConfig
+            {
+                ZipkinBaseUri = new Uri("http://zipkin.com"),
+                Domain = new Uri("http://server.com"),
+                SpanProcessorBatchSize = fixture.Create<uint>(),
+                ExcludedPathList = new List<string>(),
+                SampleRate = 0,
+                NotToBeDisplayedDomainList = new List<string>()
+            };
         }
 
         [TestMethod]
-        public void GetNotToBeDisplayedDomainListWithEmptyConfig()
+        public void Validate()
         {
-            // Arrange
-            ZipkinConfig config = new ZipkinConfig();
-            ConfigurationManager.AppSettings["zipkinNotToBeDisplayedDomainList"] = "";
-
-            // Act
-            var result = config.GetNotToBeDisplayedDomainList();
-
-            // Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(0, result.Count);
+            _sut.Validate();
         }
 
         [TestMethod]
-        public void GetNotToBeDisplayedDomainListWithOnlyCommaLocalesConfigValues()
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ValidateWithNullZipkinBaseUri()
         {
-            // Arrange
-            ZipkinConfig config = new ZipkinConfig();
-            ConfigurationManager.AppSettings["zipkinNotToBeDisplayedDomainList"] = ",";
-
-            // Act
-            var result = config.GetNotToBeDisplayedDomainList();
-
-            // Assert
-            Assert.IsNotNull(result);
-            Assert.AreEqual(0, result.Count);
+            _sut.Domain = null;
+            _sut.Validate();
         }
-        #endregion
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ValidateWithNullDontSampleList()
+        {
+            _sut.ExcludedPathList = null;
+            _sut.Validate();
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ValidateWithInvalirdDontSampleListItem()
+        {
+            _sut.ExcludedPathList = new List<string> { "xxx" };
+            _sut.Validate();
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ValidateWithNegativeSampleRate()
+        {
+            _sut.SampleRate = -1;
+            _sut.Validate();
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void ValidateWithInvalidSampleRate()
+        {
+            _sut.SampleRate = 1.1;
+            _sut.Validate();
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ValidateWithNullDomain()
+        {
+            _sut.Domain = null;
+            _sut.Validate();
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void ValidateWithNullNotToBeDisplayedDomainList()
+        {
+            _sut.NotToBeDisplayedDomainList = null;
+            _sut.Validate();
+        }
     }
 }

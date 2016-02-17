@@ -22,28 +22,18 @@ namespace Medidata.ZipkinTracer.Core
         private ServiceEndpoint zipkinEndpoint;
         private IEnumerable<string> zipkinNotToBeDisplayedDomainList;
 
-        public SpanTracer(Collector.SpanCollector spanCollector, ServiceEndpoint zipkinEndpoint, IEnumerable<string> zipkinNotToBeDisplayedDomainList, string domain, string serviceName)
+        public SpanTracer(Collector.SpanCollector spanCollector, ServiceEndpoint zipkinEndpoint, IEnumerable<string> zipkinNotToBeDisplayedDomainList, Uri domain)
         {
-            if ( spanCollector == null) 
-            {
-                throw new ArgumentNullException("spanCollector is null");
-            }
+            if (spanCollector == null) throw new ArgumentNullException(nameof(spanCollector));
+            if (zipkinEndpoint == null) throw new ArgumentNullException(nameof(zipkinEndpoint));
+            if (zipkinNotToBeDisplayedDomainList == null) throw new ArgumentNullException(nameof(zipkinNotToBeDisplayedDomainList));
+            if (domain == null) throw new ArgumentNullException(nameof(domain));
+
             this.spanCollector = spanCollector;
-
-            if ( String.IsNullOrEmpty(serviceName)) 
-            {
-                throw new ArgumentNullException("serviceName is null or empty");
-            }
             this.zipkinEndpoint = zipkinEndpoint;
-
-            if ( zipkinEndpoint == null) 
-            {
-                throw new ArgumentNullException("zipkinEndpoint is null");
-            }
             this.zipkinNotToBeDisplayedDomainList = zipkinNotToBeDisplayedDomainList;
-            var domainHost = GetHostFromUriString(domain);
-            var cleanDomain = CleanServiceName(domainHost);
-            this.serviceName = string.IsNullOrWhiteSpace(cleanDomain) ? serviceName : cleanDomain;
+            var domainHost = domain.Host;
+            this.serviceName = CleanServiceName(domainHost);
         }
 
         public virtual Span ReceiveServerSpan(string spanName, string traceId, string parentSpanId, string spanId, Uri requestUri)
@@ -110,29 +100,15 @@ namespace Medidata.ZipkinTracer.Core
 
         private string CleanServiceName(string host)
         {
-            if (string.IsNullOrWhiteSpace(host))
-            {
-                return null;
-            }
-
             foreach (var domain in zipkinNotToBeDisplayedDomainList)
             {
-                host = host.Replace(domain, "");
+                if (host.Contains(domain))
+                {
+                    return host.Replace(domain, string.Empty);
+                }
             }
-            return host;
-        }
 
-        private string GetHostFromUriString(string rawUri)
-        {
-            try
-            {
-                var uri = new Uri(rawUri);
-                return uri.Host;
-            }
-            catch
-            {
-                return string.Empty;
-            }
+            return host;
         }
 
         public virtual void ReceiveClientSpan(Span span, int statusCode)

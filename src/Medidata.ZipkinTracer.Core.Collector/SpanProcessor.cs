@@ -24,10 +24,10 @@ namespace Medidata.ZipkinTracer.Core.Collector
         internal SpanProcessorTaskFactory spanProcessorTaskFactory;
 
         internal int subsequentPollCount;
-        internal int maxBatchSize;
+        internal uint maxBatchSize;
         private readonly ILog logger;
 
-        public SpanProcessor(Uri uri, BlockingCollection<Span> spanQueue, int maxBatchSize, ILog logger)
+        public SpanProcessor(Uri uri, BlockingCollection<Span> spanQueue, uint maxBatchSize, ILog logger)
         {
             if ( spanQueue == null) 
             {

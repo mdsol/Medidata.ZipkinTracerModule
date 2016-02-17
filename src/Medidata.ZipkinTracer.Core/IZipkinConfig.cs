@@ -1,15 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Owin;
 
 namespace Medidata.ZipkinTracer.Core
 {
     public interface IZipkinConfig
     {
-        string ZipkinBaseUri { get; }
-        string ServiceName { get; }
-        string SpanProcessorBatchSize { get; }
-        string DontSampleListCsv { get; }
-        string ZipkinSampleRate { get; }
-        string Domain { get; }
-        List<string> GetNotToBeDisplayedDomainList();
+        bool Enable { get; set; }
+        Uri ZipkinBaseUri { get; set; }
+        Uri Domain { get; set; }
+        uint SpanProcessorBatchSize { get; set; }
+        IList<string> ExcludedPathList { get; set; }
+        double SampleRate { get; set; }
+        IList<string> NotToBeDisplayedDomainList { get; set; }
+        bool ShouldBeSampled(IOwinContext context, string sampled);
+        void Validate();
     }
 }

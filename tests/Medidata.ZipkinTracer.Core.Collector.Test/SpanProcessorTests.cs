@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
 using System.Collections.Concurrent;
 using Rhino.Mocks;
 using Rhino.Mocks.Interfaces;
-using Thrift;
-using System.Collections.Generic;
 using log4net;
 
 namespace Medidata.ZipkinTracer.Core.Collector.Test
@@ -18,7 +15,7 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         private SpanProcessor spanProcessor;
         private SpanProcessorTaskFactory taskFactory;
         private BlockingCollection<Span> queue;
-        private int testMaxBatchSize;
+        private uint testMaxBatchSize;
         private ILog logger;
  
         [TestInitialize]
@@ -38,14 +35,14 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullSpanQueue()
         {
-            new SpanProcessor(new Uri("http://localhost"), null, fixture.Create<int>(), logger);
+            new SpanProcessor(new Uri("http://localhost"), null, fixture.Create<uint>(), logger);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullZipkinServer()
         {
-            new SpanProcessor(null, queue, fixture.Create<int>(), logger);
+            new SpanProcessor(null, queue, fixture.Create<uint>(), logger);
         }
 
         [TestMethod]

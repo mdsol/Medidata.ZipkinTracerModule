@@ -13,6 +13,7 @@
     <tags>ZipkinTracer Core</tags>
     <dependencies>
       <dependency id="Thrift" version="0.9.1.3" />
+      <dependency id="Microsoft.Owin" version="3.0.1" />
     </dependencies>
     <references>
       <reference file="Medidata.ZipkinTracer.Core.dll" />
