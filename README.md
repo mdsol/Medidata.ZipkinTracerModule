@@ -22,7 +22,7 @@ Please use `ZipkinConig` class to configure the module and verify these values a
 - `ZipkinBaseUri` - is the zipkin scribe/collector server URI with port to send the Spans
 - `ServiceName` - name of your Service that zipkin will use to label the trace
 - `SpanProcessorBatchSize` - how many Spans should be sent to the zipkin scribe/collector in one go.
-- `SampleRate` - 1 decimal point float value between 0 and 1. This value will determine randomly if the current request will be traced or not.
+- `SampleRate` - 1 decimal point float value between 0 and 1. This value will determine randomly if the current request will be traced or not.	 
 - `NotToBeDisplayedDomainList`(optional) - It will be used when logging host name by excluding these strings in service name attribute
 	e.g. domain: ".xyz.com", host: "abc.xyz.com" will be logged as "abc" only    
 - `ExcludedPathList`(optional) - Path list that is not needed for tracing. Each item must start with "/". 
@@ -35,7 +35,7 @@ var config = new ZipkinConfig
 	Domain = "service.com",
 	ZipkinBaseUri = new Uri("http://zipkin.xyz.net:9411"),
 	ServiceName = "TestService",
-	SpanProcessorBatchSize = 1,
+	SpanProcessorBatchSize = 10,
 	SampleRate = 0.5,
 	NotToBeDisplayedDomainList = new[] { ".xyz.com", ".myApplication.net" },
 	ExcludedPathList = new[] { "/check_uri", "/status" }
@@ -60,10 +60,10 @@ public class Startup
 		{
 		    Enable = true,
 		    Domain = "service.com",
-		    SampleRate = 0.5,
-		    ServiceName = "TestService",
-		    SpanProcessorBatchSize = 1,
-		    ZipkinBaseUri = new Uri("http://zipkin.xyz.net:9411")
+			ZipkinBaseUri = new Uri("http://zipkin.xyz.net:9411"),
+			ServiceName = "TestService",
+			SpanProcessorBatchSize = 10,
+		    SampleRate = 0.5    
 		};
     }
 }
@@ -71,10 +71,12 @@ public class Startup
 ```
 
 ### Client trace (Outbound request)
-Client Trace relies on HttpMessageHandler for HttpClient.
+Client Trace relies on HttpMessageHandler for HttpClient. Please pass a ZipkinMessageHandler instance into HttpClient. 
 
 
 ```
+using Medidata.ZipkinTracer.Core.Handlers;
+
 public class HomeController : AsyncController
 {
 	private ILog logger = LogManager.GetLogger("HomeController");
@@ -89,7 +91,7 @@ public class HomeController : AsyncController
             var response = await httpClient.GetAsync("http://www.google.com");
             if (response.IsSuccessStatusCode)
             {
-                var content = response.Content.ReadAsStringAsync();
+                var content = await response.Content.ReadAsStringAsync();
             }
         }
 
