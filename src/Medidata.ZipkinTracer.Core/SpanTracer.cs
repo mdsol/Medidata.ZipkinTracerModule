@@ -102,7 +102,10 @@ namespace Medidata.ZipkinTracer.Core
         {
             foreach (var domain in zipkinNotToBeDisplayedDomainList)
             {
-                return host.Replace(domain, string.Empty);
+                if (host.Contains(domain))
+                {
+                    return host.Replace(domain, string.Empty);
+                }
             }
 
             return host;
