@@ -17,7 +17,7 @@ This will happen if :
 ## Configurations
 Please use `ZipkinConig` class to configure the module and verify these values and modify them according to your service/environment.
 
-- `BypassMode` - false: enable ZipkinMiddleware/ZipkinMessageHandler, enable: disable ZipkinMiddleware/ZipkinMessageHandler.
+- `BypassMode` - **false**: enable ZipkinMiddleware/ZipkinMessageHandler, **true**: disable ZipkinMiddleware/ZipkinMessageHandler.
 - `ZipkinBaseUri` - is the zipkin scribe/collector server URI with port to send the Spans
 - `Domain` - is a valid public facing base url for your app instance. Zipkin will use to label the trace.
 - `SpanProcessorBatchSize` - how many Spans should be sent to the zipkin scribe/collector in one go.
