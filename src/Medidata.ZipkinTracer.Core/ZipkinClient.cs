@@ -28,7 +28,7 @@ namespace Medidata.ZipkinTracer.Core
             if (spanCollectorBuilder == null) throw new ArgumentNullException(nameof(spanCollectorBuilder));
 
             var traceProvider = new TraceProvider(zipkinConfig, context);
-            IsTraceOn = zipkinConfig.Enable && IsTraceProviderSamplingOn(traceProvider);
+            IsTraceOn = !zipkinConfig.BypassMode && IsTraceProviderSamplingOn(traceProvider);
 
             if (!IsTraceOn)
                 return;

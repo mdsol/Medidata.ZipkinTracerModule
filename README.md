@@ -17,7 +17,7 @@ This will happen if :
 ## Configurations
 Please use `ZipkinConig` class to configure the module and verify these values and modify them according to your service/environment.
 
-- `Enable` - true: enable ZipkinMiddleware/ZipkinMessageHandler, false: disable ZipkinMiddleware/ZipkinMessageHandler.
+- `BypassMode` - false: enable ZipkinMiddleware/ZipkinMessageHandler, enable: disable ZipkinMiddleware/ZipkinMessageHandler.
 - `ZipkinBaseUri` - is the zipkin scribe/collector server URI with port to send the Spans
 - `Domain` - is a valid public facing base url for your app instance. Zipkin will use to label the trace.
 - `SpanProcessorBatchSize` - how many Spans should be sent to the zipkin scribe/collector in one go.
@@ -30,7 +30,7 @@ Please use `ZipkinConig` class to configure the module and verify these values a
 ```
 var config = new ZipkinConfig
 {
-	Enable = true,
+	BypassMode = false,
 	Domain = new Uri("https://yourservice.com"),
 	ZipkinBaseUri = new Uri("http://zipkin.xyz.net:9411"),
 	SpanProcessorBatchSize = 10,
@@ -56,7 +56,7 @@ public class Startup
     {
 		app.UseZipkin(new ZipkinConfig
 		{
-		    Enable = true,
+		    BypassMode = false,
 		    Domain = new Uri("https://yourservice.com"),
 			ZipkinBaseUri = new Uri("http://zipkin.xyz.net:9411"),
 			SpanProcessorBatchSize = 10,
