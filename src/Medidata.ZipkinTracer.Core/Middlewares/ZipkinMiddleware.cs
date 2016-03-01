@@ -28,7 +28,7 @@ namespace Medidata.ZipkinTracer.Core.Middlewares
     {
         public static void UseZipkin(this IAppBuilder app, IZipkinConfig config)
         {
-            if (config.Enable)
+            if (!config.BypassMode)
             {
                 config.Validate();
                 app.Use<ZipkinMiddleware>(config);
