@@ -16,6 +16,12 @@ namespace Medidata.ZipkinTracer.Core.Middlewares
 
         public override async Task Invoke(IOwinContext context)
         {
+            if (_config.Bypass != null && _config.Bypass(context.Request))
+            {
+                await Next.Invoke(context);
+                return;
+            }
+
             var logger = LogManager.GetLogger("ZipkinMiddleware");
             var zipkin = new ZipkinClient(logger, _config, context);
             var span = zipkin.StartServerTrace(context.Request.Uri, context.Request.Method);
@@ -28,11 +34,8 @@ namespace Medidata.ZipkinTracer.Core.Middlewares
     {
         public static void UseZipkin(this IAppBuilder app, IZipkinConfig config)
         {
-            if (!config.BypassMode)
-            {
-                config.Validate();
-                app.Use<ZipkinMiddleware>(config);
-            }
+            config.Validate();
+            app.Use<ZipkinMiddleware>(config);
         }
     }
 }

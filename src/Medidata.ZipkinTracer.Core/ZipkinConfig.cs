@@ -7,7 +7,7 @@ namespace Medidata.ZipkinTracer.Core
 {
     public class ZipkinConfig : IZipkinConfig
     {
-        public bool BypassMode { get; set; } = false;
+        public Predicate<IOwinRequest> Bypass { get; set; } = r => false;
         public Uri ZipkinBaseUri { get; set; }
         public Uri Domain { get; set; }
         public uint SpanProcessorBatchSize { get; set; }

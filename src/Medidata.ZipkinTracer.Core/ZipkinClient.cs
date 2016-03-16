@@ -16,19 +16,20 @@ namespace Medidata.ZipkinTracer.Core
         public ITraceProvider TraceProvider { get; }
         public IZipkinConfig ZipkinConfig { get; }
 
-        public ZipkinClient(ILog logger, IZipkinConfig zipkinConfig, IOwinContext context = null)
+        public ZipkinClient(ILog logger, IZipkinConfig zipkinConfig, IOwinContext context)
             : this (logger, zipkinConfig, new SpanCollectorBuilder(), context)
         {
         }
 
-        public ZipkinClient(ILog logger, IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder, IOwinContext context = null)
+        public ZipkinClient(ILog logger, IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder, IOwinContext context)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (zipkinConfig == null) throw new ArgumentNullException(nameof(zipkinConfig));
             if (spanCollectorBuilder == null) throw new ArgumentNullException(nameof(spanCollectorBuilder));
+            if (context == null) throw new ArgumentNullException(nameof(context));
 
             var traceProvider = new TraceProvider(zipkinConfig, context);
-            IsTraceOn = !zipkinConfig.BypassMode && IsTraceProviderSamplingOn(traceProvider);
+            IsTraceOn = !zipkinConfig.Bypass(context.Request) && IsTraceProviderSamplingOn(traceProvider);
 
             if (!IsTraceOn)
                 return;
