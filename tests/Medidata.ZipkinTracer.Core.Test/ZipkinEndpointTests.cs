@@ -24,8 +24,8 @@ namespace Medidata.ZipkinTracer.Core.Test
             var endpoint = zipkinEndpoint.GetLocalEndpoint(serviceName);
 
             Assert.IsNotNull(endpoint);
-            Assert.AreEqual(serviceName, endpoint.Service_name);
-            Assert.IsNotNull(endpoint.Ipv4);
+            Assert.AreEqual(serviceName, endpoint.ServiceName);
+            Assert.IsNotNull(endpoint.IPAddress);
             Assert.IsNotNull(endpoint.Port);
         }
 
@@ -39,8 +39,8 @@ namespace Medidata.ZipkinTracer.Core.Test
             var endpoint = zipkinEndpoint.GetRemoteEndpoint(remoteUri, serviceName);
 
             Assert.IsNotNull(endpoint);
-            Assert.AreEqual(serviceName, endpoint.Service_name);
-            Assert.IsNotNull(endpoint.Ipv4);
+            Assert.AreEqual(serviceName, endpoint.ServiceName);
+            Assert.IsNotNull(endpoint.IPAddress);
             Assert.IsNotNull(endpoint.Port);
         }
     }

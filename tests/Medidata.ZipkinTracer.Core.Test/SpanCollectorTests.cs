@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Concurrent;
+using log4net;
+using Medidata.ZipkinTracer.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
-using System.Collections.Concurrent;
-using log4net;
 
-namespace Medidata.ZipkinTracer.Core.Collector.Test
+namespace Medidata.ZipkinTracer.Core.Test
 {
     [TestClass]
     public class SpanCollectorTests
@@ -65,8 +65,8 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
             
             Span span = new Span();
             span.Id = testSpanId;
-            span.Trace_id = testTraceId;
-            span.Parent_id = testParentSpanId;
+            span.TraceId = testTraceId;
+            span.ParentId = testParentSpanId;
             span.Name = testName;
 
             spanCollector.Collect(span);

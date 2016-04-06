@@ -2,30 +2,22 @@
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using Medidata.ZipkinTracer.Models;
 
 namespace Medidata.ZipkinTracer.Core
 {
     public class ServiceEndpoint 
     {
-        public virtual Endpoint GetLocalEndpoint(string serviceName, short port = 443)
+        public virtual Endpoint GetLocalEndpoint(string serviceName, ushort port = 443)
         {
             // personally, it should have been nullable short for port. but since zipkin server requires it, 443
             // has be chosen to be that magic number as most servers have it.
             // TODO: get rid of this magic number
 
-            var addressBytes = GetLocalIPAddress().GetAddressBytes();
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(addressBytes);
-            }
-
-            var ipAddressStr = BitConverter.ToInt32(addressBytes, 0);
-            var hostIpAddressStr = (int)IPAddress.HostToNetworkOrder(ipAddressStr);
-
             return new Endpoint()
             {
-                Service_name = serviceName,
-                Ipv4 = hostIpAddressStr,
+                ServiceName = serviceName,
+                IPAddress = GetLocalIPAddress(),
                 Port = port
             };
         }
@@ -43,9 +35,9 @@ namespace Medidata.ZipkinTracer.Core
 
             return new Endpoint()
             {
-                Service_name = remoteServiceName,
-                Ipv4 = hostIpAddressStr,
-                Port = (short)remoteServer.Port
+                ServiceName = remoteServiceName,
+                IPAddress = GetRemoteIPAddress(remoteServer),
+                Port = (ushort)remoteServer.Port
             };
         }
 

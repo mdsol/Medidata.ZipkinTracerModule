@@ -68,13 +68,28 @@
     <Compile Include="ITracerClient.cs" />
     <Compile Include="IZipkinConfig.cs" />
     <Compile Include="Middlewares\ZipkinMiddleware.cs" />
+    <Compile Include="Models\Annotation.cs" />
+    <Compile Include="Models\AnnotationBase.cs" />
+    <Compile Include="Models\BinaryAnnotation.cs" />
+    <Compile Include="Models\Endpoint.cs" />
+    <Compile Include="Models\References\AnnotationType.cs" />
+    <Compile Include="Models\References\ZipkinConstants.cs" />
+    <Compile Include="Models\Serialization\Json\JsonAnnotation.cs" />
+    <Compile Include="Models\Serialization\Json\JsonBinaryAnnotation.cs" />
+    <Compile Include="Models\Serialization\Json\JsonEndpoint.cs" />
+    <Compile Include="Models\Serialization\Json\JsonSpan.cs" />
+    <Compile Include="Models\Span.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SpanCollector.cs" />
+    <Compile Include="SpanProcessor.cs" />
+    <Compile Include="SpanProcessorTaskFactory.cs" />
     <Compile Include="SpanTracer.cs" />
     <Compile Include="TraceProvider.cs" />
     <Compile Include="ZipkinClient.cs" />
     <Compile Include="ZipkinConfig.cs" />
     <Compile Include="ServiceEndpoint.cs" />
     <Compile Include="Handlers\ZipkinMessageHandler.cs" />
+    <Compile Include="ZipkinTracerExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Medidata.ZipkinTracer.Core.nuspec">
@@ -83,12 +98,6 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Medidata.ZipkinTracer.Core.Collector\Medidata.ZipkinTracer.Core.Collector.csproj">
-      <Project>{12e57184-b43e-43c5-ac19-06ad1dc25e96}</Project>
-      <Name>Medidata.ZipkinTracer.Core.Collector</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

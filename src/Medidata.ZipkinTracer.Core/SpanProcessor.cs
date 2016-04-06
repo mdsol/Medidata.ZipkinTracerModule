@@ -5,9 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using log4net;
+using Medidata.ZipkinTracer.Models;
 using Newtonsoft.Json;
 
-namespace Medidata.ZipkinTracer.Core.Collector
+namespace Medidata.ZipkinTracer.Core
 {
     public class SpanProcessor
     {
@@ -20,7 +21,7 @@ namespace Medidata.ZipkinTracer.Core.Collector
 
         //using a queue because even as we pop items to send to zipkin, another 
         //thread can be adding spans if someone shares the span processor accross threads
-        internal ConcurrentQueue<SerializableSpan> serializableSpans; 
+        internal ConcurrentQueue<JsonSpan> serializableSpans; 
         internal SpanProcessorTaskFactory spanProcessorTaskFactory;
 
         internal int subsequentPollCount;
@@ -41,7 +42,7 @@ namespace Medidata.ZipkinTracer.Core.Collector
 
             this.uri = uri;
             this.spanQueue = spanQueue;
-            this.serializableSpans = new ConcurrentQueue<SerializableSpan>();
+            this.serializableSpans = new ConcurrentQueue<JsonSpan>();
             this.maxBatchSize = maxBatchSize;
             this.logger = logger;
             spanProcessorTaskFactory = new SpanProcessorTaskFactory(logger);
@@ -104,7 +105,7 @@ namespace Medidata.ZipkinTracer.Core.Collector
             var anyNewSpansQueued = false;
             while (spanQueue.TryTake(out span))
             {
-                serializableSpans.Enqueue(new SerializableSpan(span));
+                serializableSpans.Enqueue(new JsonSpan(span));
                 anyNewSpansQueued = true;
             }
             return anyNewSpansQueued;
@@ -119,8 +120,8 @@ namespace Medidata.ZipkinTracer.Core.Collector
 
         private string GetSpansJSONRepresentation()
         {
-            SerializableSpan span;
-            var spanList = new List<SerializableSpan>();
+            JsonSpan span;
+            var spanList = new List<JsonSpan>();
             //using Dequeue into a list so that the span is removed from the queue as we add it to list
             while (serializableSpans.TryDequeue(out span))
             {

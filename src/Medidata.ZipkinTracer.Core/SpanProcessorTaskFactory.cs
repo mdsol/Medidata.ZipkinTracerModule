@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Medidata.ZipkinTracer.Core.Collector
+namespace Medidata.ZipkinTracer.Core
 {
     public class SpanProcessorTaskFactory
     {

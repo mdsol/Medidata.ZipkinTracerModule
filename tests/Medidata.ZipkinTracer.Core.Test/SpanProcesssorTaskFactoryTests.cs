@@ -1,8 +1,8 @@
 ﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Rhino.Mocks;
 using System.Threading;
 using log4net;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Rhino.Mocks;
 
 namespace Medidata.ZipkinTracer.Core.Collector.Test
 {
