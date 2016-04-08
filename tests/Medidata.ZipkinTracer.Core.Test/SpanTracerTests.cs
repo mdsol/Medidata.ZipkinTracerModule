@@ -96,8 +96,11 @@ namespace Medidata.ZipkinTracer.Core.Test
 
             Assert.AreEqual(localEndpoint, annotation.Host);
 
-            Assert.AreEqual(1, resultSpan.GetAnnotationsByType<BinaryAnnotation>().Count());
-            AssertBinaryAnnotations(resultSpan.GetAnnotationsByType<BinaryAnnotation>(), "http.uri", serverUri.AbsolutePath);
+            var binaryAnnotations = resultSpan.GetAnnotationsByType<BinaryAnnotation>();
+
+            Assert.AreEqual(1, binaryAnnotations.Count());
+
+            AssertBinaryAnnotations(binaryAnnotations, "http.uri", serverUri.AbsolutePath);
         }
 
         [TestMethod]
@@ -219,6 +222,8 @@ namespace Medidata.ZipkinTracer.Core.Test
             Assert.AreEqual(Int64.Parse(parentSpanId, System.Globalization.NumberStyles.HexNumber), resultSpan.ParentId);
             Assert.AreEqual(Int64.Parse(spanId, System.Globalization.NumberStyles.HexNumber), resultSpan.Id);
 
+
+
             Assert.AreEqual(1, resultSpan.GetAnnotationsByType<Annotation>().Count());
 
             var annotation = resultSpan.Annotations[0] as Annotation;
@@ -226,12 +231,15 @@ namespace Medidata.ZipkinTracer.Core.Test
             Assert.AreEqual(ZipkinConstants.ClientSend, annotation.Value);
             Assert.IsNotNull(annotation.Timestamp);
             Assert.AreEqual(localEndpoint, annotation.Host);
-            
-            Assert.AreEqual(2, resultSpan.GetAnnotationsByType<BinaryAnnotation>().Count());
-            AssertBinaryAnnotations(resultSpan.GetAnnotationsByType<BinaryAnnotation>(), "http.uri", serverUri.AbsolutePath);
-            AssertBinaryAnnotations(resultSpan.GetAnnotationsByType<BinaryAnnotation>(), "sa", "1");
 
-            var endpoint = resultSpan.GetAnnotationsByType<BinaryAnnotation>().Skip(1).First().Host as Endpoint;
+            var binaryAnnotations = resultSpan.GetAnnotationsByType<BinaryAnnotation>();
+
+            Assert.AreEqual(2, binaryAnnotations.Count());
+            AssertBinaryAnnotations(binaryAnnotations, "http.uri", serverUri.AbsolutePath);
+            AssertBinaryAnnotations(binaryAnnotations, "sa", "1");
+
+            var endpoint = binaryAnnotations.ToArray()[1].Host as Endpoint;
+
             Assert.IsNotNull(endpoint);
             Assert.AreEqual(clientServiceName, endpoint.ServiceName);
         }
@@ -255,7 +263,8 @@ namespace Medidata.ZipkinTracer.Core.Test
 
             var resultSpan = spanTracer.SendClientSpan(requestName, traceId, parentSpanId, spanId, serverUri);
 
-            var endpoint = resultSpan.GetAnnotationsByType<BinaryAnnotation>().Skip(1).First().Host as Endpoint;
+            var endpoint = resultSpan.GetAnnotationsByType<BinaryAnnotation>().ToArray()[1].Host as Endpoint;
+
             Assert.IsNotNull(endpoint);
             Assert.AreEqual(clientServiceName, endpoint.ServiceName);
         }
@@ -346,7 +355,10 @@ namespace Medidata.ZipkinTracer.Core.Test
                 spanTracer.RecordBinary(expectedSpan, keyName, testValue.Value);
 
                 // Assert
-                var actualAnnotation = expectedSpan.GetAnnotationsByType<BinaryAnnotation>()?.SingleOrDefault(a => a.Key == keyName);
+                var actualAnnotation = expectedSpan
+                    .GetAnnotationsByType<BinaryAnnotation>()?
+                    .SingleOrDefault(a => a.Key == keyName);
+
                 var result = actualAnnotation?.Value;
                 var annotationType = actualAnnotation?.AnnotationType;
                 Assert.AreEqual(testValue.ExpectedResult, result, "The recorded value in the annotation is wrong.");

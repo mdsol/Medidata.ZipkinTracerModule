@@ -32,9 +32,11 @@ namespace Medidata.ZipkinTracer
             return span.Annotations.OfType<TAnnotation>();
         }
 
-        public static long ToUnixTimeSeconds(this DateTimeOffset value)
+        public static long ToUnixTimeMicroseconds(this DateTimeOffset value)
         {
-            return Convert.ToInt64((value - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero)).TotalSeconds);
+            return Convert.ToInt64(
+                (value - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero)).TotalMilliseconds * 1000
+            );
         }
     }
 }

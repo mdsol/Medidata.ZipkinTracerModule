@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace Medidata.ZipkinTracer.Models
 {
@@ -17,6 +18,9 @@ namespace Medidata.ZipkinTracer.Models
 
         public JsonEndpoint(Endpoint endpoint)
         {
+            if (endpoint == null)
+                throw new ArgumentNullException(nameof(endpoint));
+
             this.endpoint = endpoint;
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 
@@ -30,6 +31,9 @@ namespace Medidata.ZipkinTracer.Models
 
         public JsonSpan(Span span)
         {
+            if (span == null)
+                throw new ArgumentNullException(nameof(span));
+
             this.span = span;
         }
     }
