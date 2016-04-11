@@ -32,17 +32,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
+    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.Owin, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Newtonsoft.Json.6.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
@@ -58,23 +58,34 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Thrift, Version=0.9.1.3, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Thrift.0.9.1.3\lib\net35\Thrift.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ITraceProvider.cs" />
     <Compile Include="ITracerClient.cs" />
     <Compile Include="IZipkinConfig.cs" />
     <Compile Include="Middlewares\ZipkinMiddleware.cs" />
+    <Compile Include="Models\Annotation.cs" />
+    <Compile Include="Models\AnnotationBase.cs" />
+    <Compile Include="Models\BinaryAnnotation.cs" />
+    <Compile Include="Models\Endpoint.cs" />
+    <Compile Include="Models\References\AnnotationType.cs" />
+    <Compile Include="Models\References\ZipkinConstants.cs" />
+    <Compile Include="Models\Serialization\Json\JsonAnnotation.cs" />
+    <Compile Include="Models\Serialization\Json\JsonBinaryAnnotation.cs" />
+    <Compile Include="Models\Serialization\Json\JsonEndpoint.cs" />
+    <Compile Include="Models\Serialization\Json\JsonSpan.cs" />
+    <Compile Include="Models\Span.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SpanCollector.cs" />
+    <Compile Include="SpanProcessor.cs" />
+    <Compile Include="SpanProcessorTaskFactory.cs" />
     <Compile Include="SpanTracer.cs" />
     <Compile Include="TraceProvider.cs" />
     <Compile Include="ZipkinClient.cs" />
     <Compile Include="ZipkinConfig.cs" />
     <Compile Include="ServiceEndpoint.cs" />
     <Compile Include="Handlers\ZipkinMessageHandler.cs" />
+    <Compile Include="ZipkinTracerExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Medidata.ZipkinTracer.Core.nuspec">
@@ -83,12 +94,6 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Medidata.ZipkinTracer.Core.Collector\Medidata.ZipkinTracer.Core.Collector.csproj">
-      <Project>{12e57184-b43e-43c5-ac19-06ad1dc25e96}</Project>
-      <Name>Medidata.ZipkinTracer.Core.Collector</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

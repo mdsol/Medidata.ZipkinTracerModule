@@ -4,7 +4,9 @@ A .NET implementation of the Zipkin Tracer client.
 ## Overview
 This nuget package implements the zipkin tracer client for .net applications.
 
-**Medidata.ZipkinTracer.Core** : core library for generating zipkin spans from ids sent through from CrossApplicationTracer and sending it to the zipkin collector using thrift protocol. For more information and implementations in other languages, please check [Openzipkin](https://github.com/openzipkin/).
+**Medidata.ZipkinTracer.Core** : core library for generating zipkin spans from ids sent through from
+CrossApplicationTracer and sending it to the zipkin collector using HTTP as the transport protocol. For more information
+and implementations in other languages, please check [Openzipkin](https://github.com/openzipkin/).
 
 ### Enable/Disable zipkin tracing
 
@@ -12,12 +14,17 @@ Zipkin will record traces if IsSampled HTTP header is true.
 This will happen if :
 - **a)** the caller of the app has set the IsSampled HTTP header value to true.
 - **OR**
-- **b)** the url request is not in the `ExcludedPathList` of ZipkinConfig , and using the `SampleRate`, it will determine whether or not to trace this request. `SampleRate` is the approximate percentage of traces being recorded in zipkin.
+- **b)** the url request is not in the `ExcludedPathList` of ZipkinConfig , and using the `SampleRate`, it will
+determine whether or not to trace this request. `SampleRate` is the approximate percentage of traces being recorded in
+zipkin.
 
 ## Configurations
-Please use `ZipkinConig` class to configure the module and verify these values and modify them according to your service/environment.
+Please use `ZipkinConig` class to configure the module and verify these values and modify them according to your
+service/environment.
 
-- `Bypass` - **false**: enable ZipkinMiddleware/ZipkinMessageHandler, **true**: disable ZipkinMiddleware/ZipkinMessageHandler.
+- `Bypass` - Controls whether the requests should be sent through the Zipkin module
+  - **false**: Enables the ZipkinMiddleware/ZipkinMessageHandler
+  - **true**: Disables the ZipkinMiddleware/ZipkinMessageHandler
 - `ZipkinBaseUri` - is the zipkin scribe/collector server URI with port to send the Spans
 - `Domain` - is a valid public facing base url for your app instance. Zipkin will use to label the trace.
 - `SpanProcessorBatchSize` - how many Spans should be sent to the zipkin scribe/collector in one go.
@@ -124,10 +131,12 @@ using (var client = new HttpClient())
 ...
 ```
 
-In case of the `ZipkinClient.Record()` method, the second parameter(`value`) can be omitted during the call, in that case the caller member name (method, property etc.) will get recorded.
+In case of the `ZipkinClient.Record()` method, the second parameter(`value`) can be omitted during the call, in that
+case the caller member name (method, property etc.) will get recorded.
 
 #### Recording a local component
-With the `RecordLocalComponent()` method of the client a local component (or information) can be recorded for the current trace. This will result an additional binary annotation with the 'lc' key (LOCAL_COMPONENT) and a custom value.
+With the `RecordLocalComponent()` method of the client a local component (or information) can be recorded for the
+current trace. This will result an additional binary annotation with the 'lc' key (LOCAL_COMPONENT) and a custom value.
 
 ## Contributors
 ZipkinTracer is (c) Medidata Solutions Worldwide and owned by its major contributors:

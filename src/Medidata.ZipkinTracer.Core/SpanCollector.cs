@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using log4net;
+using Medidata.ZipkinTracer.Models;
 
-namespace Medidata.ZipkinTracer.Core.Collector
+namespace Medidata.ZipkinTracer.Core
 {
     public class SpanCollector
     {

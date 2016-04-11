@@ -1,28 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Medidata.ZipkinTracer.Models;
 
 namespace Medidata.ZipkinTracer.Core
 {
     public class SpanTracer
     {
-        private static readonly Dictionary<Type, AnnotationType> annotationTypes = new Dictionary<Type, AnnotationType>()
-        {
-            { typeof(bool), AnnotationType.BOOL },
-            { typeof(byte[]), AnnotationType.BYTES },
-            { typeof(short), AnnotationType.I16 },
-            { typeof(int), AnnotationType.I32 },
-            { typeof(long), AnnotationType.I64 },
-            { typeof(double), AnnotationType.DOUBLE },
-            { typeof(string), AnnotationType.STRING }
-        };
-
-        private Collector.SpanCollector spanCollector;
+        private SpanCollector spanCollector;
         private string serviceName;
         private ServiceEndpoint zipkinEndpoint;
         private IEnumerable<string> zipkinNotToBeDisplayedDomainList;
 
-        public SpanTracer(Collector.SpanCollector spanCollector, ServiceEndpoint zipkinEndpoint, IEnumerable<string> zipkinNotToBeDisplayedDomainList, Uri domain)
+        public SpanTracer(SpanCollector spanCollector, ServiceEndpoint zipkinEndpoint, IEnumerable<string> zipkinNotToBeDisplayedDomainList, Uri domain)
         {
             if (spanCollector == null) throw new ArgumentNullException(nameof(spanCollector));
             if (zipkinEndpoint == null) throw new ArgumentNullException(nameof(zipkinEndpoint));
@@ -39,14 +29,14 @@ namespace Medidata.ZipkinTracer.Core
         public virtual Span ReceiveServerSpan(string spanName, string traceId, string parentSpanId, string spanId, Uri requestUri)
         {
             var newSpan = CreateNewSpan(spanName, traceId, parentSpanId, spanId);
-            var serviceEndpoint = zipkinEndpoint.GetLocalEndpoint(serviceName, (short)requestUri.Port);
+            var serviceEndpoint = zipkinEndpoint.GetLocalEndpoint(serviceName, (ushort)requestUri.Port);
 
             var annotation = new Annotation()
             {
                 Host = serviceEndpoint,
-                Timestamp = GetTimeStamp(),
-                Value = zipkinCoreConstants.SERVER_RECV
+                Value = ZipkinConstants.ServerReceive
             };
+
             newSpan.Annotations.Add(annotation);
 
             AddBinaryAnnotation("http.uri", requestUri.AbsolutePath, newSpan, serviceEndpoint);
@@ -69,8 +59,7 @@ namespace Medidata.ZipkinTracer.Core
             var annotation = new Annotation()
             {
                 Host = span.Annotations.First().Host,
-                Timestamp = GetTimeStamp(),
-                Value = zipkinCoreConstants.SERVER_SEND
+                Value = ZipkinConstants.ServerSend
             };
 
             span.Annotations.Add(annotation);
@@ -87,8 +76,7 @@ namespace Medidata.ZipkinTracer.Core
             var annotation = new Annotation
             {
                 Host = serviceEndpoint,
-                Timestamp = GetTimeStamp(),
-                Value = zipkinCoreConstants.CLIENT_SEND
+                Value = ZipkinConstants.ClientSend
             };
 
             newSpan.Annotations.Add(annotation);
@@ -126,8 +114,7 @@ namespace Medidata.ZipkinTracer.Core
             var annotation = new Annotation()
             {
                 Host = span.Annotations.First().Host,
-                Timestamp = GetTimeStamp(),
-                Value = zipkinCoreConstants.CLIENT_RECV
+                Value = ZipkinConstants.ClientReceive
             };
 
             span.Annotations.Add(annotation);
@@ -144,7 +131,6 @@ namespace Medidata.ZipkinTracer.Core
             span.Annotations.Add(new Annotation()
             {
                 Host = zipkinEndpoint.GetLocalEndpoint(serviceName),
-                Timestamp = GetTimeStamp(),
                 Value = value
             });
         }
@@ -154,54 +140,39 @@ namespace Medidata.ZipkinTracer.Core
              if (span == null)
                 throw new ArgumentNullException("span", "In order to record a binary annotation, the span must be not null.");
 
-            span.Binary_annotations.Add(new BinaryAnnotation()
+            span.Annotations.Add(new BinaryAnnotation()
             {
                 Host = zipkinEndpoint.GetLocalEndpoint(serviceName),
-                Annotation_type = GetAnnotationType(typeof(T)),
                 Key = key,
-                Value = value?.ToString()
+                Value = value
             });
-        }
-
-        private AnnotationType GetAnnotationType(Type type)
-        {
-            return annotationTypes.ContainsKey(type) ? annotationTypes[type] : AnnotationType.STRING;
         }
 
         private Span CreateNewSpan(string spanName, string traceId, string parentSpanId, string spanId)
         {
             var newSpan = new Span();
             newSpan.Id = Int64.Parse(spanId, System.Globalization.NumberStyles.HexNumber);
-            newSpan.Trace_id = Int64.Parse(traceId, System.Globalization.NumberStyles.HexNumber);
+            newSpan.TraceId = Int64.Parse(traceId, System.Globalization.NumberStyles.HexNumber);
 
             if (!String.IsNullOrEmpty(parentSpanId))
             {
-                newSpan.Parent_id = Int64.Parse(parentSpanId, System.Globalization.NumberStyles.HexNumber);
+                newSpan.ParentId = Int64.Parse(parentSpanId, System.Globalization.NumberStyles.HexNumber);
             }
 
             newSpan.Name = spanName;
-            newSpan.Annotations = new List<Annotation>();
-            newSpan.Binary_annotations = new List<BinaryAnnotation>();
             return newSpan;
         }
 
-        private long GetTimeStamp()
+        private void AddBinaryAnnotation<T>(string key, T value, Span span, Endpoint endpoint)
         {
-            var t = DateTime.UtcNow - new DateTime(1970, 1, 1);
-            return Convert.ToInt64(t.TotalMilliseconds * 1000);
-        }
-
-        private void AddBinaryAnnotation(string key, string value, Span span, Endpoint endpoint)
-        {
-            var binaryAnnotation = new BinaryAnnotation
+            var binaryAnnotation = new BinaryAnnotation()
             {
                 Host = endpoint,
-                Annotation_type = AnnotationType.STRING,
                 Key = key,
                 Value = value
             };
 
-            span.Binary_annotations.Add(binaryAnnotation);
+            span.Annotations.Add(binaryAnnotation);
         }
     }
 }

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using log4net;
+using Medidata.ZipkinTracer.Models;
+using Microsoft.Owin;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
-using Medidata.ZipkinTracer.Core.Collector;
-using log4net;
-using System.Linq;
-using System.Diagnostics;
-using Microsoft.Owin;
 
 namespace Medidata.ZipkinTracer.Core.Test
 {
@@ -15,7 +15,6 @@ namespace Medidata.ZipkinTracer.Core.Test
     public class ZipkinClientTests
     {
         private IFixture fixture;
-        private ISpanCollectorBuilder spanCollectorBuilder;
         private SpanCollector spanCollectorStub;
         private SpanTracer spanTracerStub;
         private ITraceProvider traceProvider;
@@ -27,7 +26,6 @@ namespace Medidata.ZipkinTracer.Core.Test
         public void Init()
         {
             fixture = new Fixture();
-            spanCollectorBuilder = MockRepository.GenerateStub<ISpanCollectorBuilder>();
             traceProvider = MockRepository.GenerateStub<ITraceProvider>();
             logger = MockRepository.GenerateStub<ILog>();
             owinContext = MockRepository.GenerateStub<IOwinContext>();
@@ -42,28 +40,21 @@ namespace Medidata.ZipkinTracer.Core.Test
         [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullLogger()
         {
-            new ZipkinClient(null, new ZipkinConfig(), spanCollectorBuilder, owinContext);
+            new ZipkinClient(null, new ZipkinConfig(), owinContext);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullConfig()
         {
-            new ZipkinClient(logger, null, spanCollectorBuilder, owinContext);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void CTOR_WithNullBuilder()
-        {
-            new ZipkinClient(logger, new ZipkinConfig(), null, owinContext);
+            new ZipkinClient(logger, null, owinContext);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullContext()
         {
-            new ZipkinClient(logger, new ZipkinConfig(), spanCollectorBuilder, null);
+            new ZipkinClient(logger, new ZipkinConfig(), null);
         }
 
         [TestMethod]
@@ -75,8 +66,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             AddSampled(false);
 
             spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(new Uri("http://localhost"), (uint)0, logger);
-            spanCollectorBuilder.Expect(x => x.Build(Arg<Uri>.Is.Anything, Arg<uint>.Is.Anything, Arg<ILog>.Is.Equal(logger))).Return(spanCollectorStub);
-            var zipkinClient = new ZipkinClient(logger, zipkinConfigStub, spanCollectorBuilder, owinContext);
+            var zipkinClient = new ZipkinClient(logger, zipkinConfigStub, owinContext, spanCollectorStub);
             Assert.IsFalse(zipkinClient.IsTraceOn);
         }
 
@@ -89,8 +79,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             AddSampled(false);
 
             spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(new Uri("http://localhost"), (uint)0, logger);
-            spanCollectorBuilder.Expect(x => x.Build(Arg<Uri>.Is.Anything, Arg<uint>.Is.Anything, Arg<ILog>.Is.Equal(logger))).Return(spanCollectorStub);
-            var zipkinClient = new ZipkinClient(logger, zipkinConfigStub, spanCollectorBuilder, owinContext);
+            var zipkinClient = new ZipkinClient(logger, zipkinConfigStub, owinContext, spanCollectorStub);
             Assert.IsFalse(zipkinClient.IsTraceOn);
         }
 
@@ -102,24 +91,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             Assert.IsNotNull(zipkinClient.spanTracer);
         }
 
-        [TestMethod]
-        public void CTOR_ZpkinServer_Exception()
-        {
-            var zipkinConfigStub = CreateZipkinConfigWithDefaultValues();
-
-            traceProvider.Expect(x => x.TraceId).Return(fixture.Create<string>());
-            traceProvider.Expect(x => x.IsSampled).Return(true);
-
-            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(new Uri("http://localhost"), (uint)0, logger);
-
-            var expectedException = new Exception();
-            spanCollectorBuilder.Expect(x => x.Build(Arg<Uri>.Is.Anything, Arg<uint>.Is.Anything, Arg<ILog>.Is.Equal(logger))).Throw(expectedException);
-
-            var zipkinClient = new ZipkinClient(logger, zipkinConfigStub, spanCollectorBuilder, owinContext);
-            Assert.IsFalse(zipkinClient.IsTraceOn);
-        }
-
-        [TestMethod]
+         [TestMethod]
         public void Shutdown_StopCollector()
         {
             var zipkinClient = (ZipkinClient)SetupZipkinClient();
@@ -447,13 +419,13 @@ namespace Medidata.ZipkinTracer.Core.Test
             var zipkinClient = (ZipkinClient)tracerClient;
             zipkinClient.IsTraceOn = false;
 
-            var testSpan = new Span() { Annotations = new List<Annotation>() };
+            var testSpan = new Span();
 
             // Act
             tracerClient.Record(testSpan, "irrelevant");
 
             // Assert
-            Assert.AreEqual(0, testSpan.Annotations.Count, "There are annotations but the trace is off.");
+            Assert.IsFalse(testSpan.Annotations.Any(), "There are annotations but the trace is off.");
         }
 
         [TestMethod]
@@ -467,7 +439,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             var zipkinClient = (ZipkinClient)tracerClient;
             zipkinClient.IsTraceOn = true;
 
-            var testSpan = new Span() { Annotations = new List<Annotation>() };
+            var testSpan = new Span();
 
             // Act
             tracerClient.Record(testSpan);
@@ -475,7 +447,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             // Assert
             Assert.AreEqual(1, testSpan.Annotations.Count, "There is not exactly one annotation added.");
             Assert.IsNotNull(
-                testSpan.Annotations.SingleOrDefault(a => a.Value == callerMemberName),
+                testSpan.GetAnnotationsByType<Annotation>().SingleOrDefault(a => (string)a.Value == callerMemberName),
                 "The record with the caller name is not found in the Annotations."
             );
         }
@@ -492,13 +464,13 @@ namespace Medidata.ZipkinTracer.Core.Test
             var zipkinClient = (ZipkinClient)tracerClient;
             zipkinClient.IsTraceOn = false;
 
-            var testSpan = new Span() { Binary_annotations = new List<BinaryAnnotation>() };
+            var testSpan = new Span();
 
             // Act
             tracerClient.RecordBinary(testSpan, keyName, testValue);
 
             // Assert
-            Assert.AreEqual(0, testSpan.Binary_annotations.Count, "There are annotations but the trace is off.");
+            Assert.IsFalse(testSpan.GetAnnotationsByType<Annotation>().Any(), "There are annotations but the trace is off.");
         }
 
         [TestMethod]
@@ -512,13 +484,13 @@ namespace Medidata.ZipkinTracer.Core.Test
             var zipkinClient = (ZipkinClient)tracerClient;
             zipkinClient.IsTraceOn = true;
 
-            var testSpan = new Span() { Binary_annotations = new List<BinaryAnnotation>() };
+            var testSpan = new Span();
 
             // Act
             tracerClient.RecordLocalComponent(testSpan, testValue);
 
             // Assert
-            var annotation = testSpan.Binary_annotations.SingleOrDefault(a => a.Key == zipkinCoreConstants.LOCAL_COMPONENT);
+            var annotation = testSpan.GetAnnotationsByType<BinaryAnnotation>().SingleOrDefault(a => a.Key == ZipkinConstants.LocalComponent);
             Assert.IsNotNull(annotation, "There is no local trace annotation in the binary annotations.");
             Assert.AreEqual(testValue, annotation.Value, "The local component annotation value is not correct.");
         }
@@ -534,19 +506,18 @@ namespace Medidata.ZipkinTracer.Core.Test
             var zipkinClient = (ZipkinClient)tracerClient;
             zipkinClient.IsTraceOn = false;
 
-            var testSpan = new Span() { Binary_annotations = new List<BinaryAnnotation>() };
+            var testSpan = new Span();
 
             // Act
-            tracerClient.RecordBinary(testSpan, zipkinCoreConstants.LOCAL_COMPONENT, testValue);
+            tracerClient.RecordBinary(testSpan, ZipkinConstants.LocalComponent, testValue);
 
             // Assert
-            Assert.AreEqual(0, testSpan.Binary_annotations.Count, "There are annotations but the trace is off.");
+            Assert.IsFalse(testSpan.GetAnnotationsByType<BinaryAnnotation>().Any(), "There are annotations but the trace is off.");
         }
 
         private ITracerClient SetupZipkinClient(IZipkinConfig zipkinConfig = null)
         {
             spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(new Uri("http://localhost"), (uint)0, logger);
-            spanCollectorBuilder.Expect(x => x.Build(Arg<Uri>.Is.Anything, Arg<uint>.Is.Anything, Arg<ILog>.Is.Equal(logger))).Return(spanCollectorStub);
 
             traceProvider.Stub(x => x.TraceId).Return(fixture.Create<string>());
             traceProvider.Stub(x => x.SpanId).Return(fixture.Create<string>());
@@ -564,7 +535,7 @@ namespace Medidata.ZipkinTracer.Core.Test
                 zipkinConfigSetup = CreateZipkinConfigWithDefaultValues();
             }
 
-            return new ZipkinClient(logger, zipkinConfigSetup, spanCollectorBuilder, context);
+            return new ZipkinClient(logger, zipkinConfigSetup, context, spanCollectorStub);
         }
 
         private IZipkinConfig CreateZipkinConfigWithDefaultValues()

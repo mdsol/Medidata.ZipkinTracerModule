@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using log4net;
+using Medidata.ZipkinTracer.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
-using System.Collections.Concurrent;
 using Rhino.Mocks;
 using Rhino.Mocks.Interfaces;
-using log4net;
 
 namespace Medidata.ZipkinTracer.Core.Collector.Test
 {
