@@ -14,7 +14,7 @@ namespace Medidata.ZipkinTracer.Models
         public string Value => annotation.Value;
 
         [JsonProperty("timestamp")]
-        public string Timestamp => annotation.Timestamp.ToUnixTimeMicroseconds().ToString();
+        public long Timestamp => annotation.Timestamp.ToUnixTimeMicroseconds();
 
         public JsonAnnotation(Annotation annotation)
         {

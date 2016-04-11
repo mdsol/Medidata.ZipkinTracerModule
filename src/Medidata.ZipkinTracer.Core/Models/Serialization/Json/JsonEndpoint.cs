@@ -11,7 +11,7 @@ namespace Medidata.ZipkinTracer.Models
         public string IPv4 => endpoint.IPAddress.ToString();
 
         [JsonProperty("port")]
-        public string Port => endpoint.Port.ToString();
+        public ushort Port => endpoint.Port;
 
         [JsonProperty("serviceName")]
         public string ServiceName => endpoint.ServiceName;

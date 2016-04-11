@@ -18,7 +18,7 @@ namespace Medidata.ZipkinTracer.Models
         [JsonProperty("id")]
         public string Id => span.Id.ToString("x4");
 
-        [JsonProperty("parentId")]
+        [JsonProperty("parentId", NullValueHandling = NullValueHandling.Ignore)]
         public string ParentId => span.ParentId?.ToString("x4");
 
         [JsonProperty("annotations")]
