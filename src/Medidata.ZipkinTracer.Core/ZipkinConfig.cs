@@ -1,43 +1,87 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
+using Microsoft.Owin;
 
 namespace Medidata.ZipkinTracer.Core
 {
-    [ExcludeFromCodeCoverage]  //excluded from code coverage since this class are getters using static .net class ConfigurationManager
     public class ZipkinConfig : IZipkinConfig
     {
-        public string ServiceName
+        public Predicate<IOwinRequest> Bypass { get; set; } = r => false;
+        public Uri ZipkinBaseUri { get; set; }
+        public Uri Domain { get; set; }
+        public uint SpanProcessorBatchSize { get; set; }
+        public IList<string> ExcludedPathList { get; set; } = new List<string>();
+        public double SampleRate { get; set; }
+        public IList<string> NotToBeDisplayedDomainList { get; set; } = new List<string>();
+
+        public void Validate()
         {
-            get {  return ConfigurationManager.AppSettings["ServiceName"];}
+            if (ZipkinBaseUri == null)
+            {
+                throw new ArgumentNullException("ZipkinBaseUri");
+            }
+
+            if (Domain == null)
+            {
+                throw new ArgumentNullException("Domain");
+            }
+
+            if (ExcludedPathList == null)
+            {
+                throw new ArgumentNullException("ExcludedPathList");
+            }
+
+            if (ExcludedPathList.Any(item => !item.StartsWith("/")))
+            {
+                throw new ArgumentException("Item of ExcludedPathList must start with '/'. e.g.) '/check_uri'");
+            }
+
+            if (SampleRate < 0 || SampleRate > 1)
+            {
+                throw new ArgumentException("SampleRate must range from 0 to 1.");
+            }
+
+            if (NotToBeDisplayedDomainList == null)
+            {
+                throw new ArgumentNullException("NotToBeDisplayedDomainList");
+            }
         }
 
-        public string ZipkinServerName
+        public bool ShouldBeSampled(IOwinContext context, string sampled)
         {
-            get { return ConfigurationManager.AppSettings["zipkinScribeServerName"]; }
+            if (context == null)
+            {
+                return false;
+            }
+
+            bool result;
+            if (!string.IsNullOrWhiteSpace(sampled) && Boolean.TryParse(sampled, out result))
+            {
+                return result;
+            }
+
+            if (!IsInDontSampleList(context.Request.Path.ToString()))
+            {
+                var random = new Random();
+                if (random.NextDouble() <= SampleRate)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
-        public string ZipkinServerPort
+        internal bool IsInDontSampleList(string path)
         {
-            get {  return ConfigurationManager.AppSettings["zipkinScribeServerPort"];}
-        }
-
-        public string SpanProcessorBatchSize
-        {
-            get {  return ConfigurationManager.AppSettings["spanProcessorBatchSize"];}
-        }
-
-        public string DontSampleListCsv
-        {
-            get {  return ConfigurationManager.AppSettings["mAuthWhitelist"];}
-        }
-
-        public string ZipkinSampleRate
-        {
-            get {  return ConfigurationManager.AppSettings["zipkinSampleRate"];}
+            if (path != null)
+            {
+                if (ExcludedPathList.Any(uri => path.StartsWith(uri, StringComparison.InvariantCultureIgnoreCase)))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

@@ -16,16 +16,31 @@ namespace Medidata.ZipkinTracer.Core.Test
         }
 
         [TestMethod]
-        public void GetEndpoint()
+        public void GetLocalEndpoint()
         {
             var serviceName = fixture.Create<string>();
 
             var zipkinEndpoint = new ServiceEndpoint();
-            var endpoint = zipkinEndpoint.GetEndpoint(serviceName);
+            var endpoint = zipkinEndpoint.GetLocalEndpoint(serviceName);
 
             Assert.IsNotNull(endpoint);
-            Assert.AreEqual(serviceName, endpoint.Service_name);
-            Assert.IsNotNull(endpoint.Ipv4);
+            Assert.AreEqual(serviceName, endpoint.ServiceName);
+            Assert.IsNotNull(endpoint.IPAddress);
+            Assert.IsNotNull(endpoint.Port);
+        }
+
+        [TestMethod]
+        public void GetRemoteEndpoint()
+        {
+            var remoteUri = new Uri("http://localhost");
+            var serviceName = fixture.Create<string>();
+
+            var zipkinEndpoint = new ServiceEndpoint();
+            var endpoint = zipkinEndpoint.GetRemoteEndpoint(remoteUri, serviceName);
+
+            Assert.IsNotNull(endpoint);
+            Assert.AreEqual(serviceName, endpoint.ServiceName);
+            Assert.IsNotNull(endpoint.IPAddress);
             Assert.IsNotNull(endpoint.Port);
         }
     }

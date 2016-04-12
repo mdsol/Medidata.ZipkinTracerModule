@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracer.Core", "src\Medidata.ZipkinTracer.Core\Medidata.ZipkinTracer.Core.csproj", "{EB432891-204B-4B97-BFB1-A820E424284E}"
 EndProject
@@ -15,11 +15,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{ACDBD6
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracer.Core.Test", "tests\Medidata.ZipkinTracer.Core.Test\Medidata.ZipkinTracer.Core.Test.csproj", "{0158C8BD-D881-4EE8-A8C6-54707A67A00D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracer.Core.Collector", "src\Medidata.ZipkinTracer.Core.Collector\Medidata.ZipkinTracer.Core.Collector.csproj", "{12E57184-B43E-43C5-AC19-06AD1DC25E96}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracer.Core.Collector.Test", "tests\Medidata.ZipkinTracer.Core.Collector.Test\Medidata.ZipkinTracer.Core.Collector.Test.csproj", "{A6AFE0F7-F1DE-4E0B-B6F6-CFDC293CAE2D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracer.HttpModule", "src\Medidata.ZipkinTracer.HttpModule\Medidata.ZipkinTracer.HttpModule.csproj", "{44EF130E-7549-4860-ABBB-17050FC09F5C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7CF24590-AC06-44E4-AF93-88A9B2CD1264}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,18 +34,6 @@ Global
 		{0158C8BD-D881-4EE8-A8C6-54707A67A00D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0158C8BD-D881-4EE8-A8C6-54707A67A00D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0158C8BD-D881-4EE8-A8C6-54707A67A00D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{12E57184-B43E-43C5-AC19-06AD1DC25E96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{12E57184-B43E-43C5-AC19-06AD1DC25E96}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{12E57184-B43E-43C5-AC19-06AD1DC25E96}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{12E57184-B43E-43C5-AC19-06AD1DC25E96}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A6AFE0F7-F1DE-4E0B-B6F6-CFDC293CAE2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A6AFE0F7-F1DE-4E0B-B6F6-CFDC293CAE2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A6AFE0F7-F1DE-4E0B-B6F6-CFDC293CAE2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A6AFE0F7-F1DE-4E0B-B6F6-CFDC293CAE2D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{44EF130E-7549-4860-ABBB-17050FC09F5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{44EF130E-7549-4860-ABBB-17050FC09F5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{44EF130E-7549-4860-ABBB-17050FC09F5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{44EF130E-7549-4860-ABBB-17050FC09F5C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,112 +1,201 @@
-﻿using Medidata.CrossApplicationTracer;
-using Medidata.MDLogging;
-using Medidata.ZipkinTracer.Core.Collector;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using System.Runtime.CompilerServices;
+using log4net;
+using Microsoft.Owin;
+using Medidata.ZipkinTracer.Models;
 
 namespace Medidata.ZipkinTracer.Core
 {
-    public class ZipkinClient : ITracerClient
+    public class ZipkinClient: ITracerClient
     {
-        internal bool isTraceOn;
         internal SpanCollector spanCollector;
         internal SpanTracer spanTracer;
-        internal Span clientSpan;
-        internal Span serverSpan;
 
-        private string requestName;
-        private ITraceProvider traceProvider;
-        private IMDLogger logger;
+        private ILog logger;
 
-        public ZipkinClient(ITraceProvider tracerProvider, string requestName, IMDLogger logger) : this(tracerProvider, requestName, logger, new ZipkinConfig(), new SpanCollectorBuilder()) { }
+        public bool IsTraceOn { get; set; }
 
-        public ZipkinClient(ITraceProvider traceProvider, string requestName, IMDLogger logger, IZipkinConfig zipkinConfig, ISpanCollectorBuilder spanCollectorBuilder)
+        public ITraceProvider TraceProvider { get; }
+
+        public IZipkinConfig ZipkinConfig { get; }
+
+        public ZipkinClient(ILog logger, IZipkinConfig zipkinConfig, IOwinContext context, SpanCollector collector = null)
         {
+            if (logger == null) throw new ArgumentNullException(nameof(logger));
+            if (zipkinConfig == null) throw new ArgumentNullException(nameof(zipkinConfig));
+            if (context == null) throw new ArgumentNullException(nameof(context));
+
+            var traceProvider = new TraceProvider(zipkinConfig, context);
+            IsTraceOn = !zipkinConfig.Bypass(context.Request) && IsTraceProviderSamplingOn(traceProvider);
+
+            if (!IsTraceOn)
+                return;
+
+            zipkinConfig.Validate();
+            ZipkinConfig = zipkinConfig;
             this.logger = logger;
-            isTraceOn = true;
 
-            if ( logger == null || IsConfigValuesNull(zipkinConfig) || !IsConfigValuesValid(zipkinConfig) || !IsTraceProviderValidAndSamplingOn(traceProvider))
-            {
-                isTraceOn = false;
-            }
-
-            if (isTraceOn)
-            {
-                try
-                {
-                    spanCollector = spanCollectorBuilder.Build(zipkinConfig.ZipkinServerName, int.Parse(zipkinConfig.ZipkinServerPort), int.Parse(zipkinConfig.SpanProcessorBatchSize));
-                    spanCollector.Start();
-
-                    spanTracer = new SpanTracer(spanCollector, zipkinConfig.ServiceName, new ServiceEndpoint());
-
-                    this.requestName = requestName;
-                    this.traceProvider = traceProvider;
-                }
-                catch (Exception ex)
-                {
-                    logger.Error("Error Building Zipkin Client Provider", ex);
-                    isTraceOn = false;
-                }
-            }
-        }
-
-        public void StartClientTrace()
-        {
-            if (isTraceOn)
-            {
-                clientSpan = StartTrace(spanTracer.SendClientSpan);
-            }
-        }
-
-        public void EndClientTrace(int duration)
-        {
-            if (isTraceOn)
-            {
-                EndTrace(spanTracer.ReceiveClientSpan, clientSpan, duration);
-            }
-        }
-
-        public void StartServerTrace()
-        {
-            if (isTraceOn)
-            {
-                serverSpan = StartTrace(spanTracer.ReceiveServerSpan);
-            }
-        }
-
-        public void EndServerTrace(int duration)
-        {
-            if (isTraceOn)
-            {
-                EndTrace(spanTracer.SendServerSpan, serverSpan, duration);
-            }
-        }
-
-        private Span StartTrace(Func<string, string, string, string, Span> func)
-        {
             try
             {
-                return func(requestName, traceProvider.TraceId, traceProvider.ParentSpanId, traceProvider.SpanId);
+                spanCollector = collector ?? SpanCollector.GetInstance(
+                    zipkinConfig.ZipkinBaseUri,
+                    zipkinConfig.SpanProcessorBatchSize,
+                    logger);
+
+                spanTracer = new SpanTracer(
+                    spanCollector,
+                    new ServiceEndpoint(),
+                    zipkinConfig.NotToBeDisplayedDomainList,
+                    zipkinConfig.Domain);
+
+                TraceProvider = traceProvider;
             }
             catch (Exception ex)
             {
-                logger.Error("Error Starting Trace", ex);
+                logger.Error("Error Building Zipkin Client Provider", ex);
+                IsTraceOn = false;
             }
-            return null;
         }
 
-        private void EndTrace(Action<Span, int> action, Span span, int duration)
+        public Span StartClientTrace(Uri remoteUri, string methodName, ITraceProvider trace)
         {
+            if (!IsTraceOn)
+                return null;
+
             try
             {
-                action(span, duration);
+                return spanTracer.SendClientSpan(
+                    methodName.ToLower(),
+                    trace.TraceId,
+                    trace.ParentSpanId,
+                    trace.SpanId,
+                    remoteUri);
             }
             catch (Exception ex)
             {
-                logger.Error("Error Ending Trace", ex);
+                logger.Error("Error Starting Client Trace", ex);
+                return null;
+            }
+        }
+
+        public void EndClientTrace(Span clientSpan, int statusCode)
+        {
+            if (!IsTraceOn)
+                return;
+
+            try
+            {
+                spanTracer.ReceiveClientSpan(clientSpan, statusCode);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error Ending Client Trace", ex);
+            }
+        }
+
+        public Span StartServerTrace(Uri requestUri, string methodName)
+        {
+            if (!IsTraceOn)
+                return null;
+
+            try
+            {
+                return spanTracer.ReceiveServerSpan(
+                    methodName.ToLower(),
+                    TraceProvider.TraceId,
+                    TraceProvider.ParentSpanId,
+                    TraceProvider.SpanId,
+                    requestUri);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error Starting Server Trace", ex);
+                return null;
+            }
+        }
+
+        public void EndServerTrace(Span serverSpan)
+        {
+            if (!IsTraceOn)
+                return;
+
+            try
+            {
+                spanTracer.SendServerSpan(serverSpan);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error Ending Server Trace", ex);
+            }
+        }
+
+        /// <summary>
+        /// Records an annotation with the current timestamp and the provided value in the span.
+        /// </summary>
+        /// <param name="span">The span where the annotation will be recorded.</param>
+        /// <param name="value">The value of the annotation to be recorded. If this parameter is omitted
+        /// (or its value set to null), the method caller member name will be automatically passed.</param>
+        public void Record(Span span, [CallerMemberName] string value = null)
+        {
+            if (!IsTraceOn)
+                return;
+
+            try
+            {
+                spanTracer.Record(span, value);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error recording the annotation", ex);
+            }
+        }
+
+        /// <summary>
+        /// Records a key-value pair as a binary annotiation in the span.
+        /// </summary>
+        /// <typeparam name="T">The type of the value to be recorded. See remarks for the currently supported types.</typeparam>
+        /// <param name="span">The span where the annotation will be recorded.</param>
+        /// <param name="key">The key which is a reference to the recorded value.</param>
+        /// <param name="value">The value of the annotation to be recorded.</param>
+        /// <remarks>The RecordBinary will record a key-value pair which can be used to tag some additional information
+        /// in the trace without any timestamps. The currently supported value types are <see cref="bool"/>,
+        /// <see cref="byte[]"/>, <see cref="short"/>, <see cref="int"/>, <see cref="long"/>, <see cref="double"/> and
+        /// <see cref="string"/>. Any other types will be passed as string annotation types.
+        /// 
+        /// Please note, that although the values have types, they will be recorded and sent by calling their
+        /// respective ToString() method.</remarks>
+        public void RecordBinary<T>(Span span, string key, T value)
+        {
+            if (!IsTraceOn)
+                return;
+
+            try
+            {
+                spanTracer.RecordBinary<T>(span, key, value);
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Error recording a binary annotation (key: {key})", ex);
+            }
+        }
+
+        /// <summary>
+        /// Records a local component annotation in the span.
+        /// </summary>
+        /// <param name="span">The span where the annotation will be recorded.</param>
+        /// <param name="value">The value of the local trace to be recorder.</param>
+        public void RecordLocalComponent(Span span, string value)
+        {
+            if (!IsTraceOn)
+                return;
+
+            try
+            {
+                spanTracer.RecordBinary(span, ZipkinConstants.LocalComponent, value);
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Error recording local trace (value: {value})", ex);
             }
         }
 
@@ -118,71 +207,9 @@ namespace Medidata.ZipkinTracer.Core
             }
         }
 
-        private bool IsConfigValuesNull(IZipkinConfig zipkinConfig)
+        private bool IsTraceProviderSamplingOn(ITraceProvider traceProvider)
         {
-            if (String.IsNullOrEmpty(zipkinConfig.ZipkinServerName))
-            {
-                logger.Error("zipkinConfig.ZipkinServerName is null");
-                return true;
-            }
-
-            if (String.IsNullOrEmpty(zipkinConfig.ZipkinServerPort))
-            {
-                logger.Error("zipkinConfig.ZipkinServerPort is null");
-                return true;
-            }
-
-            if (String.IsNullOrEmpty(zipkinConfig.ServiceName))
-            {
-                logger.Error("zipkinConfig.ServiceName value is null");
-                return true;
-            }
-
-            if (String.IsNullOrEmpty(zipkinConfig.SpanProcessorBatchSize))
-            {
-                logger.Error("zipkinConfig.SpanProcessorBatchSize value is null");
-                return true;
-            }
-
-            if (String.IsNullOrEmpty(zipkinConfig.ZipkinSampleRate))
-            {
-                logger.Error("zipkinConfig.ZipkinSampleRate value is null");
-                return true;
-            }
-            return false;
+            return !string.IsNullOrEmpty(traceProvider.TraceId) && traceProvider.IsSampled;
         }
-
-        private bool IsConfigValuesValid(IZipkinConfig zipkinConfig)
-        {
-            int port;
-            int spanProcessorBatchSize;
-            if (!int.TryParse(zipkinConfig.ZipkinServerPort, out port))
-            {
-                logger.Error("zipkinConfig port is not an int");
-                return false;
-            }
-
-            if (!int.TryParse(zipkinConfig.SpanProcessorBatchSize, out spanProcessorBatchSize))
-            {
-                logger.Error("zipkinConfig spanProcessorBatchSize is not an int");
-                return false;
-            }
-            return true;
-        }
-
-        private bool IsTraceProviderValidAndSamplingOn(ITraceProvider traceProvider)
-        {
-            if (traceProvider == null)
-            {
-                logger.Error("traceProvider value is null");
-                return false;
-            }
-            else if (string.IsNullOrEmpty(traceProvider.TraceId) || !traceProvider.IsSampled)
-            {
-                return false;
-            }
-            return true;
-        }
-
     }
 }
