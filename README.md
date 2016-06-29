@@ -19,7 +19,7 @@ determine whether or not to trace this request. `SampleRate` is the approximate 
 zipkin.
 
 ## Configurations
-Please use `ZipkinConig` class to configure the module and verify these values and modify them according to your
+Please use `ZipkinConfig` class to configure the module and verify these values and modify them according to your
 service/environment.
 
 - `Bypass` - Controls whether the requests should be sent through the Zipkin module
