@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Medidata.ZipkinTracer.Core.Logging;
 using Microsoft.Owin;
 using Owin;
 
