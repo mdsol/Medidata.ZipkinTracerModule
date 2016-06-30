@@ -31,7 +31,7 @@ service/environment.
 - `SampleRate` - 1 decimal point float value between 0 and 1. This value will determine randomly if the current request will be traced or not.	 
 - `NotToBeDisplayedDomainList`(optional) - It will be used when logging host name by excluding these strings in service name attribute
 	e.g. domain: ".xyz.com", host: "abc.xyz.com" will be logged as "abc" only    
-- `ExcludedPathList`(optional) - Path list that is not needed for tracing. Each item must start with "/". 
+- `ExcludedPathList`(optional) - Path list that is not needed for tracing. Each item must start with "/".
 
 
 ```
@@ -67,14 +67,14 @@ public class Startup
 			ZipkinBaseUri = new Uri("http://zipkin.xyz.net:9411"),
 			SpanProcessorBatchSize = 10,
 		    SampleRate = 0.5    
-		};
+		});
     }
 }
 
 ```
 
 ### Client trace (Outbound request)
-Client Trace relies on HttpMessageHandler for HttpClient. Please pass a ZipkinMessageHandler instance into HttpClient. 
+Client Trace relies on HttpMessageHandler for HttpClient. Please pass a ZipkinMessageHandler instance into HttpClient.
 
 
 ```
@@ -126,7 +126,7 @@ using (var client = new HttpClient())
     tracerClient.RecordBinary(span, "client.memory", GC.GetTotalMemory(false));
 
 	// end client trace
-    tracerClient.EndClientTrace(span);	
+    tracerClient.EndClientTrace(span);
 }
 ...
 ```

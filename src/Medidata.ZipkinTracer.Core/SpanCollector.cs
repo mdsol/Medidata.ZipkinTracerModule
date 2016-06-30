@@ -13,13 +13,20 @@ namespace Medidata.ZipkinTracer.Core
         internal SpanProcessor spanProcessor;
 
         private static SpanCollector instance;
+        private static readonly object syncObj = new object();
 
         public static SpanCollector GetInstance(Uri uri, uint maxProcessorBatchSize, ILog logger)
         {
             if (instance == null)
             {
-                instance = new SpanCollector(uri, maxProcessorBatchSize, logger);
-                instance.Start();
+                lock (syncObj)
+                {
+                    if (instance == null)
+                    {
+                        instance = new SpanCollector(uri, maxProcessorBatchSize, logger);
+                        instance.Start();
+                    }
+                }
             }
             return instance;
         }
