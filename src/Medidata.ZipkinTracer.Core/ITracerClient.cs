@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using Medidata.ZipkinTracer.Models;
+using Microsoft.Owin;
 
 namespace Medidata.ZipkinTracer.Core
 {
@@ -10,11 +11,11 @@ namespace Medidata.ZipkinTracer.Core
 
         ITraceProvider TraceProvider { get; }
 
-        Span StartServerTrace(Uri requestUri, string methodName);
+        Span StartServerTrace(IOwinRequest request);
 
         Span StartClientTrace(Uri remoteUri, string methodName, ITraceProvider trace);
 
-        void EndServerTrace(Span serverSpan);
+        void EndServerTrace(Span serverSpan, IOwinContext context);
 
         void EndClientTrace(Span clientSpan, int statusCode);
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Medidata.ZipkinTracer.Models;
 using Microsoft.Owin;
 
 namespace Medidata.ZipkinTracer.Core
@@ -47,6 +48,21 @@ namespace Medidata.ZipkinTracer.Core
                 throw new ArgumentNullException("NotToBeDisplayedDomainList");
             }
         }
+
+        public virtual IEnumerable<BinaryAnnotation> ExtraBinaryAnnotationsToAddBasedOnRequest(IOwinContext context)
+        {
+            return new List<BinaryAnnotation>();
+        }
+
+        public virtual IEnumerable<BinaryAnnotation> ExtraBinaryAnnotationsToAddBasedOnResponse(IOwinContext context)
+        {
+            return new List<BinaryAnnotation>
+            {
+                new BinaryAnnotation { Key = "http.response.status", Value = context.Response.StatusCode },
+                new BinaryAnnotation { Key = "http.response.size", Value = context.Response.ContentLength }
+            };
+        }
+
 
         public bool ShouldBeSampled(IOwinContext context, string sampled)
         {

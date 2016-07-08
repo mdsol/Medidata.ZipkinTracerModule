@@ -26,7 +26,7 @@ namespace Medidata.ZipkinTracer.Core
             this.serviceName = CleanServiceName(domainHost);
         }
 
-        public virtual Span ReceiveServerSpan(string spanName, string traceId, string parentSpanId, string spanId, Uri requestUri)
+        public virtual Span ReceiveServerSpan(string spanName, string traceId, string parentSpanId, string spanId, Uri requestUri, IEnumerable<BinaryAnnotation> extraContextToRecord)
         {
             var newSpan = CreateNewSpan(spanName, traceId, parentSpanId, spanId);
             var serviceEndpoint = zipkinEndpoint.GetLocalEndpoint(serviceName, (ushort)requestUri.Port);
@@ -40,11 +40,15 @@ namespace Medidata.ZipkinTracer.Core
             newSpan.Annotations.Add(annotation);
 
             AddBinaryAnnotation("http.uri", requestUri.AbsolutePath, newSpan, serviceEndpoint);
-
+            foreach (var binaryAnnotation in extraContextToRecord)
+            {
+                binaryAnnotation.Host = serviceEndpoint;
+                newSpan.Annotations.Add(binaryAnnotation);
+            }
             return newSpan;
         }
 
-        public virtual void SendServerSpan(Span span)
+        public virtual void SendServerSpan(Span span, Uri requestUri, IEnumerable<BinaryAnnotation> extraContextToRecord)
         {
             if (span == null)
             {
@@ -63,7 +67,12 @@ namespace Medidata.ZipkinTracer.Core
             };
 
             span.Annotations.Add(annotation);
-
+            var serviceEndpoint = zipkinEndpoint.GetLocalEndpoint(serviceName, (ushort)requestUri.Port);
+            foreach (var binaryAnnotation in extraContextToRecord)
+            {
+                binaryAnnotation.Host = serviceEndpoint;
+                span.Annotations.Add(binaryAnnotation);
+            }
             spanCollector.Collect(span);
         }
 

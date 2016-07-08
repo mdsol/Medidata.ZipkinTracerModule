@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Medidata.ZipkinTracer.Models;
 using Microsoft.Owin;
 
 namespace Medidata.ZipkinTracer.Core
@@ -23,5 +24,7 @@ namespace Medidata.ZipkinTracer.Core
         bool ShouldBeSampled(IOwinContext context, string sampled);
 
         void Validate();
+        IEnumerable<BinaryAnnotation> ExtraBinaryAnnotationsToAddBasedOnRequest(IOwinContext context);
+        IEnumerable<BinaryAnnotation> ExtraBinaryAnnotationsToAddBasedOnResponse(IOwinContext context);
     }
 }

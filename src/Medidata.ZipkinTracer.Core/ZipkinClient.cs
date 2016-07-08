@@ -90,7 +90,7 @@ namespace Medidata.ZipkinTracer.Core
             }
         }
 
-        public Span StartServerTrace(Uri requestUri, string methodName)
+        public Span StartServerTrace(IOwinRequest request)
         {
             if (!IsTraceOn)
                 return null;
@@ -98,11 +98,12 @@ namespace Medidata.ZipkinTracer.Core
             try
             {
                 return spanTracer.ReceiveServerSpan(
-                    methodName.ToLower(),
+                    request.Method.ToLower(),
                     TraceProvider.TraceId,
                     TraceProvider.ParentSpanId,
                     TraceProvider.SpanId,
-                    requestUri);
+                    request.Uri,
+                    ZipkinConfig.ExtraBinaryAnnotationsToAddBasedOnRequest(request.Context));
             }
             catch (Exception ex)
             {
@@ -111,14 +112,14 @@ namespace Medidata.ZipkinTracer.Core
             }
         }
 
-        public void EndServerTrace(Span serverSpan)
+        public void EndServerTrace(Span serverSpan, IOwinContext context)
         {
             if (!IsTraceOn)
                 return;
 
             try
             {
-                spanTracer.SendServerSpan(serverSpan);
+                spanTracer.SendServerSpan(serverSpan, ZipkinConfig.ExtraBinaryAnnotationsToAddBasedOnResponse(context));
             }
             catch (Exception ex)
             {
