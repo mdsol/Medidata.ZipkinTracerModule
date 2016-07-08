@@ -39,7 +39,7 @@ namespace Medidata.ZipkinTracer.Core
 
             newSpan.Annotations.Add(annotation);
 
-            AddBinaryAnnotation("http.uri", requestUri.AbsolutePath, newSpan, serviceEndpoint);
+            AddBinaryAnnotation("http.path", requestUri.AbsolutePath, newSpan, serviceEndpoint);
 
             return newSpan;
         }
@@ -80,7 +80,7 @@ namespace Medidata.ZipkinTracer.Core
             };
 
             newSpan.Annotations.Add(annotation);
-            AddBinaryAnnotation("http.uri", remoteUri.AbsolutePath, newSpan, serviceEndpoint);
+            AddBinaryAnnotation("http.path", remoteUri.AbsolutePath, newSpan, serviceEndpoint);
             AddBinaryAnnotation("sa", "1", newSpan, zipkinEndpoint.GetRemoteEndpoint(remoteUri, clientServiceName));
 
             return newSpan;

@@ -100,7 +100,7 @@ namespace Medidata.ZipkinTracer.Core.Test
 
             Assert.AreEqual(1, binaryAnnotations.Count());
 
-            AssertBinaryAnnotations(binaryAnnotations, "http.uri", serverUri.AbsolutePath);
+            AssertBinaryAnnotations(binaryAnnotations, "http.path", serverUri.AbsolutePath);
         }
 
         [TestMethod]
@@ -235,7 +235,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             var binaryAnnotations = resultSpan.GetAnnotationsByType<BinaryAnnotation>();
 
             Assert.AreEqual(2, binaryAnnotations.Count());
-            AssertBinaryAnnotations(binaryAnnotations, "http.uri", serverUri.AbsolutePath);
+            AssertBinaryAnnotations(binaryAnnotations, "http.path", serverUri.AbsolutePath);
             AssertBinaryAnnotations(binaryAnnotations, "sa", "1");
 
             var endpoint = binaryAnnotations.ToArray()[1].Host as Endpoint;
