@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using log4net;
+using Medidata.ZipkinTracer.Core.Logging;
 using Medidata.ZipkinTracer.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
@@ -26,7 +26,7 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
             logger = MockRepository.GenerateStub<ILog>();
             queue = new BlockingCollection<Span>();
             testMaxBatchSize = 10;
-            spanProcessor = MockRepository.GenerateStub<SpanProcessor>(new Uri("http://localhost"), queue, testMaxBatchSize, logger);
+            spanProcessor = MockRepository.GenerateStub<SpanProcessor>(new Uri("http://localhost"), queue, testMaxBatchSize);
             spanProcessor.Stub(x => x.SendSpansToZipkin(Arg<string>.Is.Anything)).WhenCalled(s => { });
             taskFactory = MockRepository.GenerateStub<SpanProcessorTaskFactory>(logger, null);
             spanProcessor.spanProcessorTaskFactory = taskFactory;
@@ -36,14 +36,14 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullSpanQueue()
         {
-            new SpanProcessor(new Uri("http://localhost"), null, fixture.Create<uint>(), logger);
+            new SpanProcessor(new Uri("http://localhost"), null, fixture.Create<uint>());
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullZipkinServer()
         {
-            new SpanProcessor(null, queue, fixture.Create<uint>(), logger);
+            new SpanProcessor(null, queue, fixture.Create<uint>());
         }
 
         [TestMethod]

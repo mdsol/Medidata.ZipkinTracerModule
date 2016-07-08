@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using log4net;
+using Medidata.ZipkinTracer.Core.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Rhino.Mocks;
 
@@ -61,8 +61,9 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         {
             Exception ex = new Exception("Exception!");
             bool logErrorCalled = false;
-            logger.Stub(x => x.Error(Arg<string>.Is.Equal("Error in SpanProcessorTask"), Arg<Exception>.Is.Equal(ex)))
-                .WhenCalled(x => { logErrorCalled = true; });
+            logger.Stub(x => x.Log(Arg<LogLevel>.Is.Equal(LogLevel.Error), Arg<Func<string>>.Is.Null, Arg<Exception>.Is.Null, Arg<object>.Is.Null)).Return(true);
+            logger.Stub(x => x.ErrorException("Error in SpanProcessorTask", ex))
+                .WhenCalled(x => { logErrorCalled = true; }).Return(true);
             var myAction = new Action(() => { actionCalled = true; throw ex; });
             Assert.IsFalse(actionCalled);
 

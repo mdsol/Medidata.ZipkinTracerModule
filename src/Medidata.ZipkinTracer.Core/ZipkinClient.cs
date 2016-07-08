@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using log4net;
+using Medidata.ZipkinTracer.Core.Logging;
 using Microsoft.Owin;
 using Medidata.ZipkinTracer.Models;
 
@@ -19,12 +19,10 @@ namespace Medidata.ZipkinTracer.Core
 
         public IZipkinConfig ZipkinConfig { get; }
 
-        public ZipkinClient(ILog logger, IZipkinConfig zipkinConfig, IOwinContext context, SpanCollector collector = null)
+        public ZipkinClient(IZipkinConfig zipkinConfig, IOwinContext context, SpanCollector collector = null)
         {
-            if (logger == null) throw new ArgumentNullException(nameof(logger));
             if (zipkinConfig == null) throw new ArgumentNullException(nameof(zipkinConfig));
             if (context == null) throw new ArgumentNullException(nameof(context));
-
             var traceProvider = new TraceProvider(zipkinConfig, context);
             IsTraceOn = !zipkinConfig.Bypass(context.Request) && IsTraceProviderSamplingOn(traceProvider);
 
@@ -33,14 +31,13 @@ namespace Medidata.ZipkinTracer.Core
 
             zipkinConfig.Validate();
             ZipkinConfig = zipkinConfig;
-            this.logger = logger;
+            this.logger = LogProvider.GetCurrentClassLogger();
 
             try
             {
                 spanCollector = collector ?? SpanCollector.GetInstance(
                     zipkinConfig.ZipkinBaseUri,
-                    zipkinConfig.SpanProcessorBatchSize,
-                    logger);
+                    zipkinConfig.SpanProcessorBatchSize);
 
                 spanTracer = new SpanTracer(
                     spanCollector,
@@ -52,7 +49,7 @@ namespace Medidata.ZipkinTracer.Core
             }
             catch (Exception ex)
             {
-                logger.Error("Error Building Zipkin Client Provider", ex);
+                logger.Log(LogLevel.Error, () => "Error Building Zipkin Client Provider", ex);
                 IsTraceOn = false;
             }
         }
@@ -73,7 +70,7 @@ namespace Medidata.ZipkinTracer.Core
             }
             catch (Exception ex)
             {
-                logger.Error("Error Starting Client Trace", ex);
+                logger.Log(LogLevel.Error, () => "Error Starting Client Trace", ex);
                 return null;
             }
         }
@@ -89,7 +86,7 @@ namespace Medidata.ZipkinTracer.Core
             }
             catch (Exception ex)
             {
-                logger.Error("Error Ending Client Trace", ex);
+                logger.Log(LogLevel.Error, () => "Error Ending Client Trace", ex);
             }
         }
 
@@ -109,7 +106,7 @@ namespace Medidata.ZipkinTracer.Core
             }
             catch (Exception ex)
             {
-                logger.Error("Error Starting Server Trace", ex);
+                logger.Log(LogLevel.Error, () => "Error Starting Server Trace", ex);
                 return null;
             }
         }
@@ -125,7 +122,7 @@ namespace Medidata.ZipkinTracer.Core
             }
             catch (Exception ex)
             {
-                logger.Error("Error Ending Server Trace", ex);
+                logger.Log(LogLevel.Error, () => "Error Ending Server Trace", ex);
             }
         }
 
@@ -146,7 +143,7 @@ namespace Medidata.ZipkinTracer.Core
             }
             catch (Exception ex)
             {
-                logger.Error("Error recording the annotation", ex);
+                logger.Log(LogLevel.Error, () => "Error recording the annotation", ex);
             }
         }
 
@@ -175,7 +172,7 @@ namespace Medidata.ZipkinTracer.Core
             }
             catch (Exception ex)
             {
-                logger.Error($"Error recording a binary annotation (key: {key})", ex);
+                logger.Log(LogLevel.Error, () => $"Error recording a binary annotation (key: {key})", ex);
             }
         }
 
@@ -195,7 +192,7 @@ namespace Medidata.ZipkinTracer.Core
             }
             catch (Exception ex)
             {
-                logger.Error($"Error recording local trace (value: {value})", ex);
+                logger.Log(LogLevel.Error, () => $"Error recording local trace (value: {value})", ex);
             }
         }
 
