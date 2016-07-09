@@ -60,6 +60,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\SyncHelper.cs" />
     <Compile Include="ITraceProvider.cs" />
     <Compile Include="ITracerClient.cs" />
     <Compile Include="IZipkinConfig.cs" />
