@@ -1,8 +1,8 @@
-﻿using log4net;
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
+using Medidata.ZipkinTracer.Core.Logging;
 
 namespace Medidata.ZipkinTracer.Core
 {
@@ -16,7 +16,7 @@ namespace Medidata.ZipkinTracer.Core
 
         public SpanProcessorTaskFactory(ILog logger, CancellationTokenSource cancellationTokenSource = null)
         {
-            this.logger = logger;
+            this.logger = logger ?? LogProvider.GetCurrentClassLogger();
 
             if (cancellationTokenSource == null)
             {
@@ -55,7 +55,7 @@ namespace Medidata.ZipkinTracer.Core
                 }
                 catch (Exception ex)
                 {
-                    logger.Error("Error in SpanProcessorTask", ex);
+                    logger.ErrorException("Error in SpanProcessorTask", ex);
                     delayTime = encounteredAnErrorDelayTime;
                 }
 

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using log4net;
+using Medidata.ZipkinTracer.Core.Logging;
 using Medidata.ZipkinTracer.Models;
 using Newtonsoft.Json;
 
@@ -28,7 +28,7 @@ namespace Medidata.ZipkinTracer.Core
         internal uint maxBatchSize;
         private readonly ILog logger;
 
-        public SpanProcessor(Uri uri, BlockingCollection<Span> spanQueue, uint maxBatchSize, ILog logger)
+        public SpanProcessor(Uri uri, BlockingCollection<Span> spanQueue, uint maxBatchSize)
         {
             if ( spanQueue == null) 
             {
@@ -44,8 +44,8 @@ namespace Medidata.ZipkinTracer.Core
             this.spanQueue = spanQueue;
             this.serializableSpans = new ConcurrentQueue<JsonSpan>();
             this.maxBatchSize = maxBatchSize;
-            this.logger = logger;
-            spanProcessorTaskFactory = new SpanProcessorTaskFactory(logger);
+            this.logger = LogProvider.GetCurrentClassLogger();
+            spanProcessorTaskFactory = new SpanProcessorTaskFactory(null);
         }
 
         public virtual void Stop()

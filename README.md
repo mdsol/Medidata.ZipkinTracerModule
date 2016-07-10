@@ -76,18 +76,17 @@ public class Startup
 ### Client trace (Outbound request)
 Client Trace relies on HttpMessageHandler for HttpClient. Please pass a ZipkinMessageHandler instance into HttpClient.
 
+Note: You will need the `GetOwinContext` extension method. If you host in IIS with `System.Web`, this can be found in `Microsoft.Owin.Host.SystemWeb`.
 
 ```
 using Medidata.ZipkinTracer.Core.Handlers;
 
 public class HomeController : AsyncController
 {
-	private ILog logger = LogManager.GetLogger("HomeController");
-
     public async Task<ActionResult> Index()
     {
         var context = System.Web.HttpContext.Current.GetOwinContext();
-		var client = new ZipkinClient(logger, context);
+		var client = new ZipkinClient(context);
 
         using (var httpClient = new HttpClient(new ZipkinMessageHandler(client))))
         {
@@ -137,6 +136,12 @@ case the caller member name (method, property etc.) will get recorded.
 #### Recording a local component
 With the `RecordLocalComponent()` method of the client a local component (or information) can be recorded for the
 current trace. This will result an additional binary annotation with the 'lc' key (LOCAL_COMPONENT) and a custom value.
+
+#### Troubleshooting
+
+##### Logs
+
+Logging internal to the library is provided via the [LibLog abstraction](https://github.com/damianh/LibLog). Caveat: to get logs, you must have initialised your logging framework on application-start ([console app example](https://github.com/damianh/LibLog/blob/master/src/LibLog.Example.Log4Net/Program.cs#L12) - a web-app might do this in OWIN Startup or Global.asax, or the inversion of control container initialisation).
 
 ## Contributors
 ZipkinTracer is (c) Medidata Solutions Worldwide and owned by its major contributors:

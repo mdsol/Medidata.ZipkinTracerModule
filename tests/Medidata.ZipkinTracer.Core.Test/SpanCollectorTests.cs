@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using log4net;
+using Medidata.ZipkinTracer.Core.Logging;
 using Medidata.ZipkinTracer.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
@@ -28,7 +28,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             SpanCollector.spanQueue = null;
 
-            spanCollector = new SpanCollector(new Uri("http://localhost"), 0, logger);
+            spanCollector = new SpanCollector(new Uri("http://localhost"), 0);
 
             Assert.IsNotNull(SpanCollector.spanQueue);
         }
@@ -39,7 +39,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             var spanQueue = new BlockingCollection<Span>();
             SpanCollector.spanQueue = spanQueue;
 
-            spanCollector = new SpanCollector(new Uri("http://localhost"), 0, logger);
+            spanCollector = new SpanCollector(new Uri("http://localhost"), 0);
 
             Assert.IsTrue(System.Object.ReferenceEquals(SpanCollector.spanQueue, spanQueue));
         }
@@ -105,11 +105,11 @@ namespace Medidata.ZipkinTracer.Core.Test
 
         private void SetupSpanCollector()
         {
-            spanCollector = new SpanCollector(new Uri("http://localhost"), 0, logger);
+            spanCollector = new SpanCollector(new Uri("http://localhost"), 0);
 
             SpanCollector.spanQueue = fixture.Create<BlockingCollection<Span>>();
             spanProcessorStub = MockRepository.GenerateStub<SpanProcessor>(new Uri("http://localhost"),
-                    SpanCollector.spanQueue, (uint)0, logger);
+                    SpanCollector.spanQueue, (uint)0);
             spanCollector.spanProcessor = spanProcessorStub;
         }
     }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using log4net;
+using Medidata.ZipkinTracer.Core.Logging;
 using Medidata.ZipkinTracer.Models;
 using Microsoft.Owin;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -38,23 +38,16 @@ namespace Medidata.ZipkinTracer.Core.Test
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void CTOR_WithNullLogger()
-        {
-            new ZipkinClient(null, new ZipkinConfig(), owinContext);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullConfig()
         {
-            new ZipkinClient(logger, null, owinContext);
+            new ZipkinClient(null, owinContext);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullContext()
         {
-            new ZipkinClient(logger, new ZipkinConfig(), null);
+            new ZipkinClient(new ZipkinConfig(), null);
         }
 
         [TestMethod]
@@ -65,8 +58,8 @@ namespace Medidata.ZipkinTracer.Core.Test
             AddTraceId(string.Empty);
             AddSampled(false);
 
-            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(new Uri("http://localhost"), (uint)0, logger);
-            var zipkinClient = new ZipkinClient(logger, zipkinConfigStub, owinContext, spanCollectorStub);
+            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(new Uri("http://localhost"), (uint)0);
+            var zipkinClient = new ZipkinClient(zipkinConfigStub, owinContext, spanCollectorStub);
             Assert.IsFalse(zipkinClient.IsTraceOn);
         }
 
@@ -78,8 +71,8 @@ namespace Medidata.ZipkinTracer.Core.Test
             AddTraceId(fixture.Create<string>());
             AddSampled(false);
 
-            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(new Uri("http://localhost"), (uint)0, logger);
-            var zipkinClient = new ZipkinClient(logger, zipkinConfigStub, owinContext, spanCollectorStub);
+            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(new Uri("http://localhost"), (uint)0);
+            var zipkinClient = new ZipkinClient(zipkinConfigStub, owinContext, spanCollectorStub);
             Assert.IsFalse(zipkinClient.IsTraceOn);
         }
 
@@ -517,7 +510,7 @@ namespace Medidata.ZipkinTracer.Core.Test
 
         private ITracerClient SetupZipkinClient(IZipkinConfig zipkinConfig = null)
         {
-            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(new Uri("http://localhost"), (uint)0, logger);
+            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(new Uri("http://localhost"), (uint)0);
 
             traceProvider.Stub(x => x.TraceId).Return(fixture.Create<string>());
             traceProvider.Stub(x => x.SpanId).Return(fixture.Create<string>());
@@ -535,7 +528,7 @@ namespace Medidata.ZipkinTracer.Core.Test
                 zipkinConfigSetup = CreateZipkinConfigWithDefaultValues();
             }
 
-            return new ZipkinClient(logger, zipkinConfigSetup, context, spanCollectorStub);
+            return new ZipkinClient(zipkinConfigSetup, context, spanCollectorStub);
         }
 
         private IZipkinConfig CreateZipkinConfigWithDefaultValues()

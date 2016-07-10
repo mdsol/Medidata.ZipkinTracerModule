@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using log4net;
+using Medidata.ZipkinTracer.Core.Logging;
 using Medidata.ZipkinTracer.Models;
 using Medidata.ZipkinTracer.Core.Helpers;
 
@@ -16,14 +16,14 @@ namespace Medidata.ZipkinTracer.Core
         public bool IsStarted { get; private set; }
         private readonly object syncObj = new object();
 
-        public SpanCollector(Uri uri, uint maxProcessorBatchSize, ILog logger)
+        public SpanCollector(Uri uri, uint maxProcessorBatchSize)
         {
             if (spanQueue == null)
             {
                 spanQueue = new BlockingCollection<Span>(MAX_QUEUE_SIZE);
             }
 
-            spanProcessor = new SpanProcessor(uri, spanQueue, maxProcessorBatchSize, logger);
+            spanProcessor = new SpanProcessor(uri, spanQueue, maxProcessorBatchSize);
         }
 
         public virtual void Collect(Span span)
