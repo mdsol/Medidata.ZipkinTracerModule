@@ -45,7 +45,7 @@ namespace Medidata.ZipkinTracer.Core
             this.serializableSpans = new ConcurrentQueue<JsonSpan>();
             this.maxBatchSize = maxBatchSize;
             this.logger = LogProvider.GetCurrentClassLogger();
-            spanProcessorTaskFactory = new SpanProcessorTaskFactory(null);
+            spanProcessorTaskFactory = new SpanProcessorTaskFactory();
         }
 
         public virtual void Stop()

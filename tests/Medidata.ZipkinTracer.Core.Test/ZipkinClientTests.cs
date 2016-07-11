@@ -51,6 +51,28 @@ namespace Medidata.ZipkinTracer.Core.Test
         }
 
         [TestMethod]
+        public void CTOR_WithNullCollector_create_default_collector()
+        {
+            var zipkinConfigStub = CreateZipkinConfigWithDefaultValues(sampleRate: 1);
+
+            var client = new ZipkinClient(zipkinConfigStub, owinContext, null);
+
+            Assert.IsNotNull(client.spanCollector);
+        }
+
+        [TestMethod]
+        public void multiple_Client_WithNullCTORCollector_share_same_collector()
+        {
+            var zipkinConfigStub = CreateZipkinConfigWithDefaultValues(sampleRate: 1);
+
+            var client1 = new ZipkinClient(zipkinConfigStub, owinContext, null);
+            var client2 = new ZipkinClient(zipkinConfigStub, owinContext, null);
+
+            Assert.IsNotNull(client1.spanCollector);
+            Assert.ReferenceEquals(client1.spanCollector, client2.spanCollector);
+        }
+
+        [TestMethod]
         public void CTOR_WithTraceIdNullOrEmpty()
         {
             var zipkinConfigStub = CreateZipkinConfigWithDefaultValues();
@@ -531,16 +553,20 @@ namespace Medidata.ZipkinTracer.Core.Test
             return new ZipkinClient(zipkinConfigSetup, context, spanCollectorStub);
         }
 
-        private IZipkinConfig CreateZipkinConfigWithDefaultValues()
+        static readonly char[] separators = new[] { ',', ';' };
+        static readonly Func<string, IList<string>> SplitFunc = s => s.Split(separators).Select(e => e.Trim()).ToList();
+
+        private IZipkinConfig CreateZipkinConfigWithDefaultValues(string uriSt = "http://zipkin.com", string domainSt = "http://server.com",
+            uint spanProcessorBatchSize = 123, string excludedPathList = "/foo, /bar, /baz", double sampleRate = 0.5, string notToBeDisplayedDomainList = ".xyz.net")
         {
             return new ZipkinConfig
             {
-                ZipkinBaseUri = new Uri("http://zipkin.com"),
-                Domain = new Uri("http://server.com"),
-                SpanProcessorBatchSize = 123,
-                ExcludedPathList = new List<string> { "/foo", "/bar", "/baz" },
-                SampleRate = 0.5,
-                NotToBeDisplayedDomainList = new List<string> { ".xyz.net" }
+                ZipkinBaseUri = new Uri(uriSt),
+                Domain = new Uri(domainSt),
+                SpanProcessorBatchSize = spanProcessorBatchSize,
+                ExcludedPathList = SplitFunc(excludedPathList),
+                SampleRate = sampleRate,
+                NotToBeDisplayedDomainList = SplitFunc(notToBeDisplayedDomainList),
             };
         }
 
