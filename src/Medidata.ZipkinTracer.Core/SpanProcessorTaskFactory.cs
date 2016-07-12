@@ -15,7 +15,7 @@ namespace Medidata.ZipkinTracer.Core
         private const int defaultDelayTime = 500;
         private const int encounteredAnErrorDelayTime = 30000;
 
-        static readonly object sync = new object();
+        readonly object sync = new object();
 
         public SpanProcessorTaskFactory(ILog logger, CancellationTokenSource cancellationTokenSource)
         {
@@ -31,11 +31,10 @@ namespace Medidata.ZipkinTracer.Core
         [ExcludeFromCodeCoverage]  //excluded from code coverage since this class is a 1 liner that starts up a background thread
         public virtual void CreateAndStart(Action action)
         {
-            SyncHelper.ExecuteSafely(sync, () => spanProcessorTaskInstance == null && spanProcessorTaskInstance.Status == TaskStatus.Faulted,
+            SyncHelper.ExecuteSafely(sync, () => spanProcessorTaskInstance == null || spanProcessorTaskInstance.Status == TaskStatus.Faulted,
                 () =>
                 {
-                    spanProcessorTaskInstance = new Task(() => ActionWrapper(action), cancellationTokenSource.Token, TaskCreationOptions.LongRunning);
-                    spanProcessorTaskInstance.Start();
+                    spanProcessorTaskInstance = Task.Factory.StartNew(() => ActionWrapper(action), cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
                 });
         }
 
