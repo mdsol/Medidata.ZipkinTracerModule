@@ -39,7 +39,7 @@ service/environment.
 var config = new ZipkinConfig
 {
 	Bypass = request => request.Uri.AbsolutePath.StartsWith("/allowed"),
-	Domain = new Uri("https://yourservice.com"),
+	Domain = request => new Uri("https://yourservice.com"), // or, you might like to derive a value from the request, like r => new Uri($"{r.Scheme}://{r.Host}"),
 	ZipkinBaseUri = new Uri("http://zipkin.xyz.net:9411"),
 	SpanProcessorBatchSize = 10,
 	SampleRate = 0.5,
