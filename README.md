@@ -27,6 +27,7 @@ service/environment.
   - **true**: Disables the ZipkinMiddleware/ZipkinMessageHandler
 - `ZipkinBaseUri` - is the zipkin scribe/collector server URI with port to send the Spans
 - `Domain` - is a valid public facing base url for your app instance. Zipkin will use to label the trace.
+  - by default this looks at the incoming requests and uses the hostname from them. It's a `Func<IOwinRequest, Uri>` - customise this to your requirements.
 - `SpanProcessorBatchSize` - how many Spans should be sent to the zipkin scribe/collector in one go.
 - `SampleRate` - 1 decimal point float value between 0 and 1. This value will determine randomly if the current request will be traced or not.	 
 - `NotToBeDisplayedDomainList`(optional) - It will be used when logging host name by excluding these strings in service name attribute
@@ -38,7 +39,7 @@ service/environment.
 var config = new ZipkinConfig
 {
 	Bypass = request => request.Uri.AbsolutePath.StartsWith("/allowed"),
-	Domain = new Uri("https://yourservice.com"),
+	Domain = request => new Uri("https://yourservice.com"), // or, you might like to derive a value from the request, like r => new Uri($"{r.Scheme}{Uri.SchemeDelimiter}{r.Host}"),
 	ZipkinBaseUri = new Uri("http://zipkin.xyz.net:9411"),
 	SpanProcessorBatchSize = 10,
 	SampleRate = 0.5,

@@ -536,7 +536,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             return new ZipkinConfig
             {
                 ZipkinBaseUri = new Uri("http://zipkin.com"),
-                Domain = new Uri("http://server.com"),
+                Domain = r => new Uri("http://server.com"),
                 SpanProcessorBatchSize = 123,
                 ExcludedPathList = new List<string> { "/foo", "/bar", "/baz" },
                 SampleRate = 0.5,
