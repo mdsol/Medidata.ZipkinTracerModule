@@ -10,7 +10,7 @@ namespace Medidata.ZipkinTracer.Core
 
         Uri ZipkinBaseUri { get; set; }
 
-        Uri Domain { get; set; }
+        Func<IOwinRequest, Uri> Domain { get; set; }
 
         uint SpanProcessorBatchSize { get; set; }
 

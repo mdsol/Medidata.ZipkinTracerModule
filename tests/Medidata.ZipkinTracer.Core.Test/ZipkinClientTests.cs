@@ -562,7 +562,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             return new ZipkinConfig
             {
                 ZipkinBaseUri = new Uri(uriSt),
-                Domain = new Uri(domainSt),
+                Domain = r => new Uri(domainSt),
                 SpanProcessorBatchSize = spanProcessorBatchSize,
                 ExcludedPathList = SplitFunc(excludedPathList),
                 SampleRate = sampleRate,
@@ -583,12 +583,12 @@ namespace Medidata.ZipkinTracer.Core.Test
 
         private void AddTraceId(string traceId)
         {
-            headers.Add("X-B3-TraceId", new[] { traceId });
+            headers.Add(TraceProvider.TraceIdHeaderName, new[] { traceId });
         }
 
         private void AddSampled(bool sampled)
         {
-            headers.Add("X-B3-Sampled", new[] { sampled.ToString() });
+            headers.Add(TraceProvider.SampledHeaderName, new[] { sampled.ToString() });
         }
     }
 }
