@@ -8,12 +8,8 @@ namespace Medidata.ZipkinTracer.Core
 {
     public class ServiceEndpoint 
     {
-        public virtual Endpoint GetLocalEndpoint(string serviceName, ushort port = 443)
+        public virtual Endpoint GetLocalEndpoint(string serviceName, ushort port)
         {
-            // personally, it should have been nullable short for port. but since zipkin server requires it, 443
-            // has be chosen to be that magic number as most servers have it.
-            // TODO: get rid of this magic number
-
             return new Endpoint()
             {
                 ServiceName = serviceName,

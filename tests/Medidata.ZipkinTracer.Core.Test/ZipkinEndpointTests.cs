@@ -19,9 +19,10 @@ namespace Medidata.ZipkinTracer.Core.Test
         public void GetLocalEndpoint()
         {
             var serviceName = fixture.Create<string>();
+            var port = fixture.Create<ushort>();
 
             var zipkinEndpoint = new ServiceEndpoint();
-            var endpoint = zipkinEndpoint.GetLocalEndpoint(serviceName);
+            var endpoint = zipkinEndpoint.GetLocalEndpoint(serviceName, port);
 
             Assert.IsNotNull(endpoint);
             Assert.AreEqual(serviceName, endpoint.ServiceName);
