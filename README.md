@@ -35,7 +35,7 @@ service/environment.
 - `ExcludedPathList`(optional) - Path list that is not needed for tracing. Each item must start with "/".
 
 
-```
+```csharp
 var config = new ZipkinConfig
 {
 	Bypass = request => request.Uri.AbsolutePath.StartsWith("/allowed"),
@@ -54,7 +54,7 @@ var config = new ZipkinConfig
 Server Trace relies on OWIN Middleware. Please create OWIN Startup class then call `UseZipkin()`.
 
 
-```
+```csharp
 using Medidata.ZipkinTracer.Core;
 using Medidata.ZipkinTracer.Core.Middlewares;
 
@@ -79,7 +79,7 @@ Client Trace relies on HttpMessageHandler for HttpClient. Please pass a ZipkinMe
 
 Note: You will need the `GetOwinContext` extension method. If you host in IIS with `System.Web`, this can be found in `Microsoft.Owin.Host.SystemWeb`.
 
-```
+```csharp
 using Medidata.ZipkinTracer.Core.Handlers;
 
 public class HomeController : AsyncController
@@ -106,7 +106,7 @@ public class HomeController : AsyncController
 #### Recording arbitrary events and additional information
 Additional annotations can be recorded by using the ZipkinClient's `Record()` and `RecordBinary<T>()` methods:
 
-```
+```csharp
 var zipkinClient = (ITracerClient)HttpContext.Current.Items["zipkinClient"];
 var url = "https://abc.xyz.com:8000";
 var requestUri = "/object/1";
