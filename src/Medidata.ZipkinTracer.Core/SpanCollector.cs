@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using Medidata.ZipkinTracer.Core.Logging;
 using Medidata.ZipkinTracer.Models;
+using Medidata.ZipkinTracer.Core.Helpers;
 
 namespace Medidata.ZipkinTracer.Core
 {
@@ -12,21 +13,12 @@ namespace Medidata.ZipkinTracer.Core
 
         internal SpanProcessor spanProcessor;
 
-        private static SpanCollector instance;
-
-        public static SpanCollector GetInstance(Uri uri, uint maxProcessorBatchSize)
-        {
-            if (instance == null)
-            {
-                instance = new SpanCollector(uri, maxProcessorBatchSize);
-                instance.Start();
-            }
-            return instance;
-        }
+        public bool IsStarted { get; private set; }
+        private readonly object syncObj = new object();
 
         public SpanCollector(Uri uri, uint maxProcessorBatchSize)
         {
-            if ( spanQueue == null)
+            if (spanQueue == null)
             {
                 spanQueue = new BlockingCollection<Span>(MAX_QUEUE_SIZE);
             }
@@ -41,12 +33,12 @@ namespace Medidata.ZipkinTracer.Core
 
         public virtual void Start()
         {
-            spanProcessor.Start();
+            SyncHelper.ExecuteSafely(syncObj, () => !IsStarted, () => { spanProcessor.Start(); IsStarted = true; });
         }
 
         public virtual void Stop()
         {
-            spanProcessor.Stop();
+            SyncHelper.ExecuteSafely(syncObj, () => IsStarted, () => { spanProcessor.Stop() ; IsStarted = false; });
         }
     }
 }

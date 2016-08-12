@@ -24,16 +24,6 @@ namespace Medidata.ZipkinTracer.Core.Test
         }
 
         [TestMethod]
-        public void GetInstance()
-        {
-            SpanCollector.spanQueue = null;
-
-            spanCollector = SpanCollector.GetInstance(new Uri("http://localhost"), 0);
-
-            Assert.IsNotNull(SpanCollector.spanQueue);
-        }
-
-        [TestMethod]
         public void CTOR_initializesSpanCollector()
         {
             SpanCollector.spanQueue = null;
@@ -85,7 +75,20 @@ namespace Medidata.ZipkinTracer.Core.Test
             SetupSpanCollector();
 
             spanCollector.Start();
+
             spanProcessorStub.AssertWasCalled(x => x.Start());
+            Assert.IsTrue(spanCollector.IsStarted);
+        }
+
+        [TestMethod]
+        public void StopProcessingSpansWithoutStartFirst()
+        {
+            SetupSpanCollector();
+
+            spanCollector.Stop();
+
+            spanProcessorStub.AssertWasNotCalled(x => x.Stop());
+            Assert.IsFalse(spanCollector.IsStarted);
         }
 
         [TestMethod]
@@ -93,9 +96,11 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             SetupSpanCollector();
 
+            spanCollector.Start();
             spanCollector.Stop();
 
             spanProcessorStub.AssertWasCalled(x => x.Stop());
+            Assert.IsFalse(spanCollector.IsStarted);
         }
 
         private void SetupSpanCollector()

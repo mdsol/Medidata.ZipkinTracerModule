@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using Medidata.ZipkinTracer.Core.Logging;
 using Microsoft.Owin;
 using Medidata.ZipkinTracer.Models;
+using Medidata.ZipkinTracer.Core.Helpers;
 
 namespace Medidata.ZipkinTracer.Core
 {
@@ -18,6 +19,20 @@ namespace Medidata.ZipkinTracer.Core
         public ITraceProvider TraceProvider { get; }
 
         public IZipkinConfig ZipkinConfig { get; }
+
+        private static SpanCollector instance;
+        private static readonly object syncObj = new object();
+
+        static SpanCollector GetInstance(Uri uri, uint maxProcessorBatchSize)
+        {
+            SyncHelper.ExecuteSafely(syncObj, () => instance == null,
+                () =>
+                    {
+                        instance = new SpanCollector(uri, maxProcessorBatchSize);
+                    });
+
+            return instance;
+        }
 
         public ZipkinClient(IZipkinConfig zipkinConfig, IOwinContext context, SpanCollector collector = null)
         {
@@ -35,9 +50,11 @@ namespace Medidata.ZipkinTracer.Core
 
             try
             {
-                spanCollector = collector ?? SpanCollector.GetInstance(
+                spanCollector = collector ?? GetInstance(
                     zipkinConfig.ZipkinBaseUri,
                     zipkinConfig.SpanProcessorBatchSize);
+
+                spanCollector.Start();
 
                 spanTracer = new SpanTracer(
                     spanCollector,
