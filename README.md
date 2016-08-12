@@ -90,8 +90,8 @@ public class HomeController : AsyncController
 		var config = new ZipkinConfig // you can use Dependency Injection to get the same config across your app.
 		{
 		    Domain = new Uri("https://yourservice.com"),
-			ZipkinBaseUri = new Uri("http://zipkin.xyz.net:9411"),
-			SpanProcessorBatchSize = 10,
+		    ZipkinBaseUri = new Uri("http://zipkin.xyz.net:9411"),
+		    SpanProcessorBatchSize = 10,
 		    SampleRate = 0.5    
 		}
 		var client = new ZipkinClient(config, context);
