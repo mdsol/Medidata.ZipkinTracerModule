@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using log4net;
 using Microsoft.Owin;
 using Owin;
 
@@ -22,8 +21,7 @@ namespace Medidata.ZipkinTracer.Core.Middlewares
                 return;
             }
 
-            var logger = LogManager.GetLogger("ZipkinMiddleware");
-            var zipkin = new ZipkinClient(logger, _config, context);
+            var zipkin = new ZipkinClient(_config, context);
             var span = zipkin.StartServerTrace(context.Request.Uri, context.Request.Method);
             await Next.Invoke(context);
             zipkin.EndServerTrace(span);

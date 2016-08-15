@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using log4net;
+using Medidata.ZipkinTracer.Core.Logging;
 using Medidata.ZipkinTracer.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
@@ -27,7 +27,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             fixture = new Fixture();
             logger = MockRepository.GenerateStub<ILog>();
-            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(new Uri("http://localhost"), (uint)0, logger);
+            spanCollectorStub = MockRepository.GenerateStub<SpanCollector>(new Uri("http://localhost"), (uint)0);
             zipkinEndpointStub = MockRepository.GenerateStub<ServiceEndpoint>();
             zipkinNotToBeDisplayedDomainList = new List<string> {".xyz.net"};
             serverServiceName = "xyz-sandbox";
@@ -100,7 +100,7 @@ namespace Medidata.ZipkinTracer.Core.Test
 
             Assert.AreEqual(1, binaryAnnotations.Count());
 
-            AssertBinaryAnnotations(binaryAnnotations, "http.uri", serverUri.AbsolutePath);
+            AssertBinaryAnnotations(binaryAnnotations, "http.path", serverUri.AbsolutePath);
         }
 
         [TestMethod]
@@ -235,7 +235,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             var binaryAnnotations = resultSpan.GetAnnotationsByType<BinaryAnnotation>();
 
             Assert.AreEqual(2, binaryAnnotations.Count());
-            AssertBinaryAnnotations(binaryAnnotations, "http.uri", serverUri.AbsolutePath);
+            AssertBinaryAnnotations(binaryAnnotations, "http.path", serverUri.AbsolutePath);
             AssertBinaryAnnotations(binaryAnnotations, "sa", "1");
 
             var endpoint = binaryAnnotations.ToArray()[1].Host as Endpoint;

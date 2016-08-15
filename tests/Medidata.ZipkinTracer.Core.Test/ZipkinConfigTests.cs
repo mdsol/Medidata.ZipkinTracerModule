@@ -17,7 +17,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             _sut = new ZipkinConfig
             {
                 ZipkinBaseUri = new Uri("http://zipkin.com"),
-                Domain = new Uri("http://server.com"),
+                Domain = r => new Uri("http://server.com"),
                 SpanProcessorBatchSize = fixture.Create<uint>(),
                 ExcludedPathList = new List<string>(),
                 SampleRate = 0,
@@ -28,14 +28,6 @@ namespace Medidata.ZipkinTracer.Core.Test
         [TestMethod]
         public void Validate()
         {
-            _sut.Validate();
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void ValidateWithNullZipkinBaseUri()
-        {
-            _sut.Domain = null;
             _sut.Validate();
         }
 
@@ -68,14 +60,6 @@ namespace Medidata.ZipkinTracer.Core.Test
         public void ValidateWithInvalidSampleRate()
         {
             _sut.SampleRate = 1.1;
-            _sut.Validate();
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void ValidateWithNullDomain()
-        {
-            _sut.Domain = null;
             _sut.Validate();
         }
 

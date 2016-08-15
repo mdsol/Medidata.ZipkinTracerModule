@@ -9,7 +9,7 @@ namespace Medidata.ZipkinTracer.Core
     {
         public Predicate<IOwinRequest> Bypass { get; set; } = r => false;
         public Uri ZipkinBaseUri { get; set; }
-        public Uri Domain { get; set; }
+        public Func<IOwinRequest, Uri> Domain { get; set; }
         public uint SpanProcessorBatchSize { get; set; }
         public IList<string> ExcludedPathList { get; set; } = new List<string>();
         public double SampleRate { get; set; }
@@ -24,7 +24,7 @@ namespace Medidata.ZipkinTracer.Core
 
             if (Domain == null)
             {
-                throw new ArgumentNullException("Domain");
+                Domain = request => new Uri(request.Uri.Host);
             }
 
             if (ExcludedPathList == null)
