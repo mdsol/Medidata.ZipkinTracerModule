@@ -87,7 +87,14 @@ public class HomeController : AsyncController
     public async Task<ActionResult> Index()
     {
         var context = System.Web.HttpContext.Current.GetOwinContext();
-		var client = new ZipkinClient(context);
+		var config = new ZipkinConfig // you can use Dependency Injection to get the same config across your app.
+		{
+		    Domain = new Uri("https://yourservice.com"),
+		    ZipkinBaseUri = new Uri("http://zipkin.xyz.net:9411"),
+		    SpanProcessorBatchSize = 10,
+		    SampleRate = 0.5    
+		}
+		var client = new ZipkinClient(config, context);
 
         using (var httpClient = new HttpClient(new ZipkinMessageHandler(client))))
         {
@@ -104,10 +111,19 @@ public class HomeController : AsyncController
 ```
 
 #### Recording arbitrary events and additional information
-Additional annotations can be recorded by using the ZipkinClient's `Record()` and `RecordBinary<T>()` methods:
+**NOTE:This can only be used if you are NOT using ZipkinMessageHandler as described above "Client trace (Outbound request)". ```RecordBinary<T()``` needs to be called before ```EndClientTrace()``` is invoked.**
 
+Additional annotations can be recorded by using the ZipkinClient's `Record()` and `RecordBinary<T>()` methods:
 ```csharp
-var zipkinClient = (ITracerClient)HttpContext.Current.Items["zipkinClient"];
+var context = System.Web.HttpContext.Current.GetOwinContext();
+var config = new ZipkinConfig // you can use Dependency Injection to get the same config across your app.
+{
+	Domain = new Uri("https://yourservice.com"),
+	ZipkinBaseUri = new Uri("http://zipkin.xyz.net:9411"),
+	SpanProcessorBatchSize = 10,
+	SampleRate = 0.5    
+}
+var zipkinClient = new ZipkinClient(config, context);
 var url = "https://abc.xyz.com:8000";
 var requestUri = "/object/1";
 HttpResponseMessage result;
@@ -116,17 +132,17 @@ using (var client = new HttpClient())
     client.BaseAddress = new Uri(url);
 
 	// start client trace
-    var span = tracerClient.StartClientTrace(new Uri(client.BaseAddress, requestUri), "GET");
+    var span = zipkinClient.StartClientTrace(new Uri(client.BaseAddress, requestUri), "GET");
 
-    tracerClient.Record(span, "A description which will gets recorded with a timestamp.");
+    zipkinClient.Record(span, "A description which will gets recorded with a timestamp.");
 
     result = await client.GetAsync(requestUri);
 
     // Record the total memory used after the call
-    tracerClient.RecordBinary(span, "client.memory", GC.GetTotalMemory(false));
+    zipkinClient.RecordBinary(span, "client.memory", GC.GetTotalMemory(false));
 
 	// end client trace
-    tracerClient.EndClientTrace(span);
+    zipkinClient.EndClientTrace(span);
 }
 ...
 ```
