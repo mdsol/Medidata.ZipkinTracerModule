@@ -72,9 +72,9 @@ namespace Medidata.ZipkinTracer.Core
                 headerSampled = context.Request.Headers[SampledHeaderName];
             }
 
-            TraceId = Parse(headerTraceId) ? headerTraceId : GenerateHexEncodedInt64FromNewGuid();
-            SpanId = Parse(headerSpanId) ? headerSpanId : TraceId;
-            ParentSpanId = Parse(headerParentSpanId) ? headerParentSpanId : string.Empty;
+            TraceId = Parse(headerTraceId) ? GetLower16Characters(headerTraceId) : GenerateHexEncodedInt64FromNewGuid();
+            SpanId = Parse(headerSpanId) ? GetLower16Characters(headerSpanId) : TraceId;
+            ParentSpanId = Parse(headerParentSpanId) ? GetLower16Characters(headerParentSpanId) : string.Empty;
             IsSampled = config.ShouldBeSampled(context, headerSampled);
            
             if (SpanId == ParentSpanId)
@@ -120,8 +120,18 @@ namespace Medidata.ZipkinTracer.Core
         /// <returns>true: parsed</returns>
         private bool Parse(string value)
         {
-            long result;
-            return !string.IsNullOrWhiteSpace(value) && Int64.TryParse(value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out result);
+            ulong result;
+            return !string.IsNullOrWhiteSpace(value) && UInt64.TryParse(GetLower16Characters(value), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out result);
+        }
+
+        /// <summary>
+        /// Get Lower 16 Characters of an id
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        private string GetLower16Characters(string value)
+        {
+            return value.Length > 16 ? value.Substring(value.Length - 16) : value;
         }
 
         /// <summary>

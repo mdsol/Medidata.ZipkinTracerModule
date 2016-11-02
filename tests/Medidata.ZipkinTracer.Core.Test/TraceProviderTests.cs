@@ -218,5 +218,91 @@ namespace Medidata.ZipkinTracer.Core.Test
             Assert.AreEqual(sut.SpanId, nextTraceProvider.ParentSpanId);
             Assert.AreEqual(sut.IsSampled, nextTraceProvider.IsSampled);
         }
+
+        [TestMethod]
+        public void IdsWithLessThan32Characters()
+        {
+            // Arrange
+            var fixture = new Fixture();
+            var traceId = "48485a3953bb612";
+            var spanId = "48485a3953bb613";
+            var parentSpanId = "48485a3953bb614";
+            var isSampled = fixture.Create<bool>();
+
+            var context = GenerateContext(traceId, spanId, parentSpanId, isSampled);
+
+            // Act
+            var sut = new TraceProvider(new ZipkinConfig(), context);
+
+            // Assert
+            Assert.AreEqual(traceId, sut.TraceId);
+            Assert.AreEqual(spanId, sut.SpanId);
+            Assert.AreEqual(parentSpanId, sut.ParentSpanId);
+        }
+
+        [TestMethod]
+        public void IdsWith32Characters()
+        {
+            // Arrange
+            var fixture = new Fixture();
+            var traceId = "48485a3953bb6124";
+            var spanId = "48485a3953bb6125";
+            var parentSpanId = "48485a3953bb6126";
+            var isSampled = fixture.Create<bool>();
+
+            var context = GenerateContext(traceId, spanId, parentSpanId, isSampled);
+
+            // Act
+            var sut = new TraceProvider(new ZipkinConfig(), context);
+
+            // Assert
+            Assert.AreEqual(traceId, sut.TraceId);
+            Assert.AreEqual(spanId, sut.SpanId);
+            Assert.AreEqual(parentSpanId, sut.ParentSpanId);
+        }
+
+        [TestMethod]
+        public void IdsWith64Characters()
+        {
+            // Arrange
+            var fixture = new Fixture();
+            var traceIdLower16Chars = "48485a3953bb6124";
+            var traceId = "18485a3953bb6124" + traceIdLower16Chars;
+            var spanIdLower16Chars = "48485a3953bb6125";
+            var spanId = "28485a3953bb6124" + spanIdLower16Chars;
+            var parentSpanIdLower16Chars = "48485a3953bb6126";
+            var parentSpanId = "38485a3953bb6124" + parentSpanIdLower16Chars;
+            var isSampled = fixture.Create<bool>();
+
+            var context = GenerateContext(traceId, spanId, parentSpanId, isSampled);
+
+            // Act
+            var sut = new TraceProvider(new ZipkinConfig(), context);
+
+            // Assert
+            Assert.AreEqual(traceIdLower16Chars, sut.TraceId);
+            Assert.AreEqual(spanIdLower16Chars, sut.SpanId);
+            Assert.AreEqual(parentSpanIdLower16Chars, sut.ParentSpanId);
+        }
+
+        private IOwinContext GenerateContext(string traceId, string spanId, string parentSpanId, bool isSampled)
+        {
+            var context = MockRepository.GenerateStub<IOwinContext>();
+            var request = MockRepository.GenerateStub<IOwinRequest>();
+            var headers = new HeaderDictionary(new Dictionary<string, string[]>
+            {
+                { TraceProvider.TraceIdHeaderName, new [] { traceId } },
+                { TraceProvider.SpanIdHeaderName, new [] { spanId } },
+                { TraceProvider.ParentSpanIdHeaderName, new [] { parentSpanId } },
+                { TraceProvider.SampledHeaderName, new [] { isSampled.ToString() } }
+            });
+            var environment = new Dictionary<string, object>();
+
+            request.Stub(x => x.Headers).Return(headers);
+            context.Stub(x => x.Request).Return(request);
+            context.Stub(x => x.Environment).Return(environment);
+
+            return context;
+        }
     }
 }
