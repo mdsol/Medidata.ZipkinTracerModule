@@ -66,15 +66,15 @@ namespace Medidata.ZipkinTracer.Core
                 }
 
                 // zipkin use the following X-Headers to propagate the trace information
-                headerTraceId = context.Request.Headers[TraceIdHeaderName];
+                headerTraceId = GetLower16Characters(context.Request.Headers[TraceIdHeaderName]);
                 headerSpanId = context.Request.Headers[SpanIdHeaderName];
                 headerParentSpanId = context.Request.Headers[ParentSpanIdHeaderName];
                 headerSampled = context.Request.Headers[SampledHeaderName];
             }
 
-            TraceId = Parse(headerTraceId) ? GetLower16Characters(headerTraceId) : GenerateHexEncodedInt64FromNewGuid();
-            SpanId = Parse(headerSpanId) ? GetLower16Characters(headerSpanId) : TraceId;
-            ParentSpanId = Parse(headerParentSpanId) ? GetLower16Characters(headerParentSpanId) : string.Empty;
+            TraceId = Parse(headerTraceId) ? headerTraceId : GenerateHexEncodedInt64FromNewGuid();
+            SpanId = Parse(headerSpanId) ? headerSpanId : TraceId;
+            ParentSpanId = Parse(headerParentSpanId) ? headerParentSpanId : string.Empty;
             IsSampled = config.ShouldBeSampled(context, headerSampled);
            
             if (SpanId == ParentSpanId)
@@ -121,7 +121,7 @@ namespace Medidata.ZipkinTracer.Core
         private bool Parse(string value)
         {
             ulong result;
-            return !string.IsNullOrWhiteSpace(value) && UInt64.TryParse(GetLower16Characters(value), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out result);
+            return !string.IsNullOrWhiteSpace(value) && UInt64.TryParse(value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out result);
         }
 
         /// <summary>
@@ -131,6 +131,7 @@ namespace Medidata.ZipkinTracer.Core
         /// <returns></returns>
         private string GetLower16Characters(string value)
         {
+            if (string.IsNullOrWhiteSpace(value)) return value;
             return value.Length > 16 ? value.Substring(value.Length - 16) : value;
         }
 
