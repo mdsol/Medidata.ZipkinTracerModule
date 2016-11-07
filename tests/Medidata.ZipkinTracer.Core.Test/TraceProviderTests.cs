@@ -277,7 +277,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             var sut = new TraceProvider(new ZipkinConfig(), context);
 
             // Assert
-            Assert.AreEqual(traceIdLower16Chars, sut.TraceId);
+            Assert.AreEqual(traceId, sut.TraceId);
         }
 
         private IOwinContext GenerateContext(string traceId, string spanId, string parentSpanId, bool isSampled)

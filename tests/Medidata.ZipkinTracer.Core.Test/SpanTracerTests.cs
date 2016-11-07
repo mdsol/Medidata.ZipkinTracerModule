@@ -6,6 +6,7 @@ using Medidata.ZipkinTracer.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
+using System.Globalization;
 
 namespace Medidata.ZipkinTracer.Core.Test
 {
@@ -82,9 +83,9 @@ namespace Medidata.ZipkinTracer.Core.Test
             var resultSpan = spanTracer.ReceiveServerSpan(requestName, traceId, parentSpanId, spanId, serverUri);
 
             Assert.AreEqual(requestName, resultSpan.Name);
-            Assert.AreEqual(Int64.Parse(traceId, System.Globalization.NumberStyles.HexNumber), resultSpan.TraceId);
-            Assert.AreEqual(Int64.Parse(parentSpanId, System.Globalization.NumberStyles.HexNumber), resultSpan.ParentId);
-            Assert.AreEqual(Int64.Parse(spanId, System.Globalization.NumberStyles.HexNumber), resultSpan.Id);
+            Assert.AreEqual(Int64.Parse(traceId, NumberStyles.HexNumber, CultureInfo.InvariantCulture), resultSpan.TraceId);
+            Assert.AreEqual(Int64.Parse(parentSpanId, NumberStyles.HexNumber, CultureInfo.InvariantCulture), resultSpan.ParentId);
+            Assert.AreEqual(Int64.Parse(spanId, NumberStyles.HexNumber, CultureInfo.InvariantCulture), resultSpan.Id);
 
             Assert.AreEqual(1, resultSpan.GetAnnotationsByType<Annotation>().Count());
 
@@ -101,6 +102,45 @@ namespace Medidata.ZipkinTracer.Core.Test
             Assert.AreEqual(1, binaryAnnotations.Count());
 
             AssertBinaryAnnotations(binaryAnnotations, "http.path", serverUri.AbsolutePath);
+        }
+
+        [TestMethod]
+        public void CreateNewSpanWithLessThan16CharactersTraceId()
+        {   
+            var traceId = "48485a3953bb612";
+                                    
+            var resultSpan = SpanTracer.CreateNewSpan(fixture.Create<string>(), traceId, fixture.Create<long>().ToString(), fixture.Create<long>().ToString());
+            
+            Assert.AreEqual(Int64.Parse(traceId, NumberStyles.HexNumber, CultureInfo.InvariantCulture), resultSpan.TraceId);
+        }
+
+        [TestMethod]
+        public void CreateNewSpanWith16CharactersTraceId()
+        {
+            var traceId = "48485a3953bb6124";
+
+            var resultSpan = SpanTracer.CreateNewSpan(fixture.Create<string>(), traceId, fixture.Create<long>().ToString(), fixture.Create<long>().ToString());
+            
+            Assert.AreEqual(Int64.Parse(traceId, NumberStyles.HexNumber, CultureInfo.InvariantCulture), resultSpan.TraceId);
+        }
+
+        [TestMethod]
+        public void CreateNewSpanWith32CharactersTraceId()
+        {
+            var traceIdLower16Chars = "48485a3953bb6124";
+            var traceId = "18485a3953bb6124" + traceIdLower16Chars;
+
+            var resultSpan = SpanTracer.CreateNewSpan(fixture.Create<string>(), traceId, fixture.Create<long>().ToString(), fixture.Create<long>().ToString());
+
+            Assert.AreEqual(Int64.Parse(traceIdLower16Chars, NumberStyles.HexNumber, CultureInfo.InvariantCulture), resultSpan.TraceId);
+        }
+
+        [TestMethod]
+        public void CreateNewSpanWithNullParentSpanId()
+        {
+            var resultSpan = SpanTracer.CreateNewSpan(fixture.Create<string>(), fixture.Create<long>().ToString(), null, fixture.Create<long>().ToString());
+
+            Assert.IsNull(resultSpan.ParentId);
         }
 
         [TestMethod]
@@ -218,9 +258,9 @@ namespace Medidata.ZipkinTracer.Core.Test
             var resultSpan = spanTracer.SendClientSpan(requestName, traceId, parentSpanId, spanId, serverUri);
 
             Assert.AreEqual(requestName, resultSpan.Name);
-            Assert.AreEqual(Int64.Parse(traceId, System.Globalization.NumberStyles.HexNumber), resultSpan.TraceId);
-            Assert.AreEqual(Int64.Parse(parentSpanId, System.Globalization.NumberStyles.HexNumber), resultSpan.ParentId);
-            Assert.AreEqual(Int64.Parse(spanId, System.Globalization.NumberStyles.HexNumber), resultSpan.Id);
+            Assert.AreEqual(Int64.Parse(traceId, NumberStyles.HexNumber, CultureInfo.InvariantCulture), resultSpan.TraceId);
+            Assert.AreEqual(Int64.Parse(parentSpanId, NumberStyles.HexNumber, CultureInfo.InvariantCulture), resultSpan.ParentId);
+            Assert.AreEqual(Int64.Parse(spanId, NumberStyles.HexNumber, CultureInfo.InvariantCulture), resultSpan.Id);
 
 
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Medidata.ZipkinTracer.Models;
+using System.Globalization;
 
 namespace Medidata.ZipkinTracer.Core
 {
@@ -148,15 +149,15 @@ namespace Medidata.ZipkinTracer.Core
             });
         }
 
-        private Span CreateNewSpan(string spanName, string traceId, string parentSpanId, string spanId)
+        internal static Span CreateNewSpan(string spanName, string traceId, string parentSpanId, string spanId)
         {
             var newSpan = new Span();
-            newSpan.Id = Int64.Parse(spanId, System.Globalization.NumberStyles.HexNumber);
-            newSpan.TraceId = Int64.Parse(traceId, System.Globalization.NumberStyles.HexNumber);
+            newSpan.Id = Int64.Parse(spanId, System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+            newSpan.TraceId = Int64.Parse(TraceProvider.GetLower16Characters(traceId), System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture);
 
             if (!String.IsNullOrEmpty(parentSpanId))
             {
-                newSpan.ParentId = Int64.Parse(parentSpanId, System.Globalization.NumberStyles.HexNumber);
+                newSpan.ParentId = Int64.Parse(parentSpanId, System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture);
             }
 
             newSpan.Name = spanName;

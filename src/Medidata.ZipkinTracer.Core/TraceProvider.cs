@@ -66,7 +66,7 @@ namespace Medidata.ZipkinTracer.Core
                 }
 
                 // zipkin use the following X-Headers to propagate the trace information
-                headerTraceId = GetLower16Characters(context.Request.Headers[TraceIdHeaderName]);
+                headerTraceId = context.Request.Headers[TraceIdHeaderName];
                 headerSpanId = context.Request.Headers[SpanIdHeaderName];
                 headerParentSpanId = context.Request.Headers[ParentSpanIdHeaderName];
                 headerSampled = context.Request.Headers[SampledHeaderName];
@@ -120,8 +120,8 @@ namespace Medidata.ZipkinTracer.Core
         /// <returns>true: parsed</returns>
         private bool Parse(string value)
         {
-            ulong result;
-            return !string.IsNullOrWhiteSpace(value) && UInt64.TryParse(value, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out result);
+            long result;
+            return !string.IsNullOrWhiteSpace(value) && Int64.TryParse(GetLower16Characters(value), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out result);
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace Medidata.ZipkinTracer.Core
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        private string GetLower16Characters(string value)
+        internal static string GetLower16Characters(string value)
         {
             if (string.IsNullOrWhiteSpace(value)) return value;
             return value.Length > 16 ? value.Substring(value.Length - 16) : value;
