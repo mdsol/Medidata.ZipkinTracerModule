@@ -61,14 +61,6 @@ namespace Medidata.ZipkinTracer.Core.Test
         }
 
         [TestMethod]
-        public void CreateNewSpan_WithEmptyStringParentSpanId()
-        {
-            var resultSpan = SpanTracer.CreateNewSpan(fixture.Create<string>(), fixture.Create<long>().ToString(), string.Empty, fixture.Create<long>().ToString());
-
-            Assert.IsNull(resultSpan.ParentId);
-        }
-
-        [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void CTOR_WithNullSpanCollector()
         {

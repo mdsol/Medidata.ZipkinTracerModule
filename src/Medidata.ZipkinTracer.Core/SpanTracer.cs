@@ -154,7 +154,7 @@ namespace Medidata.ZipkinTracer.Core
             {
                 Name = spanName,
                 TraceId = traceId,
-                ParentId = string.IsNullOrWhiteSpace(parentSpanId) ? null : parentSpanId,
+                ParentId = parentSpanId,
                 Id = spanId
             };
         }

@@ -19,7 +19,7 @@ namespace Medidata.ZipkinTracer.Models
         public string Id => span.Id;
 
         [JsonProperty("parentId", NullValueHandling = NullValueHandling.Ignore)]
-        public string ParentId => span.ParentId;
+        public string ParentId => string.IsNullOrWhiteSpace(span.ParentId) ? null : span.ParentId;
 
         [JsonProperty("annotations")]
         public IEnumerable<JsonAnnotation> Annotations =>

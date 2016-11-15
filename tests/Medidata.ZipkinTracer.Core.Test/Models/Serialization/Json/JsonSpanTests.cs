@@ -43,5 +43,21 @@ namespace Medidata.ZipkinTracer.Core.Test.Models.Serialization.Json
             Assert.AreEqual(2, result.Annotations.Count());
             Assert.AreEqual(2, result.BinaryAnnotations.Count());
         }
+
+        [TestMethod]
+        public void JsonSpan_ParentIdIsWhiteSpace()
+        {
+            // Arrange
+            var span = new Span
+            {
+                ParentId = string.Empty
+            };
+
+            // Act
+            var result = new JsonSpan(span);
+
+            // Assert
+            Assert.IsNull(result.ParentId);
+        }
     }
 }
