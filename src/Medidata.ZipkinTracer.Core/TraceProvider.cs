@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Globalization;
 using Microsoft.Owin;
+using Medidata.ZipkinTracer.Core.Helpers;
 
 namespace Medidata.ZipkinTracer.Core
 {
@@ -39,6 +39,7 @@ namespace Medidata.ZipkinTracer.Core
         /// </summary>
         public bool IsSampled { get; }
 
+        // TODO: Make another constructor to accept System.Web.HttpContext for non Owin applications
         /// <summary>
         /// Initializes a new instance of the TraceProvider class.
         /// </summary>
@@ -72,11 +73,11 @@ namespace Medidata.ZipkinTracer.Core
                 headerSampled = context.Request.Headers[SampledHeaderName];
             }
 
-            TraceId = Parse(headerTraceId) ? headerTraceId : GenerateHexEncodedInt64FromNewGuid();
-            SpanId = Parse(headerSpanId) ? headerSpanId : TraceId;
-            ParentSpanId = Parse(headerParentSpanId) ? headerParentSpanId : string.Empty;
+            TraceId = headerTraceId.IsParsableTo128Or64Bit() ? headerTraceId : GenerateHexFromNewGuid(config.Create128BitTraceId);
+            SpanId = headerSpanId.IsParsableToLong() ? headerSpanId : GenerateHexEncodedInt64FromNewGuid();
+            ParentSpanId = headerParentSpanId.IsParsableToLong() ? headerParentSpanId : string.Empty;
             IsSampled = config.ShouldBeSampled(context, headerSampled);
-           
+            
             if (SpanId == ParentSpanId)
             {
                 throw new ArgumentException("x-b3-SpanId and x-b3-ParentSpanId must not be the same value.");
@@ -112,27 +113,17 @@ namespace Medidata.ZipkinTracer.Core
                 SpanId,
                 IsSampled);
         }
-
+        
         /// <summary>
-        /// Parse id value
+        /// Generate a hex encoded Int64 from new Guid.
         /// </summary>
-        /// <param name="value">header's value</param>
-        /// <returns>true: parsed</returns>
-        private bool Parse(string value)
+        /// <returns>The hex encoded int64</returns>
+        private string GenerateHexFromNewGuid(bool create128Bit)
         {
-            long result;
-            return !string.IsNullOrWhiteSpace(value) && Int64.TryParse(GetLower16Characters(value), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out result);
-        }
-
-        /// <summary>
-        /// Get Lower 16 Characters of an id
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        internal static string GetLower16Characters(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value)) return value;
-            return value.Length > 16 ? value.Substring(value.Length - 16) : value;
+            if (create128Bit)
+                return Guid.NewGuid().ToString("N");
+            else
+                return GenerateHexEncodedInt64FromNewGuid();
         }
 
         /// <summary>

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Medidata.ZipkinTracer.Models;
-using System.Globalization;
 
 namespace Medidata.ZipkinTracer.Core
 {
@@ -49,7 +48,7 @@ namespace Medidata.ZipkinTracer.Core
         {
             if (span == null)
             {
-                throw new ArgumentNullException("Null server span");
+                throw new ArgumentNullException(nameof(span));
             }
 
             if (span.Annotations == null || !span.Annotations.Any())
@@ -104,7 +103,7 @@ namespace Medidata.ZipkinTracer.Core
         {
             if (span == null)
             {
-                throw new ArgumentNullException("Null client span");
+                throw new ArgumentNullException(nameof(span));
             }
 
             if (span.Annotations == null || !span.Annotations.Any())
@@ -127,7 +126,7 @@ namespace Medidata.ZipkinTracer.Core
         public virtual void Record(Span span, string value)
         {
             if (span == null)
-                throw new ArgumentNullException("span", "In order to record an annotation, the span must be not null.");
+                throw new ArgumentNullException(nameof(span), "In order to record an annotation, the span must be not null.");
 
             span.Annotations.Add(new Annotation()
             {
@@ -139,7 +138,7 @@ namespace Medidata.ZipkinTracer.Core
         public void RecordBinary<T>(Span span, string key, T value)
         {
              if (span == null)
-                throw new ArgumentNullException("span", "In order to record a binary annotation, the span must be not null.");
+                throw new ArgumentNullException(nameof(span), "In order to record a binary annotation, the span must be not null.");
 
             span.Annotations.Add(new BinaryAnnotation()
             {
@@ -151,17 +150,13 @@ namespace Medidata.ZipkinTracer.Core
 
         internal static Span CreateNewSpan(string spanName, string traceId, string parentSpanId, string spanId)
         {
-            var newSpan = new Span();
-            newSpan.Id = Int64.Parse(spanId, System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-            newSpan.TraceId = Int64.Parse(TraceProvider.GetLower16Characters(traceId), System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-
-            if (!String.IsNullOrEmpty(parentSpanId))
+            return new Span
             {
-                newSpan.ParentId = Int64.Parse(parentSpanId, System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-            }
-
-            newSpan.Name = spanName;
-            return newSpan;
+                Name = spanName,
+                TraceId = traceId,
+                ParentId = string.IsNullOrWhiteSpace(parentSpanId) ? null : parentSpanId,
+                Id = spanId
+            };
         }
 
         private void AddBinaryAnnotation<T>(string key, T value, Span span, Endpoint endpoint)

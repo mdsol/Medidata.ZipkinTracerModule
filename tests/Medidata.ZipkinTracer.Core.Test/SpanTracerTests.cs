@@ -6,7 +6,6 @@ using Medidata.ZipkinTracer.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
-using System.Globalization;
 
 namespace Medidata.ZipkinTracer.Core.Test
 {
@@ -35,6 +34,38 @@ namespace Medidata.ZipkinTracer.Core.Test
             clientServiceName = "abc-sandbox";
             port = 42;
             api = "/api/method1";
+        }
+
+        [TestMethod]
+        public void CreateNewSpan()
+        {
+            var spanName = fixture.Create<string>();
+            var traceId = Guid.NewGuid().ToString("N");
+            var parentSpanId = fixture.Create<long>().ToString("x");
+            var spanId = fixture.Create<long>().ToString("x");
+
+            var resultSpan = SpanTracer.CreateNewSpan(spanName, traceId, parentSpanId, spanId);
+
+            Assert.AreEqual(spanName, resultSpan.Name);
+            Assert.AreEqual(traceId, resultSpan.TraceId);
+            Assert.AreEqual(parentSpanId, resultSpan.ParentId);
+            Assert.AreEqual(spanId, resultSpan.Id);
+        }
+
+        [TestMethod]
+        public void CreateNewSpan_WithNullParentSpanId()
+        {
+            var resultSpan = SpanTracer.CreateNewSpan(fixture.Create<string>(), fixture.Create<long>().ToString(), null, fixture.Create<long>().ToString());
+
+            Assert.IsNull(resultSpan.ParentId);
+        }
+
+        [TestMethod]
+        public void CreateNewSpan_WithEmptyStringParentSpanId()
+        {
+            var resultSpan = SpanTracer.CreateNewSpan(fixture.Create<string>(), fixture.Create<long>().ToString(), string.Empty, fixture.Create<long>().ToString());
+
+            Assert.IsNull(resultSpan.ParentId);
         }
 
         [TestMethod]
@@ -70,9 +101,9 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             var domain = new Uri("http://server.com");
             var requestName = fixture.Create<string>();
-            var traceId = fixture.Create<long>().ToString();
-            var parentSpanId = fixture.Create<long>().ToString();
-            var spanId = fixture.Create<long>().ToString();
+            var traceId = Guid.NewGuid().ToString("N");
+            var parentSpanId = fixture.Create<long>().ToString("x");
+            var spanId = fixture.Create<long>().ToString("x");
             var serverUri = new Uri("https://" + clientServiceName + ":" + port + api);
 
             var spanTracer = new SpanTracer(spanCollectorStub, zipkinEndpointStub, zipkinNotToBeDisplayedDomainList, domain);
@@ -83,9 +114,9 @@ namespace Medidata.ZipkinTracer.Core.Test
             var resultSpan = spanTracer.ReceiveServerSpan(requestName, traceId, parentSpanId, spanId, serverUri);
 
             Assert.AreEqual(requestName, resultSpan.Name);
-            Assert.AreEqual(Int64.Parse(traceId, NumberStyles.HexNumber, CultureInfo.InvariantCulture), resultSpan.TraceId);
-            Assert.AreEqual(Int64.Parse(parentSpanId, NumberStyles.HexNumber, CultureInfo.InvariantCulture), resultSpan.ParentId);
-            Assert.AreEqual(Int64.Parse(spanId, NumberStyles.HexNumber, CultureInfo.InvariantCulture), resultSpan.Id);
+            Assert.AreEqual(traceId, resultSpan.TraceId);
+            Assert.AreEqual(parentSpanId, resultSpan.ParentId);
+            Assert.AreEqual(spanId, resultSpan.Id);
 
             Assert.AreEqual(1, resultSpan.GetAnnotationsByType<Annotation>().Count());
 
@@ -105,50 +136,10 @@ namespace Medidata.ZipkinTracer.Core.Test
         }
 
         [TestMethod]
-        public void CreateNewSpanWithLessThan16CharactersTraceId()
-        {   
-            var traceId = "48485a3953bb612";
-                                    
-            var resultSpan = SpanTracer.CreateNewSpan(fixture.Create<string>(), traceId, fixture.Create<long>().ToString(), fixture.Create<long>().ToString());
-            
-            Assert.AreEqual(Int64.Parse(traceId, NumberStyles.HexNumber, CultureInfo.InvariantCulture), resultSpan.TraceId);
-        }
-
-        [TestMethod]
-        public void CreateNewSpanWith16CharactersTraceId()
-        {
-            var traceId = "48485a3953bb6124";
-
-            var resultSpan = SpanTracer.CreateNewSpan(fixture.Create<string>(), traceId, fixture.Create<long>().ToString(), fixture.Create<long>().ToString());
-            
-            Assert.AreEqual(Int64.Parse(traceId, NumberStyles.HexNumber, CultureInfo.InvariantCulture), resultSpan.TraceId);
-        }
-
-        [TestMethod]
-        public void CreateNewSpanWith32CharactersTraceId()
-        {
-            var traceIdLower16Chars = "48485a3953bb6124";
-            var traceId = "18485a3953bb6124" + traceIdLower16Chars;
-
-            var resultSpan = SpanTracer.CreateNewSpan(fixture.Create<string>(), traceId, fixture.Create<long>().ToString(), fixture.Create<long>().ToString());
-
-            Assert.AreEqual(Int64.Parse(traceIdLower16Chars, NumberStyles.HexNumber, CultureInfo.InvariantCulture), resultSpan.TraceId);
-        }
-
-        [TestMethod]
-        public void CreateNewSpanWithNullParentSpanId()
-        {
-            var resultSpan = SpanTracer.CreateNewSpan(fixture.Create<string>(), fixture.Create<long>().ToString(), null, fixture.Create<long>().ToString());
-
-            Assert.IsNull(resultSpan.ParentId);
-        }
-
-        [TestMethod]
         public void ReceiveServerSpan_UsingToBeCleanedDomainName()
         {
-            var serverServiceName = "server";
             var requestName = fixture.Create<string>();
-            var traceId = fixture.Create<long>().ToString();
+            var traceId = fixture.Create<Guid>().ToString("N");
             var parentSpanId = fixture.Create<long>().ToString();
             var spanId = fixture.Create<long>().ToString();
             var serverUri = new Uri("https://" + clientServiceName + ":" + port + api);
@@ -171,7 +162,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             var domain = new Uri("https://server.com");
             var requestName = fixture.Create<string>();
-            var traceId = fixture.Create<long>().ToString();
+            var traceId = fixture.Create<Guid>().ToString("N");
             var parentSpanId = fixture.Create<long>().ToString();
             var spanId = fixture.Create<long>().ToString();
             var serverUri = new Uri("https://" + clientServiceName + ":" + port + api);
@@ -243,9 +234,9 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             var domain = new Uri("https://server.com");
             var requestName = fixture.Create<string>();
-            var traceId = fixture.Create<long>().ToString();
-            var parentSpanId = fixture.Create<long>().ToString();
-            var spanId = fixture.Create<long>().ToString();
+            var traceId = Guid.NewGuid().ToString("N");
+            var parentSpanId = fixture.Create<long>().ToString("x");
+            var spanId = fixture.Create<long>().ToString("x");
             var serverUri = new Uri("https://" + clientServiceName + ":" + port + api);
 
             var spanTracer = new SpanTracer(spanCollectorStub, zipkinEndpointStub, zipkinNotToBeDisplayedDomainList, domain);
@@ -258,9 +249,9 @@ namespace Medidata.ZipkinTracer.Core.Test
             var resultSpan = spanTracer.SendClientSpan(requestName, traceId, parentSpanId, spanId, serverUri);
 
             Assert.AreEqual(requestName, resultSpan.Name);
-            Assert.AreEqual(Int64.Parse(traceId, NumberStyles.HexNumber, CultureInfo.InvariantCulture), resultSpan.TraceId);
-            Assert.AreEqual(Int64.Parse(parentSpanId, NumberStyles.HexNumber, CultureInfo.InvariantCulture), resultSpan.ParentId);
-            Assert.AreEqual(Int64.Parse(spanId, NumberStyles.HexNumber, CultureInfo.InvariantCulture), resultSpan.Id);
+            Assert.AreEqual(traceId, resultSpan.TraceId);
+            Assert.AreEqual(parentSpanId, resultSpan.ParentId);
+            Assert.AreEqual(spanId, resultSpan.Id);
 
 
 
@@ -289,7 +280,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             var domain = new Uri("https://server.com");
             var requestName = fixture.Create<string>();
-            var traceId = fixture.Create<long>().ToString();
+            var traceId = fixture.Create<Guid>().ToString("N");
             var parentSpanId = fixture.Create<long>().ToString();
             var spanId = fixture.Create<long>().ToString();
             var serverUri = new Uri("https://" + clientServiceName + zipkinNotToBeDisplayedDomainList.First() + ":" + port + api);

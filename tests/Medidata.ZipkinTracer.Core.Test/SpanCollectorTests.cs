@@ -43,15 +43,16 @@ namespace Medidata.ZipkinTracer.Core.Test
 
             Assert.IsTrue(System.Object.ReferenceEquals(SpanCollector.spanQueue, spanQueue));
         }
+
         [TestMethod]
         public void CollectSpans()
         {
             SetupSpanCollector();
 
-            var testSpanId = fixture.Create<long>(); 
-            var testTraceId = fixture.Create<long>(); 
-            var testParentSpanId = fixture.Create<long>(); 
-            var testName = fixture.Create<string>(); 
+            var testSpanId = fixture.Create<string>(); 
+            var testTraceId = fixture.Create<string>(); 
+            var testParentSpanId = fixture.Create<string>(); 
+            var testName = fixture.Create<string>();
             
             Span span = new Span();
             span.Id = testSpanId;

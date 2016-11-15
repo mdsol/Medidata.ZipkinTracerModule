@@ -20,6 +20,8 @@ namespace Medidata.ZipkinTracer.Core
 
         IList<string> NotToBeDisplayedDomainList { get; set; }
 
+        bool Create128BitTraceId { get; set; }
+
         bool ShouldBeSampled(IOwinContext context, string sampled);
 
         void Validate();

@@ -33,6 +33,7 @@ service/environment.
 - `NotToBeDisplayedDomainList`(optional) - It will be used when logging host name by excluding these strings in service name attribute
 	e.g. domain: ".xyz.com", host: "abc.xyz.com" will be logged as "abc" only    
 - `ExcludedPathList`(optional) - Path list that is not needed for tracing. Each item must start with "/".
+- `Create128BitTraceId` - Create new traces using 128 bit (32 hex character) traceId
 
 
 ```csharp
@@ -166,3 +167,5 @@ ZipkinTracer is (c) Medidata Solutions Worldwide and owned by its major contribu
 * [Kenya Matsumoto](https://github.com/kenyamat)
 * [Brent Villanueva](https://github.com/bvillanueva-mdsol)
 * [Laszlo Schreck](https://github.com/lschreck-mdsol)
+* [Jordi Carres](https://github.com/jcarres-mdsol)
+* [Herry Kurniawan](https://github.com/hkurniawan-mdsol)

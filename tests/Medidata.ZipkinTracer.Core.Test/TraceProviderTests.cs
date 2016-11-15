@@ -4,6 +4,7 @@ using Microsoft.Owin;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
+using System.Globalization;
 
 namespace Medidata.ZipkinTracer.Core.Test
 {
@@ -17,7 +18,8 @@ namespace Medidata.ZipkinTracer.Core.Test
             var traceProvider = new TraceProvider(new ZipkinConfig());
 
             // Assert
-            Assert.AreEqual(traceProvider.TraceId, traceProvider.SpanId);
+            Assert.IsNotNull(traceProvider.TraceId);
+            Assert.IsNotNull(traceProvider.SpanId);
             Assert.AreEqual(string.Empty, traceProvider.ParentSpanId);
             Assert.AreEqual(false, traceProvider.IsSampled);
         }
@@ -99,7 +101,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             // Arrange
             var fixture = new Fixture();
-            var traceId = fixture.Create<string>();
+            var traceId = fixture.Create<Guid>().ToString("N").Substring(1);
             var spanId = fixture.Create<string>();
             var parentSpanId = fixture.Create<string>();
             var isSampled = fixture.Create<string>();
@@ -128,7 +130,7 @@ namespace Medidata.ZipkinTracer.Core.Test
 
             // Assert
             Assert.AreNotEqual(traceId, sut.TraceId);
-            Assert.AreEqual(sut.TraceId, sut.SpanId);
+            Assert.AreNotEqual(spanId, sut.SpanId);
             Assert.AreEqual(string.Empty, sut.ParentSpanId);
             Assert.AreEqual(expectedIsSampled, sut.IsSampled);
         }
@@ -220,11 +222,11 @@ namespace Medidata.ZipkinTracer.Core.Test
         }
 
         [TestMethod]
-        public void TraceIdWithLessThan16Characters()
+        public void Constructor_TraceIdWith32Characters()
         {
             // Arrange
             var fixture = new Fixture();
-            var traceId = "48485a3953bb612";
+            var traceId = Guid.NewGuid().ToString("N");
 
             var context = GenerateContext(
                 traceId,
@@ -240,44 +242,48 @@ namespace Medidata.ZipkinTracer.Core.Test
         }
 
         [TestMethod]
-        public void TraceIdWith16Characters()
+        public void Constructor_GeneratingNew64Bit()
         {
             // Arrange
-            var fixture = new Fixture();
-            var traceId = "48485a3953bb6124";
+            var config = new ZipkinConfig
+            {
+                Create128BitTraceId = false
+            };
 
-            var context = GenerateContext(
-                traceId,
-                Convert.ToString(fixture.Create<long>(), 16),
-                Convert.ToString(fixture.Create<long>(), 16),
-                fixture.Create<bool>());
-
-            // Act
-            var sut = new TraceProvider(new ZipkinConfig(), context);
+            // Arrange & Act
+            var traceProvider = new TraceProvider(config);
 
             // Assert
-            Assert.AreEqual(traceId, sut.TraceId);
+            Assert.IsNotNull(traceProvider.TraceId);
+            long resultLong;
+            Assert.IsTrue(long.TryParse(traceProvider.TraceId, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out resultLong));
+            Assert.IsNotNull(traceProvider.SpanId);
+            Assert.IsTrue(long.TryParse(traceProvider.SpanId, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out resultLong));
+            Assert.AreEqual(string.Empty, traceProvider.ParentSpanId);
+            Assert.AreEqual(false, traceProvider.IsSampled);
         }
 
         [TestMethod]
-        public void TraceIdWith32Characters()
+        public void Constructor_GeneratingNew128Bit()
         {
             // Arrange
-            var fixture = new Fixture();
-            var traceIdLower16Chars = "48485a3953bb6124";
-            var traceId = "18485a3953bb6124" + traceIdLower16Chars;
+            var config = new ZipkinConfig
+            {
+                Create128BitTraceId = true
+            };
 
-            var context = GenerateContext(
-                traceId,
-                Convert.ToString(fixture.Create<long>(), 16),
-                Convert.ToString(fixture.Create<long>(), 16),
-                fixture.Create<bool>());
-
-            // Act
-            var sut = new TraceProvider(new ZipkinConfig(), context);
+            // Arrange & Act
+            var traceProvider = new TraceProvider(config);
 
             // Assert
-            Assert.AreEqual(traceId, sut.TraceId);
+            Assert.IsNotNull(traceProvider.TraceId);
+            Guid resultGuid;
+            long resultLong;
+            Assert.IsTrue(Guid.TryParseExact(traceProvider.TraceId, "N", out resultGuid));
+            Assert.IsNotNull(traceProvider.SpanId);
+            Assert.IsTrue(long.TryParse(traceProvider.SpanId, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out resultLong));
+            Assert.AreEqual(string.Empty, traceProvider.ParentSpanId);
+            Assert.AreEqual(false, traceProvider.IsSampled);
         }
 
         private IOwinContext GenerateContext(string traceId, string spanId, string parentSpanId, bool isSampled)

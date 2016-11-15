@@ -10,16 +10,16 @@ namespace Medidata.ZipkinTracer.Models
         private readonly Span span;
 
         [JsonProperty("traceId")]
-        public string TraceId => span.TraceId.ToString("x4");
+        public string TraceId => span.TraceId;
 
         [JsonProperty("name")]
         public string Name => span.Name;
 
         [JsonProperty("id")]
-        public string Id => span.Id.ToString("x4");
+        public string Id => span.Id;
 
         [JsonProperty("parentId", NullValueHandling = NullValueHandling.Ignore)]
-        public string ParentId => span.ParentId?.ToString("x4");
+        public string ParentId => span.ParentId;
 
         [JsonProperty("annotations")]
         public IEnumerable<JsonAnnotation> Annotations =>
