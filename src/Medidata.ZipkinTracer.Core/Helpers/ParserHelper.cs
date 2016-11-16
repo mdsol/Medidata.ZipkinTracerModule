@@ -24,7 +24,7 @@ namespace Medidata.ZipkinTracer.Core.Helpers
         internal static bool IsParsableToGuid(this string value)
         {
             Guid result;
-            return Guid.TryParse(value, out result);
+            return Guid.TryParseExact(value, "N", out result);
         }
 
         /// <summary>

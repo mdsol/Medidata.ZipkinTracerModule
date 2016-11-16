@@ -131,6 +131,19 @@ namespace Medidata.ZipkinTracer.Core.Test.Helpers
             Assert.IsTrue(result);
         }
 
+        [TestMethod]
+        public void IsParsableToGuid_GuidWithHyphens()
+        {
+            // Arrange
+            string value = Guid.NewGuid().ToString();
+
+            // Act
+            var result = ParserHelper.IsParsableToGuid(value);
+
+            // Assert
+            Assert.IsFalse(result);
+        }
+
         #endregion
 
         #region IsParsableToLong

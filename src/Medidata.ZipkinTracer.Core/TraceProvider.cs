@@ -72,9 +72,9 @@ namespace Medidata.ZipkinTracer.Core
                 headerParentSpanId = context.Request.Headers[ParentSpanIdHeaderName];
                 headerSampled = context.Request.Headers[SampledHeaderName];
             }
-
-            TraceId = headerTraceId.IsParsableTo128Or64Bit() ? headerTraceId : GenerateHexFromNewGuid(config.Create128BitTraceId);
-            SpanId = headerSpanId.IsParsableToLong() ? headerSpanId : GenerateHexEncodedInt64FromNewGuid();
+            
+            TraceId = headerTraceId.IsParsableTo128Or64Bit() ? headerTraceId : GenerateNewTraceId(config.Create128BitTraceId);
+            SpanId = headerSpanId.IsParsableToLong() ? headerSpanId : GenerateHexEncodedInt64Id();
             ParentSpanId = headerParentSpanId.IsParsableToLong() ? headerParentSpanId : string.Empty;
             IsSampled = config.ShouldBeSampled(context, headerSampled);
             
@@ -109,28 +109,29 @@ namespace Medidata.ZipkinTracer.Core
         {
             return new TraceProvider(
                 TraceId,
-                GenerateHexEncodedInt64FromNewGuid(),
+                GenerateHexEncodedInt64Id(),
                 SpanId,
                 IsSampled);
         }
-        
+
         /// <summary>
-        /// Generate a hex encoded Int64 from new Guid.
+        /// Generate a traceId.
         /// </summary>
-        /// <returns>The hex encoded int64</returns>
-        private string GenerateHexFromNewGuid(bool create128Bit)
+        /// <param name="create128Bit">true for 128bit, false for 64 bit</param>
+        /// <returns></returns>
+        private string GenerateNewTraceId(bool create128Bit)
         {
             if (create128Bit)
                 return Guid.NewGuid().ToString("N");
             else
-                return GenerateHexEncodedInt64FromNewGuid();
+                return GenerateHexEncodedInt64Id();
         }
 
         /// <summary>
         /// Generate a hex encoded Int64 from new Guid.
         /// </summary>
         /// <returns>The hex encoded int64</returns>
-        private string GenerateHexEncodedInt64FromNewGuid()
+        private string GenerateHexEncodedInt64Id()
         {
             return Convert.ToString(BitConverter.ToInt64(Guid.NewGuid().ToByteArray(), 0), 16);
         }
