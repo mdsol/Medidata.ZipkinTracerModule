@@ -11,8 +11,8 @@ namespace Medidata.ZipkinTracer.Core.Test
     [TestClass]
     public class TraceProviderTests
     {
-        private const string regex128BitPattern = @"^[a-fA-F0-9]{32}$";
-        private const string regex64BitPattern = @"^[a-fA-F0-9]{16}$";
+        private const string regex128BitPattern = @"^[a-f0-9]{32}$";
+        private const string regex64BitPattern = @"^[a-f0-9]{16}$";
 
         [TestMethod]
         public void Constructor_GeneratingNew64BitTraceId()
