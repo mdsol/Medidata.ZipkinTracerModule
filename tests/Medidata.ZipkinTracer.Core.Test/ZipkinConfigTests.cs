@@ -159,27 +159,26 @@ namespace Medidata.ZipkinTracer.Core.Test
             // Assert
             Assert.IsTrue(result);
         }
+        
+        [TestMethod]
+        public void ShouldBeSampled_PathNotInBlacktListSampleRate1_SampledString1()
+        {
+            // Arrange
+            var fixture = new Fixture();
 
-        // TODO: Prepared for supporting 1/0 for sampled header
-        //[TestMethod]
-        //public void ShouldBeSampled_PathNotInBlacktListSampleRate1_SampledString1()
-        //{
-        //    // Arrange
-        //    var fixture = new Fixture();
+            _sut.SampleRate = 1;
 
-        //    _sut.SampleRate = 1;
+            var context = MockRepository.GenerateStub<IOwinContext>();
+            var request = MockRepository.GenerateStub<IOwinRequest>();
+            request.Path = new PathString("/samplePath");
+            context.Stub(x => x.Request).Return(request);
 
-        //    var context = MockRepository.GenerateStub<IOwinContext>();
-        //    var request = MockRepository.GenerateStub<IOwinRequest>();
-        //    request.Path = new PathString("/samplePath");
-        //    context.Stub(x => x.Request).Return(request);
+            // Act
+            var result = _sut.ShouldBeSampled(context, "1");
 
-        //    // Act
-        //    var result = _sut.ShouldBeSampled(context, "1");
-
-        //    // Assert
-        //    Assert.IsTrue(result);
-        //}
+            // Assert
+            Assert.IsTrue(result);
+        }
 
         [TestMethod]
         public void ShouldBeSampled_PathNotInBlacktListSampleRate1_SampledStringFalse()
@@ -201,26 +200,25 @@ namespace Medidata.ZipkinTracer.Core.Test
             Assert.IsFalse(result);
         }
 
-        // TODO: Prepared for supporting 1/0 for sampled header
-        //[TestMethod]
-        //public void ShouldBeSampled_PathNotInBlacktListSampleRate1_SampledString0()
-        //{
-        //    // Arrange
-        //    var fixture = new Fixture();
+        [TestMethod]
+        public void ShouldBeSampled_PathNotInBlacktListSampleRate1_SampledString0()
+        {
+            // Arrange
+            var fixture = new Fixture();
 
-        //    _sut.SampleRate = 1;
+            _sut.SampleRate = 1;
 
-        //    var context = MockRepository.GenerateStub<IOwinContext>();
-        //    var request = MockRepository.GenerateStub<IOwinRequest>();
-        //    request.Path = new PathString("/samplePath");
-        //    context.Stub(x => x.Request).Return(request);
+            var context = MockRepository.GenerateStub<IOwinContext>();
+            var request = MockRepository.GenerateStub<IOwinRequest>();
+            request.Path = new PathString("/samplePath");
+            context.Stub(x => x.Request).Return(request);
 
-        //    // Act
-        //    var result = _sut.ShouldBeSampled(context, "0");
+            // Act
+            var result = _sut.ShouldBeSampled(context, "0");
 
-        //    // Assert
-        //    Assert.IsFalse(result);
-        //}
+            // Assert
+            Assert.IsFalse(result);
+        }
 
         [TestMethod]
         public void ShouldBeSampled_PathNotInBlacktListSampleRate0()

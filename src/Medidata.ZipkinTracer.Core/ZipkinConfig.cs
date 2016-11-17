@@ -57,7 +57,7 @@ namespace Medidata.ZipkinTracer.Core
             }
 
             bool result;
-            if (!string.IsNullOrWhiteSpace(sampled) && Boolean.TryParse(sampled, out result))
+            if (TryParseToBool(sampled, out result))
             {
                 return result;
             }
@@ -83,6 +83,30 @@ namespace Medidata.ZipkinTracer.Core
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Try parse string to bool
+        /// </summary>
+        /// <param name="stringValue"></param>
+        /// <returns>returns true if value can be parsed to bool</returns>
+        private bool TryParseToBool(string stringValue, out bool booleanValue)
+        {
+            booleanValue = false;
+
+            if (string.IsNullOrWhiteSpace(stringValue)) return false;
+
+            switch (stringValue)
+            {
+                case "0":
+                    booleanValue = false;
+                    return true;
+                case "1":
+                    booleanValue = true;
+                    return true;
+                default:
+                    return Boolean.TryParse(stringValue, out booleanValue);
+            }
         }
     }
 }
