@@ -14,6 +14,7 @@ namespace Medidata.ZipkinTracer.Core
         public IList<string> ExcludedPathList { get; set; } = new List<string>();
         public double SampleRate { get; set; }
         public IList<string> NotToBeDisplayedDomainList { get; set; } = new List<string>();
+        public bool Create128BitTraceId { get; set; }
 
         public void Validate()
         {

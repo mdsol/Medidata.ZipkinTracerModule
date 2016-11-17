@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using Medidata.ZipkinTracer.Core.Logging;
 using Medidata.ZipkinTracer.Models;
 using Medidata.ZipkinTracer.Core.Helpers;
 
