@@ -7,6 +7,8 @@ namespace Medidata.ZipkinTracer.Core
 {
     public class ZipkinConfig : IZipkinConfig
     {
+        private Random random = new Random();
+
         public Predicate<IOwinRequest> Bypass { get; set; } = r => false;
         public Uri ZipkinBaseUri { get; set; }
         public Func<IOwinRequest, Uri> Domain { get; set; }
@@ -49,28 +51,20 @@ namespace Medidata.ZipkinTracer.Core
             }
         }
 
-        public bool ShouldBeSampled(IOwinContext context, string sampled)
+        /// <summary>
+        /// Checks if sampled flag from headers has value if not decide if need to sample or not using sample rate
+        /// </summary>
+        /// <param name="sampledFlag"></param>
+        /// <param name="requestPath"></param>
+        /// <returns></returns>
+        public bool ShouldBeSampled(string sampledFlag, string requestPath)
         {
-            if (context == null)
-            {
-                return false;
-            }
-
             bool result;
-            if (TryParseToBool(sampled, out result))
-            {
-                return result;
-            }
+            if (TryParseSampledFlagToBool(sampledFlag, out result)) return result;
 
-            if (!IsInDontSampleList(context.Request.Path.ToString()))
-            {
-                var random = new Random();
-                if (random.NextDouble() <= SampleRate)
-                {
-                    return true;
-                }
-            }
-            return false;
+            if (IsInDontSampleList(requestPath)) return false;
+            
+            return random.NextDouble() <= SampleRate;
         }
 
         internal bool IsInDontSampleList(string path)
@@ -86,17 +80,18 @@ namespace Medidata.ZipkinTracer.Core
         }
 
         /// <summary>
-        /// Try parse string to bool
+        /// Try parse sampledFlag to bool
         /// </summary>
-        /// <param name="stringValue"></param>
-        /// <returns>returns true if value can be parsed to bool</returns>
-        private bool TryParseToBool(string stringValue, out bool booleanValue)
+        /// <param name="sampledFlag"></param>
+        /// <param name="booleanValue"></param>
+        /// <returns>returns true if sampledFlag can be parsed to bool</returns>
+        private bool TryParseSampledFlagToBool(string sampledFlag, out bool booleanValue)
         {
             booleanValue = false;
 
-            if (string.IsNullOrWhiteSpace(stringValue)) return false;
+            if (string.IsNullOrWhiteSpace(sampledFlag)) return false;
 
-            switch (stringValue)
+            switch (sampledFlag)
             {
                 case "0":
                     booleanValue = false;
@@ -105,7 +100,7 @@ namespace Medidata.ZipkinTracer.Core
                     booleanValue = true;
                     return true;
                 default:
-                    return Boolean.TryParse(stringValue, out booleanValue);
+                    return bool.TryParse(sampledFlag, out booleanValue);
             }
         }
     }

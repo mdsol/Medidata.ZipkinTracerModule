@@ -22,7 +22,7 @@ namespace Medidata.ZipkinTracer.Core
 
         bool Create128BitTraceId { get; set; }
 
-        bool ShouldBeSampled(IOwinContext context, string sampled);
+        bool ShouldBeSampled(string sampled, string requestPath);
 
         void Validate();
     }

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
-using Rhino.Mocks;
-using Microsoft.Owin;
 
 namespace Medidata.ZipkinTracer.Core.Test
 {
@@ -73,193 +71,79 @@ namespace Medidata.ZipkinTracer.Core.Test
             _sut.Validate();
         }
 
-        [TestMethod]
-        public void ShouldBeSampled_NullContext()
+        /// <summary>
+        /// TODO: Use XUnit to do easier unit test for inline data
+        /// </summary>
+        private class ShouldBeSampledCondition
         {
-            // Arrange
-            var fixture = new Fixture();
+            public string SampledFlag { get; set; }
+            public string RequestPath { get; set; }
+            public double SampleRate { get; set; }
+            public List<string> ExcludedPathList { get; set; }
+            public bool ExpectedOutcome { get; set; }
 
-            // Act
-            var result = _sut.ShouldBeSampled(null, "true");
-
-            // Assert
-            Assert.IsFalse(result);
+            public ShouldBeSampledCondition(
+                string sampledFlag,
+                string requestPath,
+                double sampleRate,
+                List<string> excludedPathList,                
+                bool expectedOutcome)
+            {
+                SampledFlag = sampledFlag;
+                RequestPath = requestPath;
+                SampleRate = sampleRate;
+                ExcludedPathList = excludedPathList;
+                ExpectedOutcome = expectedOutcome;
+            }
         }
 
         [TestMethod]
-        public void ShouldBeSampled_NullSampledString()
+        public void ShouldBeSampled()
         {
             // Arrange
-            var fixture = new Fixture();
+            List<ShouldBeSampledCondition> testScenarios = new List<ShouldBeSampledCondition>() {
+                // sampledFlag has a valid bool string value
+                { new ShouldBeSampledCondition("0", null, 0, new List<string>(), false) },
+                { new ShouldBeSampledCondition("1", null, 0, new List<string>(), true) },
+                { new ShouldBeSampledCondition("false", null, 0, new List<string>(), false) },
+                { new ShouldBeSampledCondition("true", null, 0, new List<string>(), true) },
+                { new ShouldBeSampledCondition("FALSE", null, 0, new List<string>(), false) },
+                { new ShouldBeSampledCondition("TRUE", null, 0, new List<string>(), true) },
+                { new ShouldBeSampledCondition("FalSe", null, 0, new List<string>(), false) },
+                { new ShouldBeSampledCondition("TrUe", null, 0, new List<string>(), true) },
+                // sampledFlag has an invalid bool string value and requestPath is IsInDontSampleList
+                { new ShouldBeSampledCondition(null, "/x", 0, new List<string> { "/x" }, false) },
+                { new ShouldBeSampledCondition("", "/x", 0, new List<string> { "/x" }, false) },
+                { new ShouldBeSampledCondition("invalidValue", "/x", 0, new List<string>() { "/x" }, false) },
+                // sampledFlag has an invalid bool string value, requestPath not in IsInDontSampleList, and sample rate is 0
+                { new ShouldBeSampledCondition(null, null, 0, new List<string>(), false) },
+                { new ShouldBeSampledCondition(null, "/x", 0, new List<string>(), false) },
+                // sampledFlag has an invalid bool string value, requestPath not in IsInDontSampleList, and sample rate is 1
+                { new ShouldBeSampledCondition(null, null, 1, new List<string>(), true) },
+            };
+            
+            foreach (var testScenario in testScenarios)
+            {
+                var fixture = new Fixture();
+                _sut = new ZipkinConfig
+                {
+                    ExcludedPathList = testScenario.ExcludedPathList,
+                    SampleRate = testScenario.SampleRate
+                };
 
-            var context = MockRepository.GenerateStub<IOwinContext>();
-            var request = MockRepository.GenerateStub<IOwinRequest>();
-            request.Path = new PathString("/samplePath");
-            context.Stub(x => x.Request).Return(request);
+                // Act
+                var result = _sut.ShouldBeSampled(testScenario.SampledFlag, testScenario.RequestPath);
 
-            // Act
-            var result = _sut.ShouldBeSampled(context, null);
-
-            // Assert
-            Assert.IsFalse(result);
-        }
-
-        [TestMethod]
-        public void ShouldBeSampled_WhiteSpaceSampledString()
-        {
-            // Arrange
-            var fixture = new Fixture();
-
-            var context = MockRepository.GenerateStub<IOwinContext>();
-            var request = MockRepository.GenerateStub<IOwinRequest>();
-            request.Path = new PathString("/samplePath");
-            context.Stub(x => x.Request).Return(request);
-
-            // Act
-            var result = _sut.ShouldBeSampled(context, string.Empty);
-
-            // Assert
-            Assert.IsFalse(result);
-        }
-
-        [TestMethod]
-        public void ShouldBeSampled_InvalidSampledString()
-        {
-            // Arrange
-            var fixture = new Fixture();
-
-            var context = MockRepository.GenerateStub<IOwinContext>();
-            var request = MockRepository.GenerateStub<IOwinRequest>();
-            request.Path = new PathString("/samplePath");
-            context.Stub(x => x.Request).Return(request);
-
-            // Act
-            var result = _sut.ShouldBeSampled(context, "weirdValue");
-
-            // Assert
-            Assert.IsFalse(result);
-        }
-
-        [TestMethod]
-        public void ShouldBeSampled_PathNotInBlacktListSampleRate1_SampledStringTrue()
-        {
-            // Arrange
-            var fixture = new Fixture();
-
-            _sut.SampleRate = 1;
-
-            var context = MockRepository.GenerateStub<IOwinContext>();
-            var request = MockRepository.GenerateStub<IOwinRequest>();
-            request.Path = new PathString("/samplePath");
-            context.Stub(x => x.Request).Return(request);
-
-            // Act
-            var result =_sut.ShouldBeSampled(context, "true");
-
-            // Assert
-            Assert.IsTrue(result);
-        }
-        
-        [TestMethod]
-        public void ShouldBeSampled_PathNotInBlacktListSampleRate1_SampledString1()
-        {
-            // Arrange
-            var fixture = new Fixture();
-
-            _sut.SampleRate = 1;
-
-            var context = MockRepository.GenerateStub<IOwinContext>();
-            var request = MockRepository.GenerateStub<IOwinRequest>();
-            request.Path = new PathString("/samplePath");
-            context.Stub(x => x.Request).Return(request);
-
-            // Act
-            var result = _sut.ShouldBeSampled(context, "1");
-
-            // Assert
-            Assert.IsTrue(result);
-        }
-
-        [TestMethod]
-        public void ShouldBeSampled_PathNotInBlacktListSampleRate1_SampledStringFalse()
-        {
-            // Arrange
-            var fixture = new Fixture();
-
-            _sut.SampleRate = 1;
-
-            var context = MockRepository.GenerateStub<IOwinContext>();
-            var request = MockRepository.GenerateStub<IOwinRequest>();
-            request.Path = new PathString("/samplePath");
-            context.Stub(x => x.Request).Return(request);
-
-            // Act
-            var result = _sut.ShouldBeSampled(context, "false");
-
-            // Assert
-            Assert.IsFalse(result);
-        }
-
-        [TestMethod]
-        public void ShouldBeSampled_PathNotInBlacktListSampleRate1_SampledString0()
-        {
-            // Arrange
-            var fixture = new Fixture();
-
-            _sut.SampleRate = 1;
-
-            var context = MockRepository.GenerateStub<IOwinContext>();
-            var request = MockRepository.GenerateStub<IOwinRequest>();
-            request.Path = new PathString("/samplePath");
-            context.Stub(x => x.Request).Return(request);
-
-            // Act
-            var result = _sut.ShouldBeSampled(context, "0");
-
-            // Assert
-            Assert.IsFalse(result);
-        }
-
-        [TestMethod]
-        public void ShouldBeSampled_PathNotInBlacktListSampleRate0()
-        {
-            // Arrange
-            var fixture = new Fixture();
-
-            _sut.SampleRate = 0;
-
-            var context = MockRepository.GenerateStub<IOwinContext>();
-            var request = MockRepository.GenerateStub<IOwinRequest>();
-            request.Path = new PathString("/samplePath");
-            context.Stub(x => x.Request).Return(request);
-
-            // Act
-            var result = _sut.ShouldBeSampled(context, null);
-
-            // Assert
-            Assert.IsFalse(result);
-        }
-
-        [TestMethod]
-        public void ShouldBeSampled_PathInBlacktList()
-        {
-            // Arrange
-            var fixture = new Fixture();
-
-            _sut.SampleRate = 0;
-            var path = "/samplePath";
-            _sut.NotToBeDisplayedDomainList.Add(path);
-
-            var context = MockRepository.GenerateStub<IOwinContext>();
-            var request = MockRepository.GenerateStub<IOwinRequest>();
-            request.Path = new PathString(path);
-            context.Stub(x => x.Request).Return(request);
-
-            // Act
-            var result = _sut.ShouldBeSampled(context, null);
-
-            // Assert
-            Assert.IsFalse(result);
+                // Assert
+                Assert.AreEqual(
+                    testScenario.ExpectedOutcome,
+                    result,
+                    "Scenario: " +
+                    $"SampledFlag({testScenario.SampledFlag ?? "null"}), " +
+                    $"RequestPath({testScenario.RequestPath ?? "null"}), " +
+                    $"SampleRate({testScenario.SampleRate}), " +
+                    $"ExcludedPathList({string.Join(",", testScenario.ExcludedPathList)}),");
+            }
         }
     }
 }

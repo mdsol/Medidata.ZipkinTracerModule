@@ -51,6 +51,7 @@ namespace Medidata.ZipkinTracer.Core
             string headerSpanId = null;
             string headerParentSpanId = null;
             string headerSampled = null;
+            string requestPath = null;
 
             if (context != null)
             {
@@ -71,12 +72,14 @@ namespace Medidata.ZipkinTracer.Core
                 headerSpanId = context.Request.Headers[SpanIdHeaderName];
                 headerParentSpanId = context.Request.Headers[ParentSpanIdHeaderName];
                 headerSampled = context.Request.Headers[SampledHeaderName];
+
+                requestPath = context.Request.Path.ToString();
             }
             
             TraceId = headerTraceId.IsParsableTo128Or64Bit() ? headerTraceId : GenerateNewTraceId(config.Create128BitTraceId);
             SpanId = headerSpanId.IsParsableToLong() ? headerSpanId : GenerateHexEncodedInt64Id();
             ParentSpanId = headerParentSpanId.IsParsableToLong() ? headerParentSpanId : string.Empty;
-            IsSampled = config.ShouldBeSampled(context, headerSampled);
+            IsSampled = config.ShouldBeSampled(headerSampled, requestPath);
             
             if (SpanId == ParentSpanId)
             {
