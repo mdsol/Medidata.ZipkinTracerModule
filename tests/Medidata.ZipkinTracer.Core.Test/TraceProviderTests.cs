@@ -177,7 +177,7 @@ namespace Medidata.ZipkinTracer.Core.Test
 
             var expectedIsSampled = fixture.Create<bool>();
             var sampleFilter = MockRepository.GenerateStub<IZipkinConfig>();
-            sampleFilter.Expect(x => x.ShouldBeSampled(context, null)).Return(expectedIsSampled);
+            sampleFilter.Expect(x => x.ShouldBeSampled(Arg<string>.Is.Null, Arg<string>.Is.Anything)).Return(expectedIsSampled);
 
             // Act
             var sut = new TraceProvider(sampleFilter, context);
@@ -207,7 +207,7 @@ namespace Medidata.ZipkinTracer.Core.Test
 
             var expectedIsSampled = fixture.Create<bool>();
             var sampleFilter = MockRepository.GenerateStub<IZipkinConfig>();
-            sampleFilter.Expect(x => x.ShouldBeSampled(context, isSampled)).Return(expectedIsSampled);
+            sampleFilter.Expect(x => x.ShouldBeSampled(Arg.Is(isSampled), Arg<string>.Is.Anything)).Return(expectedIsSampled);
 
             // Act
             var sut = new TraceProvider(sampleFilter, context);
