@@ -67,7 +67,7 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
             spanProcessor.Stub(x => x.Stop()).CallOriginalMethod(OriginalCallOptions.NoExpectation);
             taskFactory.Expect(x => x.IsTaskCancelled()).Return(true);
 
-            spanProcessor.spanQueue.Add(new Span());
+            spanProcessor.spanQueue.Add(GenerateNewSpan());
             spanProcessor.Stop();
 
             spanProcessor.AssertWasCalled(s => s.SendSpansToZipkin(Arg<string>.Is.Anything));
@@ -84,7 +84,7 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         public void LogSubmittedSpans_IncrementSubsequentPollCountIfSpanQueueHasAnItemLessThanMax()
         {
             //put item in queue
-            spanProcessor.spanQueue.Add(new Span());
+            spanProcessor.spanQueue.Add(GenerateNewSpan());
             spanProcessor.LogSubmittedSpans();
 
             //Proces Log with no new items
@@ -97,7 +97,7 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         [TestMethod]
         public void LogSubmittedSpans_WhenQueueIsSubsequentlyLessThanTheMaxBatchCountMaxTimes()
         {
-            spanProcessor.spanQueue.Add(new Span());
+            spanProcessor.spanQueue.Add(GenerateNewSpan());
             spanProcessor.LogSubmittedSpans();
             spanProcessor.subsequentPollCount = SpanProcessor.MAX_NUMBER_OF_POLLS + 1;
             spanProcessor.LogSubmittedSpans();
@@ -123,8 +123,19 @@ namespace Medidata.ZipkinTracer.Core.Collector.Test
         {
             for (int i = 0; i < testMaxBatchSize + 1; i++)
             {
-                spanProcessor.spanQueue.Add(new Span());
+                spanProcessor.spanQueue.Add(GenerateNewSpan());
             }
+        }
+
+        private Span GenerateNewSpan()
+        {
+            return new Span
+            {
+                Id = fixture.Create<string>(),
+                Name = fixture.Create<string>(),
+                ParentId = fixture.Create<string>(),
+                TraceId = fixture.Create<string>(),
+            };
         }
     }
 }
