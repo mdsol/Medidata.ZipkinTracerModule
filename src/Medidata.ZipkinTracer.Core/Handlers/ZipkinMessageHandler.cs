@@ -9,8 +9,8 @@ namespace Medidata.ZipkinTracer.Core.Handlers
         private readonly ITracerClient _client;
 
         public ZipkinMessageHandler(ITracerClient client)
-            : this(client, new HttpClientHandler())
         {
+            _client = client;
         }
 
         public ZipkinMessageHandler(ITracerClient client, HttpMessageHandler innerHandler)
