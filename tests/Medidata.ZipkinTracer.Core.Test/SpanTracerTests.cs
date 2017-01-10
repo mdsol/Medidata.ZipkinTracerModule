@@ -176,11 +176,11 @@ namespace Medidata.ZipkinTracer.Core.Test
             var domain = new Uri("https://server.com");
             var spanTracer = new SpanTracer(spanCollectorStub, zipkinEndpointStub, zipkinNotToBeDisplayedDomainList, domain);
 
-            var endpoint = new Endpoint() { ServiceName = domain.Host };
+            var endpoint = new Endpoint() { ServiceName = domain.Host, Port = (ushort)domain.Port };
             var expectedSpan = new Span();
             expectedSpan.Annotations.Add(new Annotation() { Host = endpoint, Value = ZipkinConstants.ServerReceive, Timestamp = DateTimeOffset.UtcNow });
 
-            zipkinEndpointStub.Expect(x => x.GetLocalEndpoint(domain.Host)).Return(new Endpoint() { ServiceName = domain.Host });
+            zipkinEndpointStub.Expect(x => x.GetLocalEndpoint(domain.Host, (ushort)domain.Port)).Return(new Endpoint() { ServiceName = domain.Host });
 
             spanTracer.SendServerSpan(expectedSpan);
 
@@ -235,7 +235,7 @@ namespace Medidata.ZipkinTracer.Core.Test
 
             var localEndpoint = new Endpoint {ServiceName = serverServiceName};
             zipkinEndpointStub.Expect(x => x.GetLocalEndpoint(Arg.Is(domain.Host), Arg<ushort>.Is.Anything)).Return(localEndpoint);
-            var remoteEndpoint = new Endpoint { ServiceName = clientServiceName };
+            var remoteEndpoint = new Endpoint { ServiceName = clientServiceName, Port = port };
             zipkinEndpointStub.Expect(x => x.GetRemoteEndpoint(Arg.Is(serverUri), Arg.Is(clientServiceName))).Return(remoteEndpoint);
 
             var resultSpan = spanTracer.SendClientSpan(requestName, traceId, parentSpanId, spanId, serverUri);
@@ -265,6 +265,7 @@ namespace Medidata.ZipkinTracer.Core.Test
 
             Assert.IsNotNull(endpoint);
             Assert.AreEqual(clientServiceName, endpoint.ServiceName);
+            Assert.AreEqual(port, endpoint.Port);
         }
 
         [TestMethod]
@@ -281,7 +282,7 @@ namespace Medidata.ZipkinTracer.Core.Test
 
             var localEndpoint = new Endpoint { ServiceName = serverServiceName };
             zipkinEndpointStub.Expect(x => x.GetLocalEndpoint(Arg.Is(domain.Host), Arg<ushort>.Is.Anything)).Return(localEndpoint);
-            var remoteEndpoint = new Endpoint { ServiceName = clientServiceName };
+            var remoteEndpoint = new Endpoint { ServiceName = clientServiceName, Port = port };
             zipkinEndpointStub.Expect(x => x.GetRemoteEndpoint(Arg.Is(serverUri), Arg.Is(clientServiceName))).Return(remoteEndpoint);
 
             var resultSpan = spanTracer.SendClientSpan(requestName, traceId, parentSpanId, spanId, serverUri);
@@ -290,6 +291,7 @@ namespace Medidata.ZipkinTracer.Core.Test
 
             Assert.IsNotNull(endpoint);
             Assert.AreEqual(clientServiceName, endpoint.ServiceName);
+            Assert.AreEqual(port, endpoint.Port);
         }
 
         [TestMethod]
@@ -297,7 +299,7 @@ namespace Medidata.ZipkinTracer.Core.Test
         {
             var domain = new Uri("http://server.com");
             var spanTracer = new SpanTracer(spanCollectorStub, zipkinEndpointStub, zipkinNotToBeDisplayedDomainList, domain);
-            var endpoint = new Endpoint() { ServiceName = clientServiceName };
+            var endpoint = new Endpoint() { ServiceName = clientServiceName, Port = port };
             var serverUri = new Uri("https://" + clientServiceName + ":" + port + api);
             var returnCode = fixture.Create<short>();
             var expectedSpan = new Span();
@@ -309,7 +311,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             spanTracer.ReceiveClientSpan(expectedSpan, returnCode);
 
             spanCollectorStub.AssertWasCalled(x => x.Collect(Arg<Span>.Matches(y =>
-                    ValidateReceiveClientSpan(y, clientServiceName)
+                    ValidateReceiveClientSpan(y, clientServiceName, port)
                     ))
                 );
         }
@@ -389,12 +391,13 @@ namespace Medidata.ZipkinTracer.Core.Test
             }
         }
 
-        private bool ValidateReceiveClientSpan(Span y, string serviceName)
+        private bool ValidateReceiveClientSpan(Span y, string serviceName, ushort port)
         {
             var firstannotation = (Annotation)y.Annotations[0];
             var firstEndpoint = (Endpoint)firstannotation.Host;
 
             Assert.AreEqual(serviceName, firstEndpoint.ServiceName);
+            Assert.AreEqual(port, firstEndpoint.Port);
             Assert.AreEqual(ZipkinConstants.ClientSend, firstannotation.Value);
             Assert.IsNotNull(firstannotation.Timestamp);
 
@@ -402,6 +405,7 @@ namespace Medidata.ZipkinTracer.Core.Test
             var secondEndpoint = (Endpoint)secondAnnotation.Host;
 
             Assert.AreEqual(serviceName, secondEndpoint.ServiceName);
+            Assert.AreEqual(port, secondEndpoint.Port);
             Assert.AreEqual(ZipkinConstants.ClientReceive, secondAnnotation.Value);
             Assert.IsNotNull(secondAnnotation.Timestamp);
 

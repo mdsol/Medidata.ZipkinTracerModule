@@ -9,6 +9,7 @@ namespace Medidata.ZipkinTracer.Core
     {
         private SpanCollector spanCollector;
         private string serviceName;
+        private ushort servicePort;
         private ServiceEndpoint zipkinEndpoint;
         private IEnumerable<string> zipkinNotToBeDisplayedDomainList;
 
@@ -24,6 +25,7 @@ namespace Medidata.ZipkinTracer.Core
             this.zipkinNotToBeDisplayedDomainList = zipkinNotToBeDisplayedDomainList;
             var domainHost = domain.Host;
             this.serviceName = CleanServiceName(domainHost);
+            this.servicePort = (ushort)domain.Port;
         }
 
         public virtual Span ReceiveServerSpan(string spanName, string traceId, string parentSpanId, string spanId, Uri requestUri)
@@ -70,7 +72,7 @@ namespace Medidata.ZipkinTracer.Core
         public virtual Span SendClientSpan(string spanName, string traceId, string parentSpanId, string spanId, Uri remoteUri)
         {
             var newSpan = CreateNewSpan(spanName, traceId, parentSpanId, spanId);
-            var serviceEndpoint = zipkinEndpoint.GetLocalEndpoint(serviceName);
+            var serviceEndpoint = zipkinEndpoint.GetLocalEndpoint(serviceName, (ushort)remoteUri.Port);
             var clientServiceName = CleanServiceName(remoteUri.Host);
 
             var annotation = new Annotation
@@ -130,7 +132,7 @@ namespace Medidata.ZipkinTracer.Core
 
             span.Annotations.Add(new Annotation()
             {
-                Host = zipkinEndpoint.GetLocalEndpoint(serviceName),
+                Host = zipkinEndpoint.GetLocalEndpoint(serviceName, servicePort),
                 Value = value
             });
         }
@@ -142,7 +144,7 @@ namespace Medidata.ZipkinTracer.Core
 
             span.Annotations.Add(new BinaryAnnotation()
             {
-                Host = zipkinEndpoint.GetLocalEndpoint(serviceName),
+                Host = zipkinEndpoint.GetLocalEndpoint(serviceName, servicePort),
                 Key = key,
                 Value = value
             });
