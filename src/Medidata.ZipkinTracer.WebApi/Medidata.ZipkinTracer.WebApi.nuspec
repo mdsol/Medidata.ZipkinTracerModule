@@ -1,0 +1,15 @@
+﻿<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <projectUrl>https://github.com/mdsol/Medidata.ZipkinTracerModule</projectUrl>
+    <summary>$description$</summary>
+    <description>This package contains the ASP.NET WebAPI-specific implementation of the Zipkin standard tracing protocol. It provides a HttpMessageHandler which processes the incoming requests' Zipkin headers and sends the trace information to a Zipkin server endpoint.</description>
+    <copyright>$copyright$</copyright>
+    <tags>ZipkinTracer AspNet WebApi</tags>
+  </metadata>
+</package>

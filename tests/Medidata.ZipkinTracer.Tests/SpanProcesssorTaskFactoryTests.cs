@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Threading;
+using Medidata.ZipkinTracer.Core;
 using Medidata.ZipkinTracer.Core.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Rhino.Mocks;
 
-namespace Medidata.ZipkinTracer.Core.Collector.Test
+namespace Medidata.ZipkinTracer.Tests
 {
     [TestClass]
     public class SpanProcesssorTaskFactoryTests

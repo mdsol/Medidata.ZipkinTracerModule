@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using Medidata.ZipkinTracer.Core;
 using Medidata.ZipkinTracer.Core.Logging;
 using Medidata.ZipkinTracer.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
 
-namespace Medidata.ZipkinTracer.Core.Test
+namespace Medidata.ZipkinTracer.Tests
 {
     [TestClass]
     public class SpanCollectorTests

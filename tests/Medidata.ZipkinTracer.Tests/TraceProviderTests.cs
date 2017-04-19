@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Owin;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
 using Rhino.Mocks;
 using System.Text.RegularExpressions;
+using System.Web;
+using System.Collections.Specialized;
+using Medidata.ZipkinTracer.Core;
 
-namespace Medidata.ZipkinTracer.Core.Test
+namespace Medidata.ZipkinTracer.Tests
 {
     [TestClass]
     public class TraceProviderTests
@@ -56,13 +58,13 @@ namespace Medidata.ZipkinTracer.Core.Test
         public void Constructor_HavingTraceProviderInContext()
         {
             // Arrange
-            var context = MockRepository.GenerateStub<IOwinContext>();
+            var context = MockRepository.GenerateStub<HttpContextBase>();
             var providerInContext = MockRepository.GenerateStub<ITraceProvider>();
             var environment = new Dictionary<string, object>
             {
                 { "Medidata.ZipkinTracer.Core.TraceProvider", providerInContext }
             };
-            context.Stub(x => x.Environment).Return(environment);
+            context.Stub(x => x.Items).Return(environment);
 
             // Act
             var sut = new TraceProvider(new ZipkinConfig(), context);
@@ -161,19 +163,19 @@ namespace Medidata.ZipkinTracer.Core.Test
             var spanId = Convert.ToString(fixture.Create<long>(), 16);
             var parentSpanId = Convert.ToString(fixture.Create<long>(), 16);
 
-            var context = MockRepository.GenerateStub<IOwinContext>();
-            var request = MockRepository.GenerateStub<IOwinRequest>();
-            var headers = new HeaderDictionary(new Dictionary<string, string[]>
+            var context = MockRepository.GenerateStub<HttpContextBase>();
+            var request = MockRepository.GenerateStub<HttpRequestBase>();
+            var headers = new NameValueCollection()
             {
-                { TraceProvider.TraceIdHeaderName, new [] { traceId } },
-                { TraceProvider.SpanIdHeaderName, new [] { spanId } },
-                { TraceProvider.ParentSpanIdHeaderName, new [] { parentSpanId } }
-            });
+                { TraceProvider.TraceIdHeaderName, traceId },
+                { TraceProvider.SpanIdHeaderName, spanId },
+                { TraceProvider.ParentSpanIdHeaderName,parentSpanId }
+            };
             var environment = new Dictionary<string, object>();
 
             request.Stub(x => x.Headers).Return(headers);
             context.Stub(x => x.Request).Return(request);
-            context.Stub(x => x.Environment).Return(environment);
+            context.Stub(x => x.Items).Return(environment);
 
             var expectedIsSampled = fixture.Create<bool>();
             var sampleFilter = MockRepository.GenerateStub<IZipkinConfig>();
@@ -268,22 +270,22 @@ namespace Medidata.ZipkinTracer.Core.Test
             Assert.AreEqual(sut.IsSampled, nextTraceProvider.IsSampled);
         }
         
-        private IOwinContext GenerateContext(string traceId, string spanId, string parentSpanId, string isSampled)
+        private HttpContextBase GenerateContext(string traceId, string spanId, string parentSpanId, string isSampled)
         {
-            var context = MockRepository.GenerateStub<IOwinContext>();
-            var request = MockRepository.GenerateStub<IOwinRequest>();
-            var headers = new HeaderDictionary(new Dictionary<string, string[]>
+            var context = MockRepository.GenerateStub<HttpContextBase>();
+            var request = MockRepository.GenerateStub<HttpRequestBase>();
+            var headers = new NameValueCollection()
             {
-                { TraceProvider.TraceIdHeaderName, new [] { traceId } },
-                { TraceProvider.SpanIdHeaderName, new [] { spanId } },
-                { TraceProvider.ParentSpanIdHeaderName, new [] { parentSpanId } },
-                { TraceProvider.SampledHeaderName, new [] { isSampled } }
-            });
+                { TraceProvider.TraceIdHeaderName, traceId },
+                { TraceProvider.SpanIdHeaderName, spanId },
+                { TraceProvider.ParentSpanIdHeaderName, parentSpanId },
+                { TraceProvider.SampledHeaderName, isSampled }
+            };
             var environment = new Dictionary<string, object>();
 
             request.Stub(x => x.Headers).Return(headers);
             context.Stub(x => x.Request).Return(request);
-            context.Stub(x => x.Environment).Return(environment);
+            context.Stub(x => x.Items).Return(environment);
 
             return context;
         }

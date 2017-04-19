@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.Owin;
+using System.Web;
 
 namespace Medidata.ZipkinTracer.Core
 {
     public interface IZipkinConfig
     {
-        Predicate<IOwinRequest> Bypass { get; set; }
+        Predicate<HttpRequestBase> Bypass { get; set; }
 
         Uri ZipkinBaseUri { get; set; }
 
-        Func<IOwinRequest, Uri> Domain { get; set; }
+        Func<HttpRequestBase, Uri> Domain { get; set; }
 
         uint SpanProcessorBatchSize { get; set; }
 

@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
 using System.Linq;
 
-namespace Medidata.ZipkinTracer.Core.Test.Models.Serialization.Json
+namespace Medidata.ZipkinTracer.Tests
 {
     [TestClass]
     public class JsonSpanTests

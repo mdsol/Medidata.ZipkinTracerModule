@@ -1,8 +1,9 @@
 ﻿using System;
+using Medidata.ZipkinTracer.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Ploeh.AutoFixture;
 
-namespace Medidata.ZipkinTracer.Core.Test
+namespace Medidata.ZipkinTracer.Tests
 {
     [TestClass]
     public class ZipkinEndpointTests

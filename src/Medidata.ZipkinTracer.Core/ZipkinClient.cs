@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using Medidata.ZipkinTracer.Core.Logging;
-using Microsoft.Owin;
 using Medidata.ZipkinTracer.Models;
 using Medidata.ZipkinTracer.Core.Helpers;
+using System.Web;
 
 namespace Medidata.ZipkinTracer.Core
 {
@@ -34,7 +34,7 @@ namespace Medidata.ZipkinTracer.Core
             return instance;
         }
 
-        public ZipkinClient(IZipkinConfig zipkinConfig, IOwinContext context, SpanCollector collector = null)
+        public ZipkinClient(IZipkinConfig zipkinConfig, HttpContextBase context, SpanCollector collector = null)
         {
             if (zipkinConfig == null) throw new ArgumentNullException(nameof(zipkinConfig));
             if (context == null) throw new ArgumentNullException(nameof(context));

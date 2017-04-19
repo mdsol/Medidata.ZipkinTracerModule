@@ -1,8 +1,8 @@
-﻿using Medidata.ZipkinTracer.Core.Helpers;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using Medidata.ZipkinTracer.Core.Helpers;
 
-namespace Medidata.ZipkinTracer.Core.Test.Helpers
+namespace Medidata.ZipkinTracer.Tests.Helpers
 {
     [TestClass]
     public class ParserHelperTests

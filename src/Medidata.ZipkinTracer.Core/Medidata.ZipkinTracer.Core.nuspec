@@ -7,12 +7,9 @@
     <authors>$author$</authors>
     <owners>$author$</owners>
     <projectUrl>https://github.com/mdsol/Medidata.ZipkinTracerModule</projectUrl>
-    <description>Medidata Zipkin Tracer Core Service</description>
-    <releaseNotes>Initial Beta Release of the ZipkinTracer Core Service for .Net Projects</releaseNotes>
-    <copyright>Copyright 2014</copyright>
+    <summary>$description$</summary>
+    <description>This package contains the core implementation of the Zipkin standard tracing protocol. It provides a ZipkinClient object, the required object model (spans, annotations etc.) and a standard HttpMessageHandler to trace http requests with Zipkin.</description>
+    <copyright>$copyright$</copyright>
     <tags>ZipkinTracer Core</tags>
-    <dependencies>
-      <dependency id="Microsoft.Owin" version="3.0.1" />
-    </dependencies>
   </metadata>
 </package>
