@@ -1,0 +1,21 @@
+﻿<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$author$</authors>
+    <owners>$author$</owners>
+    <projectUrl>https://github.com/mdsol/Medidata.ZipkinTracerModule</projectUrl>
+    <description>Medidata Zipkin Tracer HttpModule</description>
+    <releaseNotes>ZipkinTracer HttpModule for .Net Projects</releaseNotes>
+    <copyright>Copyright 2018</copyright>
+    <tags>ZipkinTracer HttpModule</tags>
+    <dependencies>
+      <dependency id="zipkin4net" version="1.2.3" />
+    </dependencies>
+    <references>
+      <reference file="Medidata.ZipkinTracer.HttpModule.dll" />
+    </references>
+  </metadata>
+</package>
