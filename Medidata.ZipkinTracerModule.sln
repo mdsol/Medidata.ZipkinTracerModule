@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracer.Core", "src\Medidata.ZipkinTracer.Core\Medidata.ZipkinTracer.Core.csproj", "{EB432891-204B-4B97-BFB1-A820E424284E}"
 EndProject
@@ -20,6 +20,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1DBC9249-34EA-4858-9BC2-14A11B3F91AB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{B3F4AFF7-B5A4-4EE1-B799-7C399AC7FDAF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracer.HttpModule", "src\Medidata.ZipkinTracer.HttpModule\Medidata.ZipkinTracer.HttpModule.csproj", "{C3EBEDAC-78A7-4337-BDF6-2A6BCFFA322C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Medidata.ZipkinTracer.HttpModule.Tests", "tests\Medidata.ZipkinTracer.HttpModule.Tests\Medidata.ZipkinTracer.HttpModule.Tests.csproj", "{69E81EE1-534F-4905-A9F1-3923D54EA1A5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,8 +42,25 @@ Global
 		{0158C8BD-D881-4EE8-A8C6-54707A67A00D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0158C8BD-D881-4EE8-A8C6-54707A67A00D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0158C8BD-D881-4EE8-A8C6-54707A67A00D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3EBEDAC-78A7-4337-BDF6-2A6BCFFA322C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3EBEDAC-78A7-4337-BDF6-2A6BCFFA322C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3EBEDAC-78A7-4337-BDF6-2A6BCFFA322C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3EBEDAC-78A7-4337-BDF6-2A6BCFFA322C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69E81EE1-534F-4905-A9F1-3923D54EA1A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69E81EE1-534F-4905-A9F1-3923D54EA1A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69E81EE1-534F-4905-A9F1-3923D54EA1A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69E81EE1-534F-4905-A9F1-3923D54EA1A5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EB432891-204B-4B97-BFB1-A820E424284E} = {1DBC9249-34EA-4858-9BC2-14A11B3F91AB}
+		{0158C8BD-D881-4EE8-A8C6-54707A67A00D} = {B3F4AFF7-B5A4-4EE1-B799-7C399AC7FDAF}
+		{C3EBEDAC-78A7-4337-BDF6-2A6BCFFA322C} = {1DBC9249-34EA-4858-9BC2-14A11B3F91AB}
+		{69E81EE1-534F-4905-A9F1-3923D54EA1A5} = {B3F4AFF7-B5A4-4EE1-B799-7C399AC7FDAF}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2D5C99DD-708A-4A93-A1F5-F83E5EE5DB59}
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>This package contains an HTTPModule for zipkin tracing.</Description>
+    <AssemblyTitle>Medidata.ZipkinTracer.HttpModule</AssemblyTitle>
+    <TargetFramework>net452</TargetFramework>
+    <AssemblyName>Medidata.ZipkinTracer.HttpModule</AssemblyName>
+    <PackageTags>medidata;zipkin;handler</PackageTags>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="zipkin4net" Version="1.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web" />
+  </ItemGroup>
+
+</Project>
