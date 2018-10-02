@@ -35,7 +35,6 @@ namespace Medidata.ZipkinTracer.HttpModule
         {
             var application = (HttpApplication)sender;
             var request = _contextHelper.GetRequest(application.Context);
-            var response = _contextHelper.GetResponse(application.Context);
             if (IsInDontSampleList(request.Path))
             {
                 return;
@@ -54,6 +53,7 @@ namespace Medidata.ZipkinTracer.HttpModule
             var application = (HttpApplication)sender;
             var serverTrace = (ServerTrace)_contextHelper.GetItems(application.Context)[Key];
             serverTrace?.Dispose();
+            _contextHelper.GetItems(application.Context)[Key] = null;
         }
 
         public void Dispose()

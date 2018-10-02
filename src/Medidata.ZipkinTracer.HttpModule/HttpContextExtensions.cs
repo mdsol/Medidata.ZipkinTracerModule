@@ -27,7 +27,7 @@ namespace Medidata.ZipkinTracer.HttpModule
             TraceManager.Start(logger);
         }
 
-        public static bool IsZipkinHttpModuleEnabled(this HttpContext context)
+        private static bool IsZipkinHttpModuleEnabled(this HttpContext context)
         {
             var modules = context.ApplicationInstance.Modules;
             foreach (string moduleKey in modules.Keys)

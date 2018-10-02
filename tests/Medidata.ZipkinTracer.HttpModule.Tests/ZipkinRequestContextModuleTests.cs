@@ -43,10 +43,8 @@ namespace Medidata.ZipkinTracer.HttpModule.Tests
             request.Stub(x => x.Path).Return(path);
             request.Stub(x => x.Url).Return(requestUri);
             request.Stub(x => x.Headers).Return(headers);
-            var response = MockRepository.GenerateStub<HttpResponseBase>();
             var items = new Hashtable();
             _contextHelper.Stub(x => x.GetRequest(Arg<HttpContext>.Is.Anything)).Return(request);
-            _contextHelper.Stub(x => x.GetResponse(Arg<HttpContext>.Is.Anything)).Return(response);
             _contextHelper.Stub(x => x.GetItems(Arg<HttpContext>.Is.Anything)).Return(items);
             var trace = Trace.Create();
             _traceHelper.Stub(x => x.CreateTrace(headers)).Return(trace);

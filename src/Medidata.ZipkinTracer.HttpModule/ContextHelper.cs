@@ -10,11 +10,6 @@ namespace Medidata.ZipkinTracer.HttpModule
             return new HttpRequestWrapper(context.Request);
         }
 
-        public HttpResponseBase GetResponse(HttpContext context)
-        {
-            return new HttpResponseWrapper(context.Response);
-        }
-
         public IDictionary GetItems(HttpContext context)
         {
             return context.Items;
