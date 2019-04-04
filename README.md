@@ -1,3 +1,7 @@
+# Deprecated
+**This project is deprecated and no longer being maintained.
+Please use [zipkin4net](https://github.com/openzipkin/zipkin4net) or other alternatives.**
+
 # Medidata.ZipkinTracerModule
 A .NET implementation of the Zipkin Tracer client.
 
